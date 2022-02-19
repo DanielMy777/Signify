@@ -33,7 +33,7 @@ confirmer = Confirmer(hand='right')
 # ====== Neural Network
 str_device = "cuda" if torch.cuda.is_available() else "cpu"
 device = torch.device(str_device)
-model = torch.hub.load('ultralytics/yolov5', 'custom', path='best.pt')
+model = torch.hub.load('ultralytics/yolov5', 'custom', path='../Weights/best.pt')
 
 # ====== Results
 prev_results = []
