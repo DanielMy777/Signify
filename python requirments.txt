@@ -1,0 +1,12 @@
+opencv-python
+scipy
+torchvision
+matplotlib
+mediapipe
+click
+wheel
+pandas
+requests
+pyyaml
+tqdm
+seaborn
