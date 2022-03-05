@@ -1,8 +1,10 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
-import base64
 import cv2
-import signifyTest
+from base64_convertor import base64ToCv
+import sys
+#sys.path.append('../Detect Engine')
+#import signify
 
 class ServiceHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -27,11 +29,9 @@ class ServiceHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         print('in post request')
         body = self.get_body()
-        img_64 = body['img'];
-
-        image_64_decode = base64.b64decode(body['img'])
-        self.save_img(image_64_decode, 'test.jpg')
-        self.show_img('test.jpg')
+        img_64 = body['img']
+        
+        self.show_cv_img(base64ToCv(img_64))
         self.write_string(json.dumps('img recived succesfully'))
 
     def save_img(self, i_img, path):
