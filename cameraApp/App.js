@@ -18,6 +18,7 @@ import {
 } from 'react-native-vision-camera';
 import {HttpMethod, http_method} from './src/httpClient';
 import Orientation from 'react-native-orientation-locker';
+import {ip} from '../secrets';
 
 function scanQRCodes(frame, orientation, isFrontDevice) {
   'worklet';
@@ -68,11 +69,9 @@ const App = () => {
 
   const upload_img = async img => {
     try {
-      res = await http_method(
-        'http://192.168.1.125:2718/api/img',
-        HttpMethod.POST,
-        {img: img},
-      );
+      res = await http_method(`http://${ip}:3000/api/img`, HttpMethod.POST, {
+        img: img,
+      });
       console.log(res);
     } catch (err) {
       console.log('error upload_img:');
@@ -138,7 +137,6 @@ const App = () => {
         }}
       />
       <Text style={styles.text}>
-        {' '}
         {frontCamera ? 'detected Or' : 'detected Screen'}
       </Text>
     </View>
