@@ -1,170 +1,97 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { StyleSheet, Text, View, Button, Dimensions, Image } from 'react-native';
+import { Camera } from 'react-native-vision-camera';
+import { HttpMethod, http_method } from './src/httpClient'
+import Base64Camera from './components/Base64Camera';
+import { ip } from './secrets'
+function create_hands_style(handRect) {
 
-import React, {useState, useEffect, useMemo, useRef} from 'react';
-import {StyleSheet, Text, View, Button} from 'react-native';
-import Reanimated, {useSharedValue, runOnJS} from 'react-native-reanimated';
-import {
-  Camera,
-  useCameraDevices,
-  useFrameProcessor,
-  Frame,
-  sortFormats,
-} from 'react-native-vision-camera';
-import {HttpMethod, http_method} from './src/httpClient';
-import Orientation from 'react-native-orientation-locker';
-import {ip} from '../secrets';
-
-function scanQRCodes(frame, orientation, isFrontDevice) {
-  'worklet';
-  return __scanQRCodes(frame, orientation, isFrontDevice);
+  styles.hand_rect.width = handRect.width + '%';
+  styles.hand_rect.height = handRect.height + '%'
+  styles.hand_rect.left = handRect.x + '%'
+  styles.hand_rect.top = handRect.y + '%'
+  const hands_style = { ...styles.hand_rect }
+  return hands_style
 }
 
 const App = () => {
   const [cameraPermission, setCameraPermission] = useState(false);
-  const [frontCamera, setFrontCamera] = useState(true);
-  const orientation_obj = useSharedValue('null');
-  const first_obj = useSharedValue(true);
-  const isFrontCamera = useSharedValue(true);
+  const [handRect, setHandsRect] = useState({ "detected": false })
 
-  const wtf = useSharedValue({
-    ok: true,
-    m: () => {
-      console.log('sup');
-    },
-  });
+  hands_style = useMemo(() => {
+    return create_hands_style(handRect);
+  }, [handRect])
+
+
 
   useEffect(() => {
+
     const check_premessions = async () => {
-      Orientation.getOrientation(value => {
-        orientation_obj.value = value;
-      });
-      let cameraPermission = await Camera.getCameraPermissionStatus();
+
+      let cameraPermission = await Camera.getCameraPermissionStatus()
       if (cameraPermission != 'authorized') {
         setCameraPermission(false);
-        cameraPermission = await Camera.requestCameraPermission();
+        cameraPermission = await Camera.requestCameraPermission()
       }
       setCameraPermission(cameraPermission == 'authorized');
     };
-    intrval = setInterval(check_premessions, 1000);
-    //check_premessions();
-    const update_orientation = value => {
-      orientation_obj.value = value;
-    };
-    Orientation.addOrientationListener(update_orientation);
+    intrval = setInterval(check_premessions, 1000)
+    check_premessions();
     return () => {
-      clearInterval(intrval);
-      Orientation.removeOrientationListener(update_orientation);
-    };
-  });
-
-  const fps = useMemo(() => {
-    return 30;
-  });
-
-  const upload_img = async img => {
-    try {
-      res = await http_method(`http://${ip}:3000/api/img`, HttpMethod.POST, {
-        img: img,
-      });
-      console.log(res);
-    } catch (err) {
-      console.log('error upload_img:');
-      console.log(err);
+      clearInterval(intrval)
     }
+  }, [])
+
+
+
+  const upload_img = async (img) => {
+    try {
+
+      res = await http_method(`http://${ip}:2718/api/img`, HttpMethod.POST, { img: img }, 2000);
+      //  setHandsRect(res);
+    }
+    catch (err) {
+      //setHandsRect({ "detected": false })
+    }
+
   };
 
-  const frameProcessor = useFrameProcessor(
-    async frame => {
-      'worklet';
-
-      let base64_img = scanQRCodes(
-        frame,
-        orientation_obj.value,
-        isFrontCamera.value ? 'yes' : 'false',
-      );
-      // console.log(orientation_obj.value);
-      runOnJS(upload_img)(base64_img);
-
-      if (first_obj.value) {
-        first_obj.value = false;
-        //  runOnJS(upload_img)(base64_img);
-      }
-    },
-    [first_obj, orientation_obj],
-  );
-
-  const devices = useCameraDevices();
-  const device = frontCamera ? devices.front : devices.back;
-
-  if (device == null) {
-    console.log('device is null');
-  }
-  if (device == null || cameraPermission != true) {
-    return (
-      <View>
-        <Text>please allow camera premession</Text>
-      </View>
-    );
-  }
-
-  const formats = device.formats ? device.formats.sort(sortFormats) : [];
-
-  // console.log('device supports night boost ', device.supportsLowLightBoost);
-
-  const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
-  return (
-    <View style={styles.container}>
-      <ReanimatedCamera
-        style={styles.camera}
-        device={device}
-        isActive={true}
-        frameProcessor={frameProcessor}
-        hdr={true}
-        frameProcessorFps={1}
-      />
-      <Button
-        title="flip camera"
-        styles={styles.button}
-        onPress={() => {
-          setFrontCamera(!frontCamera);
-          isFrontCamera.value = !isFrontCamera.value;
-        }}
-      />
-      <Text style={styles.text}>
-        {frontCamera ? 'detected Or' : 'detected Screen'}
-      </Text>
+  if (cameraPermission != true) {
+    return <View >
+      <Text>Signify</Text>
     </View>
-  );
-};
+  }
+
+  return <View style={styles.container}>
+    <Base64Camera handle_frame={upload_img} style={styles.camera} frameProcessorFps={8} />
+    {handRect.detected && <View style={hands_style} ></View>}
+  </View>
+
+}
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  button: {
-    backgroundColor: 'red',
-  },
-  text: {
-    position: 'absolute',
-    bottom: '5%',
-    fontSize: 30,
-    backgroundColor: 'red',
-    width: '100%',
-    textAlign: 'center',
-  },
-  camera: {
+  camera:
+  {
     position: 'absolute',
     top: 0,
     left: 0,
-    bottom: '10%',
-    right: 0,
+    width: '100%',
+    height: '100%',
+
   },
+  hand_rect: {
+    left: 0,
+    top: 0,
+    borderWidth: 4,
+    width: 0,
+    height: 0,
+    borderColor: 'green',
+    position: 'absolute',
+  }
 });
 
 export default App;
