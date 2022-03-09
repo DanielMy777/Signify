@@ -16,6 +16,8 @@ target 'cameraApp' do
 
   pod 'react-native-orientation-locker', :path => '../node_modules/react-native-orientation-locker'
 
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
   target 'cameraAppTests' do
     inherit! :complete
     # Pods for testing
