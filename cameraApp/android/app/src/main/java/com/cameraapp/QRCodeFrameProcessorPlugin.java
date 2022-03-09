@@ -35,9 +35,22 @@ public class QRCodeFrameProcessorPlugin extends FrameProcessorPlugin {
       frontDevice = ((String)params[1]).equals("yes");
       Bitmap rgbFrameBitmap = toBitMap(image.getImage());
       rgbFrameBitmap = rotateBitMap(rgbFrameBitmap,getRotateDegree(orientation));
+      if(frontDevice) // fix selfie mirroring
+      {
+          rgbFrameBitmap= mirrorBitmap(rgbFrameBitmap);
+      }
 
       return toBase64(rgbFrameBitmap);
   }
+
+   public Bitmap mirrorBitmap(Bitmap bitmap) {
+ 
+    Matrix matrix = new Matrix();
+    matrix.setScale(-1,1);
+    Bitmap bitmapRes = Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),
+        bitmap.getHeight(),matrix,true);
+    return bitmapRes;
+}
 
   Bitmap toBitMap(Image image)
   {
