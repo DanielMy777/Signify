@@ -27,6 +27,9 @@ from glob import glob
 import hand_detector as htm
 from sign_confirmer import Confirmer
 
+# ====== Constants
+IM_SIZE = 300
+
 # ====== Hand Detector
 detector = htm.handDetector(detectionCon=1)
 confirmer = Confirmer(hand='right')
@@ -45,10 +48,10 @@ printed_ctr = 0
 # %%
 # ## Import a video
 cv2.namedWindow('out',cv2.WINDOW_NORMAL)
-cv2.resizeWindow('out', 600,600)
+cv2.resizeWindow('out', 500,600)
 
 cv2.namedWindow('outi',cv2.WINDOW_NORMAL)
-cv2.resizeWindow('outi', 200,200)
+cv2.resizeWindow('outi', IM_SIZE,IM_SIZE)
 
 cap = cv2.VideoCapture('media/input-main.mp4')
 if (cap.isOpened() == False):
@@ -156,6 +159,16 @@ def get_hand_coords(keys):
 
     return dict
 
+def pad_image(img):
+    height, width, channels = img.shape
+    dst = np.full((IM_SIZE,IM_SIZE, channels), (0,0,0), dtype=np.uint8)
+    x_center = int((IM_SIZE - width) / 2)
+    y_center = int((IM_SIZE - height) / 2)
+    dst[y_center:y_center+height, 
+       x_center:x_center+width] = img
+    
+    return dst
+
 def get_hand_measures(keys_dict):
     width = keys_dict['right-val'] - keys_dict['left-val']
     height = keys_dict['bottom-val'] - keys_dict['top-val']
@@ -183,7 +196,7 @@ def get_match(img, keys_dict, keys):
     curr_char = '!'
     curr_score = 0
 
-    cv2.resizeWindow('outi', img.shape[1],img.shape[0])
+    img = pad_image(img)
     cv2.imshow('outi',img)
     
     results.append(compare_to_db(img))
