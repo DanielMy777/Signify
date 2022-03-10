@@ -1,6 +1,7 @@
 import sys
 import base64
 import os
+import time
 
 # -------------------------------- imports for testing -------------------------------- #
 
@@ -38,6 +39,7 @@ import mediapipe as mp
 def main() -> None:
     while True:
         inp = sys.stdin.readline().rstrip('\n')
+        time.sleep(3)
         print(f'inp = {inp}, inp[::-1] = {inp[::-1]}\n', end='')
         
         sys.stdout.flush()
