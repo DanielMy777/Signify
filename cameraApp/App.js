@@ -42,19 +42,15 @@ const App = () => {
     }
   }, [])
 
-
-
   const upload_img = async (img) => {
     try {
-
       res = await http_method(`http://${ip}:2718/api/img`, HttpMethod.POST, { img: img }, 2000);
-      // setHandsRect(res);
-
+      setHandsRect(res);
     }
     catch (err) {
       console.log(err)
-      //if (handRect.detected)
-      //setHandsRect({ "detected": false })
+      if (handRect.detected)
+        setHandsRect({ "detected": false })
     }
 
   };
