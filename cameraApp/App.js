@@ -47,11 +47,14 @@ const App = () => {
   const upload_img = async (img) => {
     try {
 
-      res = await http_method(`http://${ip}:2718/api/img`, HttpMethod.POST, { img: img }, 2000);
-      //  setHandsRect(res);
+      res = await http_method(`http://${ip}:80/api/img`, HttpMethod.POST, { img: img }, 2000);
+      setHandsRect(res);
+    
     }
     catch (err) {
-      //setHandsRect({ "detected": false })
+      console.log(err)
+      if (handRect.detected)
+        setHandsRect({ "detected": false })
     }
 
   };
@@ -63,7 +66,7 @@ const App = () => {
   }
 
   return <View style={styles.container}>
-    <Base64Camera handle_frame={upload_img} style={styles.camera} frameProcessorFps={8} />
+    <Base64Camera handle_frame={upload_img} style={styles.camera} frameProcessorFps={1} frameMaxSize={220} frameQuality={20} />
     {handRect.detected && <View style={hands_style} ></View>}
   </View>
 
