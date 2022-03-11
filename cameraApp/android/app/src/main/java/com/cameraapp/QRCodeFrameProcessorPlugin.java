@@ -24,24 +24,46 @@ import com.facebook.react.bridge.WritableNativeMap;
 
 public class QRCodeFrameProcessorPlugin extends FrameProcessorPlugin {
    // private final YuvToRgbConverter yuvToRgbConverter;
-    private boolean frontDevice = false;
-
+    private boolean selfieCamera = false;
+    private static final int DEFAULT_QUALITY = 90;
   @Override
   public Object callback(ImageProxy image, Object[] params) {
       
     // code goes here
 
       String orientation = (String)params[0];
-      frontDevice = ((String)params[1]).equals("yes");
+      selfieCamera = ((Boolean)params[1]);
+      Double smallSize = ((Double)params[2]);
+      Double quality = ((Double)params[3]);
       Bitmap rgbFrameBitmap = toBitMap(image.getImage());
       rgbFrameBitmap = rotateBitMap(rgbFrameBitmap,getRotateDegree(orientation));
-      if(frontDevice) // fix selfie mirroring
+      if(selfieCamera) // fix selfie mirroring
       {
           rgbFrameBitmap= mirrorBitmap(rgbFrameBitmap);
       }
+     
+      if(smallSize != null)
+      {
+          rgbFrameBitmap = getResizedBitmap(rgbFrameBitmap,smallSize.intValue());
+      }
 
-      return toBase64(rgbFrameBitmap);
+      return toBase64(rgbFrameBitmap,quality != null? quality.intValue() : DEFAULT_QUALITY);
   }
+
+  public static Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+            int width = image.getWidth();
+            int height = image.getHeight();
+    
+            float bitmapRatio = (float) width / (float) height;
+            if (bitmapRatio > 1) {
+                width = maxSize;
+                height = (int) (width / bitmapRatio);
+            } else {
+                height = maxSize;
+                width = (int) (height * bitmapRatio);
+            }
+            return Bitmap.createScaledBitmap(image, width, height, true);
+        }
 
    public Bitmap mirrorBitmap(Bitmap bitmap) {
  
@@ -63,13 +85,15 @@ public class QRCodeFrameProcessorPlugin extends FrameProcessorPlugin {
       return rgbFrameBitmap;
   }
 
-  String toBase64(Bitmap img)
+  
+  String toBase64(Bitmap img,int quality)
   {
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-      img.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
+      img.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream);
       byte[] byteArray = byteArrayOutputStream .toByteArray();
       String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
       return encoded;
+
   }
 
 
@@ -89,7 +113,7 @@ public class QRCodeFrameProcessorPlugin extends FrameProcessorPlugin {
   int getRotateDegree(String orientation)
   {
       if(orientation.toLowerCase().equals("portrait")) {
-          if(frontDevice)
+          if(selfieCamera)
           return 270;
           return 90;
       }

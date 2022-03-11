@@ -6,12 +6,12 @@ import Orientation from 'react-native-orientation-locker'
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import { PressableOpacity } from 'react-native-pressable-opacity';
 
-function scanQRCodes(frame, orientation, isFrontDevice) {
+function scanQRCodes(frame, orientation, isFrontDevice, frameMaxSize, quality) {
     'worklet'
-    return __scanQRCodes(frame, orientation, isFrontDevice)
+    return __scanQRCodes(frame, orientation, isFrontDevice, frameMaxSize, quality)
 }
 
-const Base64Camera = ({ handle_frame, frameProcessorFps = 8, style = styles.default_camera_style }) => {
+const Base64Camera = ({ handle_frame, frameProcessorFps = 8, style = styles.default_camera_style, frameMaxSize, frameQuality }) => {
 
     const [frontCamera, setFrontCamera] = useState(true);
     const orientation_obj = useSharedValue('null');
@@ -26,7 +26,6 @@ const Base64Camera = ({ handle_frame, frameProcessorFps = 8, style = styles.defa
         }
 
     }, [])
-
     const flipCamera = () => {
 
         setFrontCamera(!frontCamera);
@@ -35,11 +34,11 @@ const Base64Camera = ({ handle_frame, frameProcessorFps = 8, style = styles.defa
 
     const frameProcessor = useFrameProcessor(async (frame) => {
         'worklet'
-        let base64_img = scanQRCodes(frame, orientation_obj.value, isFrontCamera.value ? "yes" : "false");
+        let base64_img = scanQRCodes(frame, orientation_obj.value, isFrontCamera.value, frameMaxSize, frameQuality);
         if (handle_frame) {
             runOnJS(handle_frame)(base64_img)
         }
-    }, [orientation_obj])
+    }, [orientation_obj, frameMaxSize, frameQuality])
 
     const devices = useCameraDevices();
     const device = frontCamera ? devices.front : devices.back;
