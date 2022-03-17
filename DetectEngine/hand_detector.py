@@ -43,6 +43,40 @@ class handDetector():
 
         return lmList
 
+    # returns a dictionary of the sqaure boundries of the detected hand
+    def getHandCoordsByKeys(self, keys, f_height, f_width):
+        left_most_key = None
+        right_most_key = None
+        top_most_key = None
+        bottom_most_key = None
+        left_most_key_val = f_width
+        right_most_key_val = 0
+        top_most_key_val = f_height
+        bottom_most_key_val = 0
+        for k in keys:
+            if(k[1] < left_most_key_val):
+                left_most_key_val = k[1]
+                left_most_key = k
+            if(k[1] > right_most_key_val):
+                right_most_key_val = k[1]
+                right_most_key = k
+            if(k[2] < top_most_key_val):
+                top_most_key_val = k[2]
+                top_most_key = k
+            if(k[2] > bottom_most_key_val):
+                bottom_most_key_val = k[2]
+                bottom_most_key = k
+        dict = {'left-key':left_most_key, 'left-val':left_most_key_val,
+            'right-key':right_most_key, 'right-val':right_most_key_val,
+            'top-key':top_most_key, 'top-val':top_most_key_val,
+            'bottom-key':bottom_most_key, 'bottom-val':bottom_most_key_val,
+            'valid': left_most_key is not None and 
+                right_most_key is not None and 
+                bottom_most_key is not None and
+                top_most_key is not None}
+
+        return dict
+
 
 def main():
     pTime = 0
