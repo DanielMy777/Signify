@@ -25,6 +25,8 @@ from sign_confirmer import Confirmer
 
 # ====== Constants
 IM_SIZE = 300
+ERROR = (0, 0, 255)
+WARNING = (255, 255, 0)
 
 # ====== Hand Detector
 detector = htm.handDetector(detectionCon=1)
@@ -117,7 +119,7 @@ def delete_low_keys(keys):
     return good_keys
 
 
-# ====== Recieve an image, send it to detection and return the letter detected
+# ====== Recieve a normalized image, send it to detection and return the letter detected
 def compare_to_db(img):
     best_match = '!'
     best_match_score = 0
@@ -198,6 +200,13 @@ def draw_square(img, keys_dict, letter):
             cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 3, cv2.LINE_AA)
         return dst
 
+# ====== Write a message on the frame
+def write_message(src, message, type):
+    cv2.putText(
+            src, message,
+            (50,50), 
+            cv2.FONT_HERSHEY_SIMPLEX, 1, type, 3, cv2.LINE_AA)
+
 # ====== Process a single image (or video frame)
 def process_image(img):
     dst = img.copy()
@@ -206,18 +215,12 @@ def process_image(img):
     keys = detector.findPosition(marked_img, draw=False)
     high_hand_keys = delete_low_keys(keys)
     if(high_hand_keys is None): # no hand detected
-        cv2.putText(
-            dst, "Unable To Read",
-            (50,50), 
-            cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 3, cv2.LINE_AA)
+        write_message(dst, "Unable To Read", ERROR)
     else:
         keys_dict = detector.getHandCoordsByKeys(high_hand_keys, orig_frame_height, orig_frame_width)
         cut_img = cut_hand(dst, keys_dict)
         if(cut_img is None): # hand detected, but to close to edges
-            cv2.putText(
-                dst, "Please centrelize your hand",
-                (50,50), 
-                cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 3, cv2.LINE_AA)
+            write_message(dst, "Please centrelize your hand", ERROR)
         else: # good hand positioning
             char = get_match(cut_img, high_hand_keys)
             check_identify(char)

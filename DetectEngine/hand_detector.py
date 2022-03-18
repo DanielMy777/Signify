@@ -15,6 +15,7 @@ class handDetector():
                                         self.detectionCon, self.trackCon)
         self.mpDraw = mp.solutions.drawing_utils
 
+    # Finds the hands in the image
     def findHands(self, img, draw=True):
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         self.results = self.hands.process(imgRGB)
@@ -27,6 +28,8 @@ class handDetector():
                                                self.mpHands.HAND_CONNECTIONS)
         return img
 
+
+    # Returns a positional keys array containing hand landmarks
     def findPosition(self, img, handNo=0, draw=True):
 
         lmList = []
@@ -76,30 +79,3 @@ class handDetector():
                 top_most_key is not None}
 
         return dict
-
-
-def main():
-    pTime = 0
-    cTime = 0
-    cap = cv2.VideoCapture(1)
-    detector = handDetector()
-    while True:
-        success, img = cap.read()
-        img = detector.findHands(img)
-        lmList = detector.findPosition(img)
-        if len(lmList) != 0:
-            print(lmList[4])
-
-        cTime = time.time()
-        fps = 1 / (cTime - pTime)
-        pTime = cTime
-
-        cv2.putText(img, str(int(fps)), (10, 70), cv2.FONT_HERSHEY_PLAIN, 3,
-                    (255, 0, 255), 3)
-
-        cv2.imshow("Image", img)
-        cv2.waitKey(1)
-
-
-if __name__ == "__main__":
-    main()
