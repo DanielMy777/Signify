@@ -1,5 +1,5 @@
 const { createChildArray } = require("./src/createChildArray");
-const { getRecognition } = require("./src/getRecognition");
+const { getRecognitionPromise } = require("./src/getRecognition");
 const { findAndMarkFreeChild } = require("./src/findAndMarkFreeChild");
 const { shutDown } = require("./src/shutDown");
 const express = require("express");
@@ -19,24 +19,24 @@ app.get("/", (req, res) => {
 });
 
 app.post("/api/img", async (req, res) => {
-  // TODO
   console.log("got post in /api/img");
-  const childObj = await findAndMarkFreeChild(childArray, mutex);
+  const childObj = findAndMarkFreeChild(childArray);
 
-  // console.log(`childArray = `);
-  // console.log(childArray.map((obj) => obj.busy));
+  console.log(`childArray after find = `);
+  console.log(childArray.map((obj) => obj.busy));
 
   if (childObj !== null) {
-    const recognitionData = await getRecognition(req.body.img, childObj.child);
-    // not sure mutex is required here, just to be safe
-    const release = await mutex.acquire();
-    childObj.busy = false;
-    release();
+    getRecognitionPromise(req.body.img, childObj.child)
+      .then((recognitionData) => {
+        console.log(`recognitionData = ${recognitionData}`);
+        childObj.busy = false;
 
-    // console.log(`childArray after finishing getRecognition = `);
-    // console.log(childArray.map((obj) => obj.busy));
+        console.log(`childArray after finishing getRecognition = `);
+        console.log(childArray.map((obj) => obj.busy));
 
-    res.json("finished getting the data! " + recognitionData);
+        res.json("finished getting the data! " + recognitionData);
+      })
+      .catch((err) => console.log(err));
   } else {
     res.json({ error: "server could not handle the request right now" });
   }
@@ -46,6 +46,7 @@ const server = app.listen(PORT, () => {
   console.log(`listening on port ${PORT}`);
 });
 
+server.on("close", () => shutDown(server, childArray));
 process.on("SIGINT", () => shutDown(server, childArray));
 process.on("SIGTERM", () => shutDown(server, childArray));
 

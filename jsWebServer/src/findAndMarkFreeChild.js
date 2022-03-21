@@ -1,6 +1,4 @@
-const findAndMarkFreeChild = async (childArray, mutex) => {
-  const release = await mutex.acquire();
-
+const findAndMarkFreeChild = (childArray) => {
   ret = childArray.find((child) => child.busy === false);
 
   if (ret === undefined) {
@@ -9,8 +7,6 @@ const findAndMarkFreeChild = async (childArray, mutex) => {
     console.log(`returning child: ${ret.id}`);
     ret.busy = true;
   }
-
-  release();
   return ret;
 };
 
