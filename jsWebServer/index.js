@@ -20,17 +20,17 @@ app.post("/api/img", async (req, res) => {
   console.log("got post in /api/img");
   const childObj = findAndMarkFreeChild(childArray);
 
-  console.log(`childArray after find = `);
-  console.log(childArray.map((obj) => obj.busy));
+  // console.log(`childArray after find = `);
+  // console.log(childArray.map((obj) => obj.busy));
 
   if (childObj !== null) {
     getRecognitionPromise(req.body.img, childObj.child)
       .then((recognitionData) => {
-        console.log(`recognitionData = ${recognitionData}`);
+        // console.log(`recognitionData = ${recognitionData}`);
         childObj.busy = false;
 
-        console.log(`childArray after finishing getRecognition = `);
-        console.log(childArray.map((obj) => obj.busy));
+        // console.log(`childArray after finishing getRecognition = `);
+        // console.log(childArray.map((obj) => obj.busy));
 
         res.json("finished getting the data! " + recognitionData);
       })
