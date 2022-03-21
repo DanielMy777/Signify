@@ -3,14 +3,12 @@ const { getRecognitionPromise } = require("./src/getRecognition");
 const { findAndMarkFreeChild } = require("./src/findAndMarkFreeChild");
 const { shutDown } = require("./src/shutDown");
 const express = require("express");
-const Mutex = require("async-mutex").Mutex;
 
 const app = express();
 const PORT = 3000;
 const CHILD_NUM = 5;
 
 const childArray = createChildArray(CHILD_NUM);
-const mutex = new Mutex();
 
 app.use(express.json({ limit: "50mb" }));
 
