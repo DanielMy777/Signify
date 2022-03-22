@@ -51,6 +51,9 @@ cv2.resizeWindow('out', 500,600)
 cv2.namedWindow('outi',cv2.WINDOW_NORMAL)
 cv2.resizeWindow('outi', IM_SIZE,IM_SIZE)
 
+#cv2.namedWindow('outer',cv2.WINDOW_NORMAL)
+#cv2.resizeWindow('outer', 500, 600)
+
 # ====== Import a video (0 for webcam)
 cap = cv2.VideoCapture('media/input-main.mp4')
 if (cap.isOpened() == False):
@@ -98,27 +101,6 @@ def print_identify(img, char):
 # ========= END ==========
 
 
-# ====== Prevent false detection of un-raised hand (Temporary solution)
-def delete_low_keys(keys):
-    if(len(keys) == 0):
-        return None
-
-    max_key = keys[0]
-    for k in keys:
-        if(k[2] > max_key[2]):
-            max_key = k
-
-    good_keys = []
-    for k in keys:
-        if(k[2] < max_key[2] + 300) and (k[2] < orig_frame_height/2):
-            good_keys.append(k)
-
-    if(len(good_keys) != 21):
-        return None
-
-    return good_keys
-
-
 # ====== Recieve a normalized image, send it to detection and return the letter detected
 def compare_to_db(img):
     best_match = '!'
@@ -134,6 +116,9 @@ def compare_to_db(img):
 # ====== Recieve an image, pad it into an IM_SIZExIM_SIZE picture with black border
 def pad_image(img):
     height, width, channels = img.shape
+    if(height >= 300 or width >= 300):
+        img = cv2.resize(img, (300,300))
+        height, width, channels = img.shape
     dst = np.full((IM_SIZE,IM_SIZE, channels), (0,0,0), dtype=np.uint8)
     x_center = int((IM_SIZE - width) / 2)
     y_center = int((IM_SIZE - height) / 2)
@@ -210,19 +195,20 @@ def write_message(src, message, type):
 # ====== Process a single image (or video frame)
 def process_image(img):
     dst = img.copy()
-    cropped_img = img[0:int(orig_frame_height/2), :]
-    marked_img = detector.findHands(cropped_img)
+    marked_img = detector.findHands(img)
+    if not detector.isPoseValid(dst): # invalid position
+        write_message(dst, "Please raise one hand", WARNING)
+        return dst
     keys = detector.findPosition(marked_img, draw=False)
-    high_hand_keys = delete_low_keys(keys)
-    if(high_hand_keys is None): # no hand detected
+    if(keys is None or len(keys) == 0): # no hand detected
         write_message(dst, "Unable To Read", ERROR)
     else:
-        keys_dict = detector.getHandCoordsByKeys(high_hand_keys, orig_frame_height, orig_frame_width)
+        keys_dict = detector.getHandCoordsByKeys(keys, orig_frame_height, orig_frame_width)
         cut_img = cut_hand(dst, keys_dict)
         if(cut_img is None): # hand detected, but to close to edges
             write_message(dst, "Please centrelize your hand", ERROR)
         else: # good hand positioning
-            char = get_match(cut_img, high_hand_keys)
+            char = get_match(cut_img, keys)
             check_identify(char)
             dst = draw_square(dst, keys_dict, char)
     return dst

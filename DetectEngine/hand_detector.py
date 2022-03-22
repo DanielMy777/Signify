@@ -5,11 +5,15 @@ import time
 
 class handDetector():
     def __init__(self, mode=False, maxHands=2, detectionCon=0.5, trackCon=0.5):
+        self.draw = mp.solutions.drawing_utils
+        self.drawStyle = mp.solutions.drawing_styles
         self.mode = mode
         self.maxHands = maxHands
         self.detectionCon = detectionCon
         self.trackCon = trackCon
 
+        self.mpPose = mp.solutions.pose
+        self.pose = self.mpPose.Pose(self.mode, 0, False, min_detection_confidence = 0.9)
         self.mpHands = mp.solutions.hands
         self.hands = self.mpHands.Hands(self.mode, self.maxHands,
                                         self.detectionCon, self.trackCon)
@@ -33,8 +37,11 @@ class handDetector():
     def findPosition(self, img, handNo=0, draw=True):
 
         lmList = []
+        if(self.useHandNo == -1): # neglect detected hand
+            return None
+
         if self.results.multi_hand_landmarks:
-            myHand = self.results.multi_hand_landmarks[handNo]
+            myHand = self.results.multi_hand_landmarks[self.useHandNo]
             for id, lm in enumerate(myHand.landmark):
                 # print(id, lm)
                 h, w, c = img.shape
@@ -79,3 +86,68 @@ class handDetector():
                 top_most_key is not None}
 
         return dict
+
+
+    # when pose is valid, choose the hand that is raised (or most likely)
+    def filterHands(self, rightPalmPt, leftPalmPt, w, h):
+        lms = self.results.multi_hand_landmarks
+        if not lms:
+            return True
+        rightDiff = abs(lms[0].landmark[0].x*w - rightPalmPt[0]) + abs(lms[0].landmark[0].y*h - rightPalmPt[1])
+        leftDiff = abs(lms[0].landmark[0].x*w - leftPalmPt[0]) + abs(lms[0].landmark[0].y*h - leftPalmPt[1])
+
+        if len(lms) == 1:
+            if(rightDiff < leftDiff and self.currPose['Right'] == 'down'): # detected hand is right hand
+                self.useHandNo = -1 # neglect detection
+            elif(leftDiff < rightDiff and self.currPose['Left'] == 'down'): # detected hand is left hand
+                self.useHandNo = -1 # neglect detection
+
+        if len(lms) > 1:
+            if(rightDiff < leftDiff): # index 0 is right hand
+                self.useHandNo = 1 if self.currPose['Right'] == 'down' else 0
+            else: # index 0 is left hand
+                self.useHandNo = 1 if self.currPose['Left'] == 'down' else 0
+            
+            if(self.currPose['Right'] == 'down' or self.currPose['Left'] == 'down'): # already filtered
+                return True
+            else: # needs more filter
+                if self.currPose['Right'] == 'unknown' and self.currPose['Left'] == 'unknown':
+                    return False # both hands are in the picture, no way to identify which is raised
+                else:
+                    if(rightDiff < leftDiff): # index 0 is right hand
+                        self.useHandNo = 0 if self.currPose['Right'] == 'raised' else 1
+                    else: # index 0 is left hand
+                        self.useHandNo = 0 if self.currPose['Left'] == 'raised' else 1
+        return True
+                
+
+    # check if the persons pose is valid, filter if it is, return false if not
+    def isPoseValid(self, img):
+        self.useHandNo = 0
+        self.currPose = {'Right': 'unknown', 'Left':'unknown'}
+        image_height, image_width, _ = img.shape
+        results = self.pose.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+
+        if(results.pose_landmarks): # pose detected
+            rightElbow, rightPalm = results.pose_landmarks.landmark[14], results.pose_landmarks.landmark[16]
+            leftElbow, leftPalm = results.pose_landmarks.landmark[13], results.pose_landmarks.landmark[15]
+            right_elb_visible = rightElbow.visibility > 0.985 or rightElbow.y < 1
+            left_elb_visible = leftElbow.visibility > 0.985 or leftElbow.y < 1
+            if right_elb_visible and rightPalm.visibility > 0.9:
+                self.currPose['Right'] = 'raised' if rightPalm.y < rightElbow.y else 'down'
+            if left_elb_visible and leftPalm.visibility > 0.9:
+                self.currPose['Left'] = 'raised' if leftPalm.y < leftElbow.y else 'down'
+            
+            if ((self.currPose['Right'] == 'raised' and self.currPose['Left'] == 'raised')
+                or (self.currPose['Right'] == 'down' and self.currPose['Left'] == 'down')):
+                return False
+            else:
+                return self.filterHands((rightPalm.x*image_width, rightPalm.y*image_height),
+                    (leftPalm.x*image_width, leftPalm.y*image_height),
+                    image_width,
+                    image_height)
+        else: # no pose detected (no person on frame)
+            lms = self.results.multi_hand_landmarks
+            if lms:
+                return len(lms) <= 1
+        return True
