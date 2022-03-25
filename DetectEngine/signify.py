@@ -35,7 +35,7 @@ confirmer = Confirmer(hand='right')
 # ====== Neural Network
 str_device = "cuda" if torch.cuda.is_available() else "cpu"
 device = torch.device(str_device)
-model = torch.hub.load('ultralytics/yolov5', 'custom', path='./Weights/best.pt')
+model = torch.hub.load('ultralytics/yolov5', 'custom', path='../Weights/best.pt')
 
 # ====== Results
 prev_results = []
@@ -43,26 +43,7 @@ identified = None
 printed_iden = None
 printed_ctr = 0
 
-# %%
-# ====== Debugging tools
-cv2.namedWindow('out',cv2.WINDOW_NORMAL)
-cv2.resizeWindow('out', 500,600)
 
-cv2.namedWindow('outi',cv2.WINDOW_NORMAL)
-cv2.resizeWindow('outi', IM_SIZE,IM_SIZE)
-
-#cv2.namedWindow('outer',cv2.WINDOW_NORMAL)
-#cv2.resizeWindow('outer', 500, 600)
-
-# ====== Import a video (0 for webcam)
-cap = cv2.VideoCapture('media/input-main.mp4')
-if (cap.isOpened() == False):
-  print("Error opening video file")
-
-orig_frame_width = frame_width = int(cap.get(3))
-orig_frame_height = frame_height = int(cap.get(4))
-
-# %%
 
 # ========= identification - currently for testing use only ==========
 def check_identify(char):
@@ -79,10 +60,11 @@ def check_identify(char):
 def print_identify(img, char):
     global printed_iden
     global printed_ctr
+    h, w, _ = img.shape
     if(char is not None):
         printed_iden = char
     if(printed_iden is not None):
-        mid_wid = int(orig_frame_width / 2)
+        mid_wid = int(w / 2)
         cv2.putText(
                 img, printed_iden,
                 (50, 100), 
@@ -208,10 +190,10 @@ def get_rect(img):
             padding = max(get_hand_measures(keys_dict), int(max(w, h) / 64))
             top_left_p = (keys_dict['left-val'] - padding, keys_dict['top-val'] - padding)
             bottom_right_p = (keys_dict['right-val'] + padding, keys_dict['bottom-val'] + padding)
-            coords['x'] = (top_left_p[0] / w) * 100
-            coords['y'] = (top_left_p[1] / h) * 100
-            coords['w'] = ((bottom_right_p[0] - top_left_p[0]) / w) * 100
-            coords['h'] = ((bottom_right_p[1] - top_left_p[1]) / h) * 100
+            coords['x'] = round((top_left_p[0] / w) * 100)
+            coords['y'] = round((top_left_p[1] / h) * 100)
+            coords['w'] = round(((bottom_right_p[0] - top_left_p[0]) / w) * 100)
+            coords['h'] = round(((bottom_right_p[1] - top_left_p[1]) / h) * 100)
 
     return coords
 
@@ -247,32 +229,44 @@ def process_image(img):
             dst = draw_square(dst, keys_dict, char)
     return (char, dst)
 
-# %%
-# ## -Main code snippet-
-# ## Read each frame of the source video, process it, and paste it on the output video.
-out = cv2.VideoWriter('output1.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 30, (orig_frame_width,orig_frame_height))
-while(cap.isOpened()):
-    ret, frame = cap.read()
+def main():
+    cv2.namedWindow('out', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('out', 500, 600)
+    cv2.namedWindow('outi', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('outi', IM_SIZE, IM_SIZE)
+    cap = cv2.VideoCapture('media/input-main.mp4')
+    if (cap.isOpened() == False):
+        print("Error opening video file")
 
-    if ret == True:
-        print(get_rect(frame))
-        char, reframe = process_image(frame)
-        reframe = print_identify(reframe, identified)
-        if(identified is not None):
-            identified = None
-    else:
-        break
+    orig_frame_width = frame_width = int(cap.get(3))
+    orig_frame_height = frame_height = int(cap.get(4))
 
-    out.write(reframe)
-    cv2.imshow('out', reframe)
+    out = cv2.VideoWriter('output1.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 30,
+                          (orig_frame_width, orig_frame_height))
+    while (cap.isOpened()):
+        ret, frame = cap.read()
 
-    if cv2.waitKey(10) & 0xFF == ord('q'):
-        break
+        if ret == True:
+            print(get_rect(frame))
+            char, reframe = process_image(frame)
+            reframe = print_identify(reframe, identified)
+            if (identified is not None):
+                identified = None
+        else:
+            break
+
+        out.write(reframe)
+        cv2.imshow('out', reframe)
+
+        if cv2.waitKey(10) & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    out.release()
+    cv2.destroyAllWindows()
 
 
+if __name__ =='__main__':
+    main()
 
-cap.release()
-out.release()
-cv2.destroyAllWindows()
 
-# %%
