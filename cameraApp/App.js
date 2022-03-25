@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { StyleSheet, Text, View, Button, Dimensions, Image } from 'react-native';
-import { Camera } from 'react-native-vision-camera';
-import { HttpMethod, http_method } from './src/httpClient'
 import Base64Camera from './components/Base64Camera';
-import { ip } from './secrets'
+import { check_request_camera_premession } from './src/premessions'
+import { detect_hands, is_handsRect_updated, UN_DETECTED_HANDS } from './src/detectionModel'
 function create_hands_style(handRect) {
 
-  styles.hand_rect.width = handRect.width + '%';
-  styles.hand_rect.height = handRect.height + '%'
+  styles.hand_rect.width = handRect.w + '%';
+  styles.hand_rect.height = handRect.h + '%'
   styles.hand_rect.left = handRect.x + '%'
   styles.hand_rect.top = handRect.y + '%'
   const hands_style = { ...styles.hand_rect }
@@ -16,43 +15,32 @@ function create_hands_style(handRect) {
 
 const App = () => {
   const [cameraPermission, setCameraPermission] = useState(false);
-  const [handRect, setHandsRect] = useState({ "detected": false })
+  const [handRect, setHandsRect] = useState(UN_DETECTED_HANDS)
 
   hands_style = useMemo(() => {
     return create_hands_style(handRect);
+
   }, [handRect])
 
 
-
   useEffect(() => {
-
-    const check_premessions = async () => {
-
-      let cameraPermission = await Camera.getCameraPermissionStatus()
-      if (cameraPermission != 'authorized') {
-        setCameraPermission(false);
-        cameraPermission = await Camera.requestCameraPermission()
-      }
-      setCameraPermission(cameraPermission == 'authorized');
-    };
-    intrval = setInterval(check_premessions, 1000)
-    check_premessions();
+    check_premessions_interval = setInterval(() => { check_request_camera_premession(setCameraPermission) }, 1000)
+    check_request_camera_premession(setCameraPermission);
     return () => {
-      clearInterval(intrval)
+      clearInterval(check_premessions_interval)
     }
   }, [])
 
   const upload_img = async (img) => {
     try {
-      res = await http_method(`http://${ip}:2718/api/img`, HttpMethod.POST, { img: img }, 2000);
-      setHandsRect(res);
+      hands_rect = await detect_hands(img);
+      hands_rect.detected = true;
+      setHandsRect(hands_rect);
     }
     catch (err) {
-      console.log(err)
-      if (handRect.detected)
-        setHandsRect({ "detected": false })
+      console.log(err);
+      setHandsRect(UN_DETECTED_HANDS);
     }
-
   };
 
   if (cameraPermission != true) {
@@ -62,7 +50,7 @@ const App = () => {
   }
 
   return <View style={styles.container}>
-    <Base64Camera handle_frame={upload_img} style={styles.camera} frameProcessorFps={1} frameMaxSize={220} frameQuality={20} />
+    <Base64Camera handle_frame={upload_img} style={styles.camera} frameProcessorFps={10} frameMaxSize={220} frameQuality={20} />
     {handRect.detected && <View style={hands_style} ></View>}
   </View>
 
