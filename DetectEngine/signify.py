@@ -195,10 +195,11 @@ def write_message(src, message, type):
 # ====== Process a single image (or video frame)
 def process_image(img):
     dst = img.copy()
+    char = '!'
     marked_img = detector.findHands(img)
     if not detector.isPoseValid(dst): # invalid position
         write_message(dst, "Please raise one hand", WARNING)
-        return dst
+        return (char, dst)
     keys = detector.findPosition(marked_img, draw=False)
     if(keys is None or len(keys) == 0): # no hand detected
         write_message(dst, "Unable To Read", ERROR)
@@ -211,7 +212,7 @@ def process_image(img):
             char = get_match(cut_img, keys)
             check_identify(char)
             dst = draw_square(dst, keys_dict, char)
-    return dst
+    return (char, dst)
 
 # %%
 # ## -Main code snippet-
@@ -221,7 +222,7 @@ while(cap.isOpened()):
     ret, frame = cap.read()
 
     if ret == True:
-        reframe = process_image(frame)
+        char, reframe = process_image(frame)
         reframe = print_identify(reframe, identified)
         if(identified is not None):
             identified = None
