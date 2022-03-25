@@ -136,6 +136,7 @@ def get_hand_measures(keys_dict):
 
 # ====== Recieve image and hand keys, return sub-image containing the hand in proportional size
 def cut_hand(img, keys_dict):
+    h, w, _ = img.shape
     if not keys_dict['valid']:
         return None
     else:
@@ -143,7 +144,7 @@ def cut_hand(img, keys_dict):
         top_left_point = (keys_dict['left-val'] - padding, keys_dict['top-val'] - padding)
         bottom_right_point = (keys_dict['right-val'] + padding, keys_dict['bottom-val'] + padding)
         # check if out of bounds
-        if any(x < 0 for x in set(top_left_point)) or bottom_right_point[0] >= orig_frame_width or bottom_right_point[1] >= orig_frame_height:
+        if any(x < 0 for x in set(top_left_point)) or bottom_right_point[0] >= w or bottom_right_point[1] >= h:
             return None
         
         dst = img.copy()[top_left_point[1] : bottom_right_point[1], top_left_point[0] : bottom_right_point[0]]
@@ -171,11 +172,12 @@ def get_match(img, keys):
 
 # ====== Recieve image, hand keys, and letter. Draws these results on the image
 def draw_square(img, keys_dict, letter):
+    h, w, _ = img.shape
     if not keys_dict['valid']:
         return img
     else:
         dst = img.copy()
-        padding = max(get_hand_measures(keys_dict), int(max(orig_frame_width, orig_frame_height) / 64))
+        padding = max(get_hand_measures(keys_dict), int(max(w, h) / 64))
         top_left_p = (keys_dict['left-val'] - padding, keys_dict['top-val'] - padding)
         bottom_right_p = (keys_dict['right-val'] + padding, keys_dict['bottom-val'] + padding)
         dst = cv2.rectangle(dst, top_left_p, bottom_right_p, (0,255,0), 2, cv2.LINE_AA)
@@ -184,6 +186,36 @@ def draw_square(img, keys_dict, letter):
             (top_left_p[0], top_left_p[1]-10), 
             cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 3, cv2.LINE_AA)
         return dst
+
+
+# ====== Get the bounding rectange coordinates for the detected hand
+def get_rect(img):
+    coords = {'x': 0, 'y': 0, 'h': 0, 'w': 0, 'v': 1}
+    dst = img.copy()
+    h, w, _ = dst.shape
+    marked_img = detector.findHands(dst)
+    if not detector.isPoseValid(dst): # invalid position
+        coords['v'] = 0
+    else:
+        keys = detector.findPosition(marked_img, draw=False)
+        if(keys is None or len(keys) == 0): # no hand detected
+            coords['v'] = 0
+        else:
+            keys_dict = detector.getHandCoordsByKeys(keys, h, w)
+            cut_img = cut_hand(dst, keys_dict)
+            if(cut_img is None): # hand detected, but to close to edges
+                coords['v'] = 0
+            padding = max(get_hand_measures(keys_dict), int(max(w, h) / 64))
+            top_left_p = (keys_dict['left-val'] - padding, keys_dict['top-val'] - padding)
+            bottom_right_p = (keys_dict['right-val'] + padding, keys_dict['bottom-val'] + padding)
+            coords['x'] = (top_left_p[0] / w) * 100
+            coords['y'] = (top_left_p[1] / h) * 100
+            coords['w'] = ((bottom_right_p[0] - top_left_p[0]) / w) * 100
+            coords['h'] = ((bottom_right_p[1] - top_left_p[1]) / h) * 100
+
+    return coords
+
+            
 
 # ====== Write a message on the frame
 def write_message(src, message, type):
@@ -195,6 +227,7 @@ def write_message(src, message, type):
 # ====== Process a single image (or video frame)
 def process_image(img):
     dst = img.copy()
+    h, w, _ = dst.shape
     char = '!'
     marked_img = detector.findHands(img)
     if not detector.isPoseValid(dst): # invalid position
@@ -204,7 +237,7 @@ def process_image(img):
     if(keys is None or len(keys) == 0): # no hand detected
         write_message(dst, "Unable To Read", ERROR)
     else:
-        keys_dict = detector.getHandCoordsByKeys(keys, orig_frame_height, orig_frame_width)
+        keys_dict = detector.getHandCoordsByKeys(keys, h, w)
         cut_img = cut_hand(dst, keys_dict)
         if(cut_img is None): # hand detected, but to close to edges
             write_message(dst, "Please centrelize your hand", ERROR)
@@ -222,6 +255,7 @@ while(cap.isOpened()):
     ret, frame = cap.read()
 
     if ret == True:
+        print(get_rect(frame))
         char, reframe = process_image(frame)
         reframe = print_identify(reframe, identified)
         if(identified is not None):
