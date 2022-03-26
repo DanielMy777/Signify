@@ -1,10 +1,31 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
+import datetime
 import cv2
-from base64_convertor import base64ToCv
+from base64_convertor import base64ToCv, cvToBase64
+import base64
 import sys
-#sys.path.append('../Detect Engine')
-#import signify
+sys.path.append('../DetectEngine')
+from signify import get_rect
+
+
+
+
+def calculate_time(fun):
+    start_time = datetime.datetime.now()
+    fun()
+    end_time = datetime.datetime.now()
+    time_diff = (end_time - start_time)
+    execution_time = time_diff.total_seconds() * 1000
+    return execution_time
+
+
+
+def show_cv_img(img):
+    cv2.imshow('image', img)
+    cv2.waitKey(3000)
+    cv2.destroyAllWindows()
+
 
 class ServiceHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -30,9 +51,12 @@ class ServiceHandler(BaseHTTPRequestHandler):
         print('in post request')
         body = self.get_body()
         img_64 = body['img']
-        
-        self.show_cv_img(base64ToCv(img_64))
-        self.write_string(json.dumps('img recived succesfully'))
+        img_cv = base64ToCv(img_64)
+        hand_rectangle = get_rect(img_cv)
+        self.write_json(hand_rectangle)
+
+    def write_json(self, obj):
+        self.write_string(json.dumps(obj))
 
     def save_img(self, i_img, path):
         image_result = open(path, 'wb')  # create a writable image and write the decoding result
