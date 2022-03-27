@@ -9,6 +9,7 @@ const detect_hands = async (img) => {
         new_handRect = await http_method(`http://${ip}:2718/api/img`, HttpMethod.POST, { img: img }, 2000);
         new_handRect.detected = new_handRect.v == 1;
         check_update_stable_hands();
+        
         return new_handRect
     } catch (e) {
         stable_handRect = new_handRect = UN_DETECTED_HANDS;
@@ -39,8 +40,7 @@ const is_handsRect_updated = () => {
     let y_change = Math.abs(stable_handRect.y - new_handRect.y);
     let w_change = Math.abs(stable_handRect.w - new_handRect.w);
     let h_change = Math.abs(stable_handRect.h - new_handRect.h);
-
-    return x_change > 3 || y_change > 2 || (stable_handRect.detected ^ new_handRect.detected);
+    return x_change > 6 || y_change > 3 || (stable_handRect.detected ^ new_handRect.detected);
 
 }
 
