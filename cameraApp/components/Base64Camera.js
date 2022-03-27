@@ -4,19 +4,22 @@ import Reanimated, { useSharedValue, runOnJS } from 'react-native-reanimated'
 import { Camera, useCameraDevices, useFrameProcessor, Frame, sortFormats, frameRateIncluded } from 'react-native-vision-camera';
 import Orientation from 'react-native-orientation-locker'
 import IonIcon from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { PressableOpacity } from 'react-native-pressable-opacity';
+
 
 function scanQRCodes(frame, orientation, isFrontDevice, frameMaxSize, quality) {
     'worklet'
     return __scanQRCodes(frame, orientation, isFrontDevice, frameMaxSize, quality)
 }
 
-const Base64Camera = ({ handle_frame, frameProcessorFps = 8, style = styles.default_camera_style, frameMaxSize, frameQuality }) => {
+
+const Base64Camera = React.forwardRef(({ handle_frame, frameProcessorFps = 8,
+     style = styles.default_camera_style, frameMaxSize, frameQuality,handsOk = false },ref) => {
 
     const [frontCamera, setFrontCamera] = useState(true);
     const orientation_obj = useSharedValue('null');
     const isFrontCamera = useSharedValue(true);
-
     useEffect(() => {
         const update_orientation = (value) => { orientation_obj.value = value; }
         Orientation.getOrientation(update_orientation);
@@ -44,7 +47,7 @@ const Base64Camera = ({ handle_frame, frameProcessorFps = 8, style = styles.defa
     const device = frontCamera ? devices.front : devices.back;
 
     const formats = device && device.formats ? device.formats.sort(sortFormats) : []
-
+   
     if (device == null) {
         console.log('device is null');
     }
@@ -59,6 +62,7 @@ const Base64Camera = ({ handle_frame, frameProcessorFps = 8, style = styles.defa
                 style={style}
                 device={device}
                 isActive={true}
+                ref ={ref}
                 frameProcessor={frameProcessor}
                 hdr={true}
                 frameProcessorFps={frameProcessorFps}
@@ -68,12 +72,16 @@ const Base64Camera = ({ handle_frame, frameProcessorFps = 8, style = styles.defa
                 <PressableOpacity style={styles.button} disabledOpacity={0.4} onPress={flipCamera}>
                     <IonIcon name="camera-reverse" color="white" size={40} />
                 </PressableOpacity>
+               { handsOk && <View style={{...styles.button,backgroundColor:'green'}}>
+                  <MaterialCommunityIcons  name="hand-okay" size={40} color="white"/>
+                </View>
+               }
             </View>
 
         </View>
 
     )
-}
+});
 
 const CONTENT_SPACING = 15
 const BUTTON_SIZE = 40
@@ -94,7 +102,7 @@ const styles = StyleSheet.create({
         width: BUTTON_SIZE,
         height: BUTTON_SIZE,
         borderRadius: BUTTON_SIZE / 2,
-        backgroundColor: 'rgba(140, 140, 140, 0.7)',
+        backgroundColor: 'rgba(140, 140, 140, 0.8)',
         justifyContent: 'center',
         alignItems: 'center',
     },
