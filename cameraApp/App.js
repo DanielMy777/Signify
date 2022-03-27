@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { StyleSheet, Text, View, Button, Dimensions, Image } from 'react-native';
 import Base64Camera from './components/Base64Camera';
 import { check_request_camera_premession } from './src/premessions'
-import { detect_hands, is_handsRect_updated, UN_DETECTED_HANDS } from './src/detectionModel'
+import { detect_hands, UN_DETECTED_HANDS } from './src/detectionModel'
 function create_hands_style(handRect) {
 
   styles.hand_rect.width = handRect.w + '%';
@@ -34,8 +34,9 @@ const App = () => {
   const upload_img = async (img) => {
     try {
       hands_rect = await detect_hands(img);
-      hands_rect.detected = true;
-      setHandsRect(hands_rect);
+
+      if (hands_rect.stable)
+        setHandsRect(hands_rect);
     }
     catch (err) {
       console.log(err);
@@ -50,7 +51,7 @@ const App = () => {
   }
 
   return <View style={styles.container}>
-    <Base64Camera handle_frame={upload_img} style={styles.camera} frameProcessorFps={10} frameMaxSize={220} frameQuality={20} />
+    <Base64Camera handle_frame={upload_img} style={styles.camera} frameProcessorFps={6} frameMaxSize={300} frameQuality={50} />
     {handRect.detected && <View style={hands_style} ></View>}
   </View>
 
