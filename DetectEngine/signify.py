@@ -44,7 +44,6 @@ printed_iden = None
 printed_ctr = 0
 
 
-
 # ========= identification - currently for testing use only ==========
 def check_identify(char):
     global identified
@@ -229,25 +228,31 @@ def process_image(img):
             dst = draw_square(dst, keys_dict, char)
     return (char, dst)
 
+
+# ===== Main code snippet
 def main():
+    # create and resize windows for visual debugging
     cv2.namedWindow('out', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('out', 500, 600)
     cv2.namedWindow('outi', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('outi', IM_SIZE, IM_SIZE)
+
+    # load a video file (0 for webcam)
     cap = cv2.VideoCapture('media/input-main.mp4')
     if (cap.isOpened() == False):
         print("Error opening video file")
-
     orig_frame_width = frame_width = int(cap.get(3))
     orig_frame_height = frame_height = int(cap.get(4))
 
+    # create an output file
     out = cv2.VideoWriter('output1.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), 30,
                           (orig_frame_width, orig_frame_height))
+
+    # send the input stream frame by frame for detection
     while (cap.isOpened()):
         ret, frame = cap.read()
 
         if ret == True:
-            print(get_rect(frame))
             char, reframe = process_image(frame)
             reframe = print_identify(reframe, identified)
             if (identified is not None):
