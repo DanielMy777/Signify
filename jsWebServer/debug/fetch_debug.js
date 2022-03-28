@@ -6,10 +6,12 @@ const range = (n) => [...Array(n).keys()];
 
 const REQ_NUM = process.argv.length <= 2 ? 20 : parseInt(process.argv[2]);
 const USER_NUM = process.argv.length <= 3 ? 1 : parseInt(process.argv[3]);
+const PICTURE_PATH =
+  process.argv.length <= 4 ? __dirname + "/img_debug.txt" : process.argv[4];
 
 console.log(`REQ_NUM = ${REQ_NUM}, USER_NUM = ${USER_NUM}`);
 
-const base64Hand = fs.readFileSync(__dirname + "/img_debug.txt").toString();
+const base64Hand = fs.readFileSync(PICTURE_PATH).toString();
 
 range(USER_NUM).forEach((i) => {
   let count = 0;

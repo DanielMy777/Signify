@@ -65,9 +65,12 @@ def main() -> None:
     while True:
         try:
             img_base64 = sys.stdin.readline().rstrip('\n')
-            start = time.time()
+            logger.write(f'img_base64 length = {len(img_base64)}\n')
+            logger.flush()
             img_cv = base64ToCv(img_base64)
+            start = time.time()
             res = signify.get_rect(img_cv)
+            logger.write(f'time for get_rect = {time.time() - start}\n')
             res2 = signify.process_image(img_cv)
             logger.write(f'time for detection = {time.time() - start}\n')
             logger.write(f'detected char = {res2[0]}\n')
@@ -77,7 +80,9 @@ def main() -> None:
             logger.write('keyBoardInterrupt...\n')
             logger.close()
             exit(1)
-        except:
+        except Exception as e:
+            logger.write(str(e) + '\n')
+            logger.flush()
             print('error\n',end='')
         sys.stdout.flush()
 
