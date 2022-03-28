@@ -1,5 +1,4 @@
 import cv2
-import sys
 import os
 import glob
 import base64_convertor
