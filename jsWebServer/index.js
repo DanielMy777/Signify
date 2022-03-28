@@ -8,8 +8,12 @@ const app = express();
 const PORT = 3000;
 const CHILD_NUM = 5;
 const TIME_OUT = 5000;
+const processName = "../SignifyService/signifyService.py";
 
-const childArray = createChildArray(CHILD_NUM);
+const childArray = createChildArray(
+  CHILD_NUM,
+  "../SignifyService/signifyService.py"
+);
 
 app.use(express.json({ limit: "50mb" }));
 
@@ -23,7 +27,7 @@ app.post("/api/img", async (req, res) => {
       getRecognitionPromise(req.body.img, wrapper.child)
         .then((recognitionData) => {
           wrapper.busy = false;
-          res.json("finished getting the data! " + recognitionData);
+          res.send(recognitionData);
         })
         .catch((err) => console.log(err));
     })
