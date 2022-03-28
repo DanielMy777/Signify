@@ -2,13 +2,15 @@ import React, { useState, useEffect, useMemo, useRef,useCallback } from 'react';
 import { StyleSheet, Text, View, Button, Dimensions, Image } from 'react-native';
 import SignifyCamera from './components/SignifyCamera';
 
+
+
 const App = () => {
    const [handsDetected,setHandsDetected] = useState(false);
    const onDetection = useCallback((res) =>{
-     setHandsDetected(res.detected);
+     setHandsDetected(res.hands.handsRect.detected);
    },[]);
    return <View style = {styles.container} >
-    <SignifyCamera onDetection={onDetection} style={styles.camera} frameProcessorFps={8}
+    <SignifyCamera onDetection={onDetection} style={styles.camera} frameProcessorFps={10}
      frameMaxSize={220} frameQuality={20}/>
     {!handsDetected && <Text style={styles.myText}>No Hands</Text>}
     </View>

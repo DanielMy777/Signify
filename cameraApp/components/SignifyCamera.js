@@ -2,9 +2,11 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { StyleSheet, Text, View, Button, Dimensions, Image } from 'react-native';
 import Base64Camera from './Base64Camera';
 import { check_request_camera_premession } from '../src/premessions'
-import { detect_hands, UN_DETECTED_HANDS } from '../src/detectionModel'
+import { EMPTY_RESULTS, UN_DETECTED_HANDS } from '../src/DetectionConstants';
 import {getNumInStr} from '../src/utils'
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import {DEFAULT_MODEL} from '../src/defaultModel';
+
+
 function create_hands_style(hand_rect,camera_style) {
 
    const handRect = {...hand_rect};
@@ -30,7 +32,7 @@ function create_hands_style(hand_rect,camera_style) {
 
 
 const SignifyCamera = ({style = styles.camera,frameProcessorFps = 3,
-    frameMaxSize = 250,frameQuality = 30,DetectModel = {detect_hands},onDetection }) => {
+    frameMaxSize = 250,frameQuality = 30,DetectModel = DEFAULT_MODEL,onDetection }) => {
 
   const [cameraPermission, setCameraPermission] = useState(false);
   const [handRect, setHandsRect] = useState(UN_DETECTED_HANDS)
@@ -50,19 +52,25 @@ const SignifyCamera = ({style = styles.camera,frameProcessorFps = 3,
   }, [])
 
   const upload_img = useCallback( async (img) => {
+   
     let detect_res ;
-    try {
-        detect_res = await DetectModel.detect_hands(img);
-      if (detect_res.stable)
-        setHandsRect(detect_res);
+try {
+        detect_res = await DetectModel.detectHandSign(img);
+        if(detect_res.hands.handsRect.stable)
+        {
+           setHandsRect(detect_res.hands.handsRect);
+        }
+        
     }
     catch (err) {
-      console.log(err);
       setHandsRect(UN_DETECTED_HANDS);
-      detect_res = UN_DETECTED_HANDS;
+      detect_res = EMPTY_RESULTS;   
     }
+
     if(onDetection)
-       onDetection(detect_res);
+        onDetection(detect_res);
+
+    
   },)
 
  
