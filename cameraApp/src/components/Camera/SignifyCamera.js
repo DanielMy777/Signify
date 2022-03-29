@@ -19,7 +19,7 @@ const SignifyCamera = ({
   DetectModel = DEFAULT_MODEL,
   onDetection,
 }) => {
-  const [cameraPermission, setCameraPermission] = useState(false);
+  const [cameraPermission, setCameraPermission] = useState(undefined);
   const [handRect, setHandsRect] = useState(UN_DETECTED_HANDS);
   const camera_style = style;
   hands_style = useMemo(() => {
@@ -61,7 +61,7 @@ const SignifyCamera = ({
 
   return (
     <View style={styles.container}>
-      {!cameraPermission && <PremessionsPage />}
+      {cameraPermission == false && <PremessionsPage />}
       {cameraPermission && (
         <View style={styles.container}>
           <Base64Camera
