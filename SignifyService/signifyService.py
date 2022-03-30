@@ -60,6 +60,8 @@ logger.flush()
 from base64_convertor import base64ToCv 
 
 def main() -> None:
+    print('ready', end='')      # signals the server that the process is ready
+    sys.stdout.flush()
     logger.write('starting service\n')
     logger.flush()
     while True:
