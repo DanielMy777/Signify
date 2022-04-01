@@ -1,14 +1,18 @@
 # %% [markdown]
 # # Epsilon Team
 
+import sys
+import os
+
+abs_dir = os.path.abspath( os.path.dirname( __file__ ))
+sys.path.append(abs_dir)                                # path will contain this dir no matter the script exec point
+
 # ======= Disable Warnings
 import warnings
 from cv2 import waitKey
 warnings.filterwarnings("ignore")
 
 # ======= Imports
-import sys
-import os
 from sys import platform
 import argparse
 from scipy import ndimage
@@ -35,7 +39,7 @@ confirmer = Confirmer(hand='right')
 # ====== Neural Network
 str_device = "cuda" if torch.cuda.is_available() else "cpu"
 device = torch.device(str_device)
-model = torch.hub.load('ultralytics/yolov5', 'custom', path='../Weights/best.pt')
+model = torch.hub.load('ultralytics/yolov5', 'custom', path=(abs_dir + '/../Weights/best.pt'))
 
 # ====== Results
 prev_results = []
