@@ -77,7 +77,7 @@ def main() -> None:
             logger.write(f'time for detection = {time.time() - start}\n')
             logger.write(f'detected char = {res2[0]}\n')
             logger.flush()
-            res_object = {"hands":{"handsRect":res},"sign":{"char":"!","detected":False}}
+            res_object = {"hands":{"handsRect":res},"sign":{"char":res2[0],"detected":False}}
             print(f'{json.dumps(res_object)}\n', end='')
         except KeyboardInterrupt:
             logger.write('keyBoardInterrupt...\n')
