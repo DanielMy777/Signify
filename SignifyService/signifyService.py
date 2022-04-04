@@ -1,63 +1,28 @@
 import sys
-import base64
 import os
 import time
+import json
 
 procNum = 0 if len(args := (sys.argv)) <= 1 else int(args[1])
 logger = open(f"debug/script_out{procNum}.log", 'w')
 
-# -------------------------------- imports for testing -------------------------------- #
+abs_dir = os.path.abspath( os.path.dirname( __file__ ))
+sys.path.append(abs_dir)                                # path will contain this dir no matter the script exec point
 
-# ======= Disable Warnings
-from importlib.resources import path
-from multiprocessing.connection import wait
-from time import sleep
-import warnings
-logger.write('after first imports\n')
+logger.write(f'script {procNum} starting.\n')
 logger.flush()
 
-from cv2 import waitKey
-warnings.filterwarnings("ignore")
-
-# ======= Imports
-import sys
-import os
-from sys import platform
-import argparse
-from scipy import ndimage
-import numpy as np
-logger.write('after numpy imports\n')
-logger.flush()
-import torch
-import torchvision
-import torch.nn as nn
-import torch.optim as optim
-logger.write('after torch imports\n')
-logger.flush()
-import matplotlib.pyplot as plt
-import cv2
-logger.write('after cv2 imports\n')
-logger.flush()
-from glob import glob
-# import hand_detector as htm
-# from sign_confirmer import Confirmer
-from click import confirm
-import mediapipe as mp
-import json
-
-import sys
-sys.path.append('../DetectEngine')
 try:
-    import signify
+    import DetectEngine.signify as signify
+    from base64_convertor import base64ToCv
 except ImportError as ie:
-    logger.write('import error at signify\n')
+    logger.write('import error...\n')
     logger.write(ie.msg)
     logger.close()
     exit(1)
 
-logger.write('after signify imports\n')
+logger.write('after imports\n')
 logger.flush()
-from base64_convertor import base64ToCv 
 
 def main() -> None:
     print('ready', end='')      # signals the server that the process is ready
@@ -89,8 +54,6 @@ def main() -> None:
             print('error\n',end='')
         sys.stdout.flush()
 
-        
-        
 
 if __name__ == '__main__':
     main()
