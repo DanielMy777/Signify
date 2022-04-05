@@ -3,8 +3,10 @@ import os
 import time
 import json
 
+abs_dir = os.path.abspath( os.path.dirname( __file__ ))
+
 procNum = 0 if len(args := (sys.argv)) <= 1 else int(args[1])
-logger = open(f"debug/script_out{procNum}.log", 'w')
+logger = open(f"{abs_dir}/debug/script_out{procNum}.log", 'w')
 
 abs_dir = os.path.abspath( os.path.dirname( __file__ ))
 sys.path.append(abs_dir)                                # path will contain this dir no matter the script exec point
