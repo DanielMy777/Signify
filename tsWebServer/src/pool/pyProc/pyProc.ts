@@ -53,7 +53,7 @@ class PyProc {
     });
   }
 
-  run(img: string, timeOut: number | undefined = undefined): Promise<string> {
+  run(request: string, img: string, timeOut: number | undefined = undefined): Promise<string> {
     if (!this._ready) {
       throw "Process is not ready! await waitForSpwan() to be ready";
     }
@@ -61,6 +61,7 @@ class PyProc {
     if (this._killed) {
       throw "Process is killed!";
     }
+
 
     return new Promise((resolve, reject) => {
       let timeoutid: any = undefined;
@@ -71,7 +72,7 @@ class PyProc {
         }, timeOut);
       }
 
-      getRecognitionPromise(img, this._child)
+      getRecognitionPromise(request, img, this._child)
         .then((res) => resolve(res))
         .catch((err) => reject(err))
         .finally(() => clearTimeout(timeoutid));

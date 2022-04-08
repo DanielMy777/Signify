@@ -6,6 +6,7 @@ const decoder = new StringDecoder("utf8");
 const FINISHED_READING = "finished";
 
 const getRecognitionPromise = (
+  request: string,
   img: string,
   child: ChildProcess
 ): Promise<string> => {
@@ -22,6 +23,7 @@ const getRecognitionPromise = (
     };
 
     child.stdout!.on("data", listener);
+    child.stdin!.write(request.replace(/\s/g, "") + "\n");
     child.stdin!.write(img.replace(/\s/g, "") + "\n");
 
     bus.once(FINISHED_READING, () => {

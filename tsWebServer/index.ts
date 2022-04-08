@@ -1,8 +1,10 @@
 import { Pool } from "./src/pool/pool.js";
 import { shutDown } from "./src/util/shutDown.js";
 import { Request, Response } from "express";
+import { DetectType } from './src/detection/DetectType.js'
 import express from "express";
-
+import { executePoolRequest } from './src/server/services.js'
+console.log(DetectType)
 const app = express();
 const PORT = 3000;
 const CHILD_NUM = 1;
@@ -11,19 +13,23 @@ const PROCESS_NAME = "../SignifyService/signifyService.py";
 
 const pool = new Pool(CHILD_NUM, PROCESS_NAME);
 
+
 app.use(express.json({ limit: "50mb" }));
+
+
 
 app.get("/", (_: Request, res: Response) => {
   res.send("hello world");
 });
 
-app.post("/api/img", async (req: Request, res: Response) => {
-  pool
-    .exec(req.body.img)
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => res.send(err));
+app.post("/api/img/DetectHands", async (req: Request, res: Response) => {
+  console.log("In Detect Hands");
+  executePoolRequest(pool, DetectType.Hands, req, res)
+})
+
+app.post("/api/img/DetectHandsSign", async (req: Request, res: Response) => {
+  console.log("In Detect Sign");
+  executePoolRequest(pool, DetectType.HandsSign, req, res)
 });
 
 pool.workersReady(true).then(() => {
