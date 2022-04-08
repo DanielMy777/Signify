@@ -2,6 +2,7 @@ import React, {useState, useEffect, useMemo, useRef, useCallback} from 'react';
 import {StyleSheet, Text, View, Button, Dimensions, Image} from 'react-native';
 import Base64Camera from './Base64Camera';
 import {check_request_camera_premession} from '../../AppPremessions/camera-premessions';
+import {useSharedValue} from 'react-native-reanimated';
 import PremessionsPage from '../Pages/PremessionsPage';
 import {
   EMPTY_RESULTS,
@@ -18,9 +19,12 @@ const SignifyCamera = ({
   frameQuality = 30,
   DetectModel = DEFAULT_MODEL,
   onDetection,
+  detectSignFrames,
 }) => {
   const [cameraPermission, setCameraPermission] = useState(undefined);
   const [handRect, setHandsRect] = useState(UN_DETECTED_HANDS);
+  const frameNumber = useSharedValue(0);
+
   const camera_style = style;
   hands_style = useMemo(() => {
     return create_hands_style(
@@ -41,23 +45,38 @@ const SignifyCamera = ({
     };
   }, []);
 
-  const upload_img = useCallback(async img => {
-    let detect_res;
-    try {
-      detect_res = await DetectModel.detectHandSign(img);
-      if (detect_res.hands.handsRect.stable) {
-        detect_res.hands.detected = true;
-        setHandsRect(detect_res.hands.handsRect);
-      }
-    } catch (err) {
-      console.log(err.to_string());
-      setHandsRect(UN_DETECTED_HANDS);
-      detect_res = EMPTY_RESULTS;
-      detect_res.error = err.to_string();
-    }
+  const updateGetFrameNumber = useCallback(() => {
+    let value = frameNumber.value;
+    value += 1;
+    if (value >= frameProcessorFps) frameNumber.value = 0;
+    else frameNumber.value += 1;
+    return value;
+  }, [frameProcessorFps]);
 
-    if (onDetection) onDetection(detect_res);
-  }, []);
+  const upload_img = useCallback(
+    async img => {
+      let detect_res = EMPTY_RESULTS;
+      try {
+        const fnumber = updateGetFrameNumber();
+        const detectSignMethod = fnumber == 1 || fnumber == frameProcessorFps;
+        detect_res = await (detectSignMethod
+          ? DetectModel.detectSign(img)
+          : DetectModel.detectHands(img));
+        if (detect_res.hands.handsRect.stable) {
+          detect_res.hands.detected = true;
+          setHandsRect(detect_res.hands.handsRect);
+        }
+      } catch (err) {
+        console.log(err.to_string());
+        setHandsRect(UN_DETECTED_HANDS);
+        detect_res = EMPTY_RESULTS;
+        detect_res.error = err.to_string ? err.to_string() : err;
+      }
+
+      if (onDetection) onDetection(detect_res);
+    },
+    [detectSignFrames, updateGetFrameNumber],
+  );
 
   return (
     <View style={styles.container}>

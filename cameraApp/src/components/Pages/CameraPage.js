@@ -9,7 +9,9 @@ const CameraPage = () => {
   const onDetection = useCallback(res => {
     const error = res.error;
     setErrorText(error);
-    setDetectedChar(res.sign.char);
+    //res.sign != undefined when the camera tried to detect the letter
+    //otherwise is just the hand rect
+    if (res.sign) setDetectedChar(res.sign.char);
   }, []);
   const detectedTextStyle = useMemo(() => {
     return detectedChar != EMPTY_SIGN
@@ -22,7 +24,7 @@ const CameraPage = () => {
       <SignifyCamera
         onDetection={onDetection}
         style={styles.camera}
-        frameProcessorFps={6}
+        frameProcessorFps={5}
         frameMaxSize={220}
         frameQuality={30}
       />
