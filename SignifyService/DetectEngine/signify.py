@@ -37,9 +37,14 @@ detector = htm.handDetector(detectionCon=1)
 confirmer = Confirmer(hand='right')
 
 # ====== Neural Network
-str_device = "cuda" if torch.cuda.is_available() else "cpu"
-device = torch.device(str_device)
-model = torch.hub.load('ultralytics/yolov5', 'custom', path=(abs_dir + '/../Weights/best.pt'))
+model = None
+device = None
+def setupTorchModel(useCuda: bool) -> None:       # if imported the importing module has to call setupTorchModel
+    global model
+    global device
+    str_device = "cuda" if torch.cuda.is_available() and useCuda else "cpu"
+    device = torch.device(str_device)
+    model = torch.hub.load('ultralytics/yolov5', 'custom', path=(abs_dir + '/../Weights/best.pt'))
 
 # ====== Results
 prev_results = []
@@ -235,6 +240,9 @@ def process_image(img):
 
 # ===== Main code snippet
 def main():
+    # setup torch
+    setupTorchModel(useCuda=True)
+
     # create and resize windows for visual debugging
     cv2.namedWindow('out', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('out', 500, 600)

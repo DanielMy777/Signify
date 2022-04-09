@@ -5,12 +5,12 @@ const GracefulShutdownManager = shutdownPack.GracefulShutdownManager;
 
 let shutDownCalled = false;
 
-const shutDown = (server: Server, pool: Pool) => {
+const shutDown = (server: Server, ...pools: Pool[]) => {
   if (!shutDownCalled) {
     shutDownCalled = true;
     const shutdownManager = new GracefulShutdownManager(server);
     shutdownManager.terminate(() => {
-      pool.destroy(true);
+      pools.forEach((p) => p.destroy(true));
       console.log("shut down complete, exiting...");
       process.exit(0);
     });
