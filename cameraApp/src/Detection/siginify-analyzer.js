@@ -3,11 +3,25 @@ class SignifyDetectionAnalyzer {
   constructor(detection_model) {
     this.detection_model = detection_model;
     this.stable_handRect = this.new_handRect = UN_DETECTED_HANDS;
+    this.sign_res = undefined;
   }
 
-  async detectHandSign(img) {
+  async detectHands(img) {
     try {
-      this.latest_res = await this.detection_model.detect(img);
+      this.latest_res = await this.detection_model.detectHands(img);
+      this.update_hands();
+      return this.latest_res;
+    } catch (e) {
+      this.latest_res = EMPTY_RESULTS;
+      this.stable_handRect = this.new_handRect = UN_DETECTED_HANDS;
+      this.latest_res.error = e.to_string();
+      throw e;
+    }
+  }
+
+  async detectSign(img) {
+    try {
+      this.latest_res = await this.detection_model.detectSign(img);
       this.update_hands();
       return this.latest_res;
     } catch (e) {

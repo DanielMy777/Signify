@@ -8,9 +8,9 @@ class PyProc {
   private _ready: boolean;
   private _killed: boolean;
 
-  constructor(id: number, path: string) {
+  constructor(id: number, path: string, extraParams: string[]) {
     this._id = id;
-    this._child = spawn("python", [path, `${id}`]);
+    this._child = spawn("python", [path, `${id}`, ...extraParams]);
     this._free = true;
     this._ready = false;
     this._killed = false;

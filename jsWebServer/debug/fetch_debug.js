@@ -17,9 +17,14 @@ range(USER_NUM).forEach((i) => {
   let count = 0;
   const id = setInterval(async () => {
     try {
-      const res = await axios.post("http://127.0.0.1:3000/api/img", {
-        img: base64Hand,
-      });
+      const signifyApi =
+        count === 0 || count === REQ_NUM ? "DetectHandsSign" : "DetectHands";
+      const res = await axios.post(
+        `http://127.0.0.1:3000/api/img/${signifyApi}`,
+        {
+          img: base64Hand,
+        }
+      );
       console.log(res.data);
     } catch (err) {
       console.log("err");

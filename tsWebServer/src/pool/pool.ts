@@ -14,9 +14,13 @@ class Pool {
   constructor(
     size: number,
     path: string,
+    idStart: number = 0,
+    extraParams: string[] = [],
     timeout: number | undefined = undefined
   ) {
-    this._workers = range(size).map((i) => new PyProc(i, path));
+    this._workers = range(size).map(
+      (i) => new PyProc(i + idStart, path, extraParams)
+    );
 
     this._bus.on(FREE_WORKER_EVENT, (worker_id: number) => {
       const task = this._tasks.shift();
