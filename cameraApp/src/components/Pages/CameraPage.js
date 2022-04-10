@@ -24,8 +24,8 @@ const CameraPage = () => {
       <SignifyCamera
         onDetection={onDetection}
         style={styles.camera}
-        frameProcessorFps={5}
-        frameMaxSize={220}
+        frameProcessorFps={2}
+        frameMaxSize={400}
         frameQuality={30}
       />
       {errorText != undefined && <Text style={styles.myText}>{errorText}</Text>}
