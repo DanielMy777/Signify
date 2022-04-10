@@ -86,9 +86,9 @@ const Base64Camera = React.forwardRef(
     }
 
     return (
-      <View style={styles.container}>
+      <View style={{...styles.container, ...style}}>
         <Camera
-          style={style}
+          style={styles.default_camera_style}
           device={device}
           isActive={true}
           ref={ref}
@@ -124,6 +124,10 @@ const BUTTON_SIZE = 40;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'yellow',
   },
   default_camera_style: {
     position: 'absolute',

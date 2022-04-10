@@ -64,6 +64,7 @@ class SignifyDetectionAnalyzer {
     return (
       x_change > 6 ||
       y_change > 3 ||
+      w_change > 3 ||
       stable_handRect.detected ^ new_handRect.detected
     );
   }

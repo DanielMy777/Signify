@@ -12,7 +12,7 @@ import {DEFAULT_MODEL} from '../../Detection/default-model';
 import {create_hands_style} from '../../Utils/styles-utils';
 
 const SignifyCamera = ({
-  style = styles.camera,
+  style,
   HandRectStyle = styles.hand_rect_default,
   frameProcessorFps = 3,
   frameMaxSize = 250,
@@ -25,12 +25,10 @@ const SignifyCamera = ({
   const [handRect, setHandsRect] = useState(UN_DETECTED_HANDS);
   const frameNumber = useSharedValue(0);
 
-  const camera_style = style;
   hands_style = useMemo(() => {
     return create_hands_style(
       handRect,
       styles.hand_rect_default,
-      camera_style,
       HandRectStyle,
     );
   }, [handRect]);
@@ -58,7 +56,8 @@ const SignifyCamera = ({
       let detect_res = EMPTY_RESULTS;
       try {
         const fnumber = updateGetFrameNumber();
-        const detectSignMethod = fnumber == 1 || fnumber == frameProcessorFps;
+        const detectSignMethod =
+          fnumber == 1 || (fnumber == frameProcessorFps && false);
         detect_res = await (detectSignMethod
           ? DetectModel.detectSign(img)
           : DetectModel.detectHands(img));
@@ -79,14 +78,14 @@ const SignifyCamera = ({
   );
 
   return (
-    <View style={styles.container}>
+    <View style={{...styles.container, ...style}}>
       {cameraPermission == false && <PremessionsPage />}
       {cameraPermission && (
         <View style={styles.container}>
           <Base64Camera
             handle_frame={upload_img}
             handsOk={handRect.detected}
-            style={style}
+            style={styles.camera}
             frameProcessorFps={frameProcessorFps}
             frameMaxSize={frameMaxSize}
             frameQuality={frameQuality}
@@ -101,14 +100,11 @@ const SignifyCamera = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  camera: {
     position: 'absolute',
-    top: '0%',
-    left: '0%',
     width: '100%',
     height: '100%',
   },
+
   hand_rect_default: {
     borderWidth: 4,
     borderColor: 'green',
