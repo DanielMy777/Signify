@@ -3,7 +3,7 @@ import {StyleSheet, Text, View, Button, Dimensions, Image} from 'react-native';
 import {EMPTY_SIGN} from '../../Detection/detection-constants';
 import SignifyCamera from '../Camera/SignifyCamera';
 
-const CameraPage = () => {
+const CameraPage = ({style}) => {
   const [errorText, setErrorText] = useState(undefined);
   const [detectedChar, setDetectedChar] = useState(null);
   const onDetection = useCallback(res => {
@@ -20,11 +20,11 @@ const CameraPage = () => {
   }, [detectedChar]);
 
   return (
-    <View style={styles.container}>
+    <View style={{...styles.container, ...style}}>
       <SignifyCamera
         onDetection={onDetection}
         style={styles.camera}
-        frameProcessorFps={2}
+        frameProcessorFps={5}
         frameMaxSize={400}
         frameQuality={30}
       />

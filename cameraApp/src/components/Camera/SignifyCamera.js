@@ -11,16 +11,6 @@ import {
 import {DEFAULT_MODEL} from '../../Detection/default-model';
 import {create_hands_style} from '../../Utils/styles-utils';
 
-const createHandsStyle = (handsRect, handsRectDefaultStyle, handsRectStyle) => {
-  const rect_style = {...handsRectDefaultStyle, ...handsRectStyle};
-  rect_style.top = handsRect.y + '%';
-  rect_style.left = handsRect.x + '%';
-  rect_style.width = handsRect.w + '%';
-  rect_style.height = handsRect.h + '%';
-  console.log(rect_style);
-  return rect_style;
-};
-
 const SignifyCamera = ({
   style,
   HandRectStyle = styles.hand_rect_default,
@@ -35,9 +25,12 @@ const SignifyCamera = ({
   const [handRect, setHandsRect] = useState(UN_DETECTED_HANDS);
   const frameNumber = useSharedValue(0);
 
-  const camera_style = style;
   hands_style = useMemo(() => {
-    return createHandsStyle(handRect, styles.hand_rect_default, HandRectStyle);
+    return create_hands_style(
+      handRect,
+      styles.hand_rect_default,
+      HandRectStyle,
+    );
   }, [handRect]);
 
   useEffect(() => {
