@@ -7,4 +7,8 @@ const copyProps = (to, from) => {
   for (prop in from) to[prop] = from[prop];
 };
 
-module.exports = {getNumInStr, copyProps};
+const getPercent = (num, percent) => {
+  return Math.round(num * (percent / 100));
+};
+
+module.exports = {getNumInStr, copyProps, getPercent};
