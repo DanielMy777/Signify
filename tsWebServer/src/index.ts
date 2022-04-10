@@ -1,5 +1,5 @@
-import { Pool } from "./src/pool/pool.js";
-import { shutDown } from "./src/util/shutDown.js";
+import { Pool } from "./pool/pool.js";
+import { shutDown } from "./util/shutDown.js";
 import { Request, Response } from "express";
 import express from "express";
 
