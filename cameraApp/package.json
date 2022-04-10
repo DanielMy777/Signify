@@ -15,6 +15,7 @@
     "react-native-gesture-handler": "^2.3.1",
     "react-native-orientation-locker": "^1.4.0",
     "react-native-pressable-opacity": "^1.0.8",
+    "react-native-really-awesome-button": "^1.6.0",
     "react-native-reanimated": "^2.4.1",
     "react-native-vector-icons": "^9.1.0",
     "react-native-vision-camera": "^2.12.0",
