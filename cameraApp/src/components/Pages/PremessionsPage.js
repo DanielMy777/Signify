@@ -34,7 +34,7 @@ const PremessionsPage = ({paddingTopPercent = 20}) => {
         height: dimensions.height,
       }}
       source={backgronudSrc}>
-      <SignifyHeader style={{position: 'absolute'}} />
+      <SignifyHeader style={{position: 'absolute'}} fontSize={50} />
       <Text style={styles.text}>Camera Premession Needed</Text>
       <AwesomeButtonRick
         type="primary"
@@ -50,7 +50,7 @@ const PremessionsPage = ({paddingTopPercent = 20}) => {
 
 const styles = StyleSheet.create({
   text: {
-    fontSize: 50,
+    fontSize: 65,
     fontFamily: 'BerkshireSwash-Regular',
     color: 'black',
     textAlign: 'center',
