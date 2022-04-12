@@ -57,7 +57,8 @@ const SignifyCamera = ({
       try {
         const fnumber = updateGetFrameNumber();
         const detectSignMethod =
-          fnumber == 1 || (fnumber == frameProcessorFps && false);
+          (fnumber == 1 || (fnumber == frameProcessorFps && false)) &&
+          detectSignFrames !== 0;
         detect_res = await (detectSignMethod
           ? DetectModel.detectSign(img)
           : DetectModel.detectHands(img));
@@ -66,7 +67,6 @@ const SignifyCamera = ({
           setHandsRect(detect_res.hands.handsRect);
         }
       } catch (err) {
-        console.log(err.to_string());
         setHandsRect(UN_DETECTED_HANDS);
         detect_res = EMPTY_RESULTS;
         detect_res.error = err.to_string ? err.to_string() : err;
