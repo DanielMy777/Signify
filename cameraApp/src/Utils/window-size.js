@@ -1,4 +1,5 @@
 import {Dimensions} from 'react-native';
+import {getPercent} from './utils';
 function addWindowSizeChangeListener(windowReSizeListener) {
   return Dimensions.addEventListener('change', () => {
     windowReSizeListener(getWindowDimensions());
@@ -9,4 +10,8 @@ const getWindowDimensions = () => {
   const width = Dimensions.get('window').width;
   return {height, width};
 };
-module.exports = {addWindowSizeChangeListener, getWindowDimensions};
+
+module.exports = {
+  addWindowSizeChangeListener,
+  getWindowDimensions,
+};

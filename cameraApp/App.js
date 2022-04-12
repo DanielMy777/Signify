@@ -1,8 +1,6 @@
 import React from 'react';
-
-import CameraPage from './src/components/Pages/CameraPage';
+import SignifyApp from './src/components/Main/SignifyApp';
 const App = () => {
-  return <CameraPage />;
+  return <SignifyApp />;
 };
-
 export default App;
