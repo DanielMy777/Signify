@@ -180,21 +180,24 @@ def draw_square(img, keys_dict, letter):
 
 # ====== Get the bounding rectange coordinates for the detected hand
 def get_rect(img):
-    coords = {'x': 0, 'y': 0, 'h': 0, 'w': 0, 'v': 1}
+    coords = {'x': 0, 'y': 0, 'h': 0, 'w': 0, 'v': 1, 'msg': "OK"}
     dst = img.copy()
     h, w, _ = dst.shape
     marked_img = detector.findHands(dst)
     if not detector.isPoseValid(dst): # invalid position
         coords['v'] = 0
+        coords['msg'] = "Please raise one hand"
     else:
         keys = detector.findPosition(marked_img, draw=False)
         if(keys is None or len(keys) == 0): # no hand detected
             coords['v'] = 0
+            coords['msg'] = "No hand detected"
         else:
             keys_dict = detector.getHandCoordsByKeys(keys, h, w)
             cut_img = cut_hand(dst, keys_dict)
             if(cut_img is None): # hand detected, but to close to edges
                 coords['v'] = 0
+                coords['msg'] = "Please centralize your hand"
             padding = max(get_hand_measures(keys_dict), int(max(w, h) / 64))
             top_left_p = (keys_dict['left-val'] - padding, keys_dict['top-val'] - padding)
             bottom_right_p = (keys_dict['right-val'] + padding, keys_dict['bottom-val'] + padding)
@@ -240,6 +243,7 @@ def process_image(img):
 
 # ===== Main code snippet
 def main():
+    global identified
     # setup torch
     setupTorchModel(useCuda=True)
 
@@ -250,7 +254,7 @@ def main():
     cv2.resizeWindow('outi', IM_SIZE, IM_SIZE)
 
     # load a video file (0 for webcam)
-    cap = cv2.VideoCapture('media/input-main.mp4')
+    cap = cv2.VideoCapture(0)
     if (cap.isOpened() == False):
         print("Error opening video file")
     orig_frame_width = frame_width = int(cap.get(3))
