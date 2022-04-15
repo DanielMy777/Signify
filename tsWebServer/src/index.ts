@@ -6,7 +6,7 @@ import express from "express";
 const app = express();
 const PORT = 3000;
 const SIGN_CHILD_NUM = 1;
-const HAND_CHILD_NUM = 5;
+const HAND_CHILD_NUM = 1;
 // const TIME_OUT = 5000;
 const PROCESS_NAME = "../SignifyService/signifyService.py";
 
@@ -15,7 +15,7 @@ const signPool = new Pool(SIGN_CHILD_NUM, PROCESS_NAME, 0, [
   "detectSign",
 ]);
 const handPool = new Pool(HAND_CHILD_NUM, PROCESS_NAME, SIGN_CHILD_NUM, [
-  "cpu",
+  "cuda",
   "noSignDetection",
 ]);
 

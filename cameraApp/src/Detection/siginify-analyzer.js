@@ -45,7 +45,7 @@ class SignifyDetectionAnalyzer {
     this.new_handRect.detected = this.new_handRect.v == 1;
     this.stable_handRect = this.get_stable_handRect(this.new_handRect);
     if (!this.new_handRect.detected) {
-      this.latest_res.error = 'No Hands';
+      this.latest_res.error = String(this.new_handRect.msg);
     }
   }
 
