@@ -117,6 +117,15 @@ def pad_image(img):
     
     return dst
 
+# ====== Recieve image and hand keys, Flip an image horizontally, and the keys accordingly
+def flip_image(img, keys, orig_width, handType):
+    if handType == 'Right':
+        img = cv2.flip(img, 1)
+        for k in keys:
+            k[1] = orig_width - k[1]
+    return (img, keys)
+
+
 # ====== Recieve hand keys, return 30% of hand size
 def get_hand_measures(keys_dict):
     width = keys_dict['right-val'] - keys_dict['left-val']
@@ -217,6 +226,7 @@ def write_message(src, message, type):
             (50,50), 
             cv2.FONT_HERSHEY_SIMPLEX, 1, type, 3, cv2.LINE_AA)
 
+
 # ====== Process a single image (or video frame)
 def process_image(img):
     dst = img.copy()
@@ -235,7 +245,8 @@ def process_image(img):
         if(cut_img is None): # hand detected, but to close to edges
             write_message(dst, "Please centrelize your hand", ERROR)
         else: # good hand positioning
-            char = get_match(cut_img, keys)
+            fixed_img, fixed_keys = flip_image(cut_img, keys, w, detector.detectedSide)
+            char = get_match(fixed_img, fixed_keys)
             check_identify(char)
             dst = draw_square(dst, keys_dict, char)
     return (char, dst)
