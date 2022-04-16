@@ -42,6 +42,8 @@ class handDetector():
 
         if self.results.multi_hand_landmarks:
             myHand = self.results.multi_hand_landmarks[self.useHandNo]
+            myHandedness = self.results.multi_handedness[self.useHandNo]
+            self.detectedSide = myHandedness.classification[0].label
             for id, lm in enumerate(myHand.landmark):
                 # print(id, lm)
                 h, w, c = img.shape
