@@ -5,10 +5,11 @@ const SignifyHeader = ({
   style,
   title = 'Signify',
   fontSize = styles.headerTitle.fontSize,
+  color = styles.headerTitle.color,
 }) => {
   return (
     <View style={{...styles.header, ...style}}>
-      <Text style={{...styles.headerTitle, fontSize}}>{title}</Text>
+      <Text style={{...styles.headerTitle, fontSize, color}}>{title}</Text>
     </View>
   );
 };

@@ -24,7 +24,7 @@ const CameraPage = ({style}) => {
       <SignifyCamera
         onDetection={onDetection}
         style={styles.camera}
-        frameProcessorFps={10}
+        frameProcessorFps={5}
         frameMaxSize={400}
         frameQuality={30}
       />
