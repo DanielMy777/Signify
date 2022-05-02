@@ -9,9 +9,16 @@ try {
   backgronudSrc = null;
 }
 
-const FullScreenBackground = ({source = backgronudSrc, children}) => {
+const FullScreenBackground = ({
+  source = backgronudSrc,
+  resizeMode = 'cover',
+  children,
+}) => {
   return (
-    <ImageBackground source={source} style={styles.container}>
+    <ImageBackground
+      source={source}
+      style={styles.container}
+      resizeMode={resizeMode}>
       {children}
     </ImageBackground>
   );
@@ -21,7 +28,6 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     top: '0%',
-    resizeMode: 'stretch',
     backgroundColor: 'black',
     height: '100%',
     width: '100%',
