@@ -1,9 +1,19 @@
-import {SafeAreaView, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  Button,
+  SafeAreaView,
+  Touchable,
+  StyleSheet,
+} from 'react-native';
 
 import React from 'react';
 import {useNavigation} from '@react-navigation/native';
 import PageName from './PageName';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AwesomeButtonRick from 'react-native-really-awesome-button/src/themes/rick';
+import AwesomeButton from 'react-native-really-awesome-button';
 import FullScreenBackground from '../General/FullScreenBackground';
 import SignifyHeader from '../General/SignifyHeader';
 const backGroundImg = require('../../../resources/images/HomePageBackground2.jpg');

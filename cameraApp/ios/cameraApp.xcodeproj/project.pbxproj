@@ -30,8 +30,6 @@
 		C7035C511CF44B0BBC3BA2A4 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DFE9CE98884F4AC09D8F1579 /* Zocial.ttf */; };
 		A73BC01B569A416081A0AC2D /* RubikMoonrocks-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4DC22063309549F7AD670B5B /* RubikMoonrocks-Regular.ttf */; };
 		FA3E88BF293D47EEBE93C283 /* BerkshireSwash-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7678671A62C34EF084DD3B79 /* BerkshireSwash-Regular.ttf */; };
-		2797324285C843FAAB386B66 /* American Sign Lenguage.otf in Resources */ = {isa = PBXBuildFile; fileRef = 78C32BB3869E421487173D48 /* American Sign Lenguage.otf */; };
-		52984177F7344AD4BF98195B /* signs language tfb.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C79EFEBA1D584C899B370EBE /* signs language tfb.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,8 +72,6 @@
 		DFE9CE98884F4AC09D8F1579 /* Zocial.ttf */ = {isa = PBXFileReference; name = "Zocial.ttf"; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		4DC22063309549F7AD670B5B /* RubikMoonrocks-Regular.ttf */ = {isa = PBXFileReference; name = "RubikMoonrocks-Regular.ttf"; path = "../resources/fonts/RubikMoonrocks-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		7678671A62C34EF084DD3B79 /* BerkshireSwash-Regular.ttf */ = {isa = PBXFileReference; name = "BerkshireSwash-Regular.ttf"; path = "../resources/fonts/BerkshireSwash-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		78C32BB3869E421487173D48 /* American Sign Lenguage.otf */ = {isa = PBXFileReference; name = "American Sign Lenguage.otf"; path = "../resources/fonts/American Sign Lenguage.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		C79EFEBA1D584C899B370EBE /* signs language tfb.ttf */ = {isa = PBXFileReference; name = "signs language tfb.ttf"; path = "../resources/fonts/signs language tfb.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -186,8 +182,6 @@
 				DFE9CE98884F4AC09D8F1579 /* Zocial.ttf */,
 				4DC22063309549F7AD670B5B /* RubikMoonrocks-Regular.ttf */,
 				7678671A62C34EF084DD3B79 /* BerkshireSwash-Regular.ttf */,
-				78C32BB3869E421487173D48 /* American Sign Lenguage.otf */,
-				C79EFEBA1D584C899B370EBE /* signs language tfb.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -301,8 +295,6 @@
 				C7035C511CF44B0BBC3BA2A4 /* Zocial.ttf in Resources */,
 				A73BC01B569A416081A0AC2D /* RubikMoonrocks-Regular.ttf in Resources */,
 				FA3E88BF293D47EEBE93C283 /* BerkshireSwash-Regular.ttf in Resources */,
-				2797324285C843FAAB386B66 /* American Sign Lenguage.otf in Resources */,
-				52984177F7344AD4BF98195B /* signs language tfb.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
