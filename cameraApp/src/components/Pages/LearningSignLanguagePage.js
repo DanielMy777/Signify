@@ -1,11 +1,11 @@
 import {View, Text, TextInput, ScrollView, StyleSheet} from 'react-native';
 import React, {useState, useEffect} from 'react';
-import FontName from '../General/FontName';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PressableOpacity} from 'react-native-pressable-opacity';
 import SignifyHeader from '../General/SignifyHeader';
 import Tts from '../../Utils/text-to-speech';
+import SignText from '../General/SignText';
 const LearningSignLanguagePage = () => {
   const [text, setText] = useState('');
   const [signText, setSignText] = useState('');
@@ -48,8 +48,8 @@ const LearningSignLanguagePage = () => {
         </PressableOpacity>
       </View>
 
-      <ScrollView style={{marginBottom: 120}}>
-        <Text style={styles.signText}>{signText} </Text>
+      <ScrollView style={{marginBottom: 120}} persistentScrollbar={true}>
+        <SignText text={signText} />
       </ScrollView>
     </View>
   );
@@ -58,11 +58,6 @@ const styles = StyleSheet.create({
   container: {
     textAlign: 'center',
     alignItems: 'center',
-  },
-  signText: {
-    fontSize: 120,
-    fontFamily: FontName.AmericanSignLanguage,
-    color: 'green',
   },
   textBox: {
     borderWidth: 1,
