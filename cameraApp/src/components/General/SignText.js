@@ -5,7 +5,7 @@ const SignText = ({
   text,
   fontSize = styles.signText.fontSize,
   color = styles.signText.color,
-  detectedLettersNumber = 2,
+  detectedLettersNumber = 0,
 }) => {
   const getLetterColor = (letter, index) => {
     return index < detectedLettersNumber ? 'green' : color;
