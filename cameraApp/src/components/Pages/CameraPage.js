@@ -1,25 +1,17 @@
 import React, {useState, useEffect, useMemo, useRef, useCallback} from 'react';
 import {StyleSheet, Text, View, Button, Dimensions, Image} from 'react-native';
 import {EMPTY_SIGN} from '../../Detection/detection-constants';
-import {NetworkException} from '../../Network/httpClient';
-import {HandsError} from '../../Utils/custom-exceptions';
 import SignifyCamera from '../Camera/SignifyCamera';
 
 const CameraPage = ({style}) => {
   const [errorText, setErrorText] = useState(undefined);
-  const [detectedChar, setDetectedChar] = useState(null);
   const onError = useCallback(error => {
     setErrorText(error.to_string());
   });
   const onDetection = useCallback(res => {
     setErrorText(undefined);
-    setDetectedChar(res.sign.char);
+    //if (res.sign) setDetectedChar(res.sign.char);
   }, []);
-  const detectedTextStyle = useMemo(() => {
-    return detectedChar != EMPTY_SIGN
-      ? styles.DetectedText
-      : {...styles.DetectedText, backgroundColor: 'orange'};
-  }, [detectedChar]);
 
   return (
     <View style={{...styles.container, ...style}}>
@@ -32,9 +24,8 @@ const CameraPage = ({style}) => {
         detectSignFrames={1}
         onError={onError}
       />
-      {errorText != undefined && <Text style={styles.myText}>{errorText}</Text>}
-      {!errorText && detectedChar && (
-        <Text style={detectedTextStyle}>{detectedChar}</Text>
+      {errorText != undefined && (
+        <Text style={styles.errorText}>{errorText}</Text>
       )}
     </View>
   );
@@ -44,20 +35,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  DetectedText: {
-    position: 'absolute',
-    left: '4%',
-    top: '5%',
-    backgroundColor: 'green',
-    width: 44,
-    height: 44,
-    borderRadius: 44 / 2,
-    textAlign: 'center',
-    paddingTop: 3,
-    fontSize: 30,
-    color: 'black',
-  },
-  myText: {
+  errorText: {
     position: 'absolute',
     bottom: '5%',
     textAlign: 'center',
@@ -71,9 +49,9 @@ const styles = StyleSheet.create({
   camera: {
     position: 'absolute',
     top: '0%',
-    left: '10%',
-    width: '80%',
-    height: '80%',
+    left: '0%',
+    width: '100%',
+    height: '100%',
   },
 });
 
