@@ -5,33 +5,32 @@ import SignifyCamera from '../Camera/SignifyCamera';
 
 const CameraPage = ({style}) => {
   const [errorText, setErrorText] = useState(undefined);
-  const [detectedChar, setDetectedChar] = useState(null);
+  const [predictedText, setPredictedText] = useState('');
+  const onError = useCallback(error => {
+    setErrorText(error.to_string());
+  });
   const onDetection = useCallback(res => {
-    const error = res.error;
-    setErrorText(error);
-    //res.sign != undefined when the camera tried to detect the letter
-    //otherwise is just the hand rect
-    if (res.sign) setDetectedChar(res.sign.char);
+    setErrorText(undefined);
+    if (res.sign && res.sign.char != EMPTY_SIGN) {
+      setPredictedText(prev => prev + res.sign.char);
+    }
   }, []);
-  const detectedTextStyle = useMemo(() => {
-    return detectedChar != EMPTY_SIGN
-      ? styles.DetectedText
-      : {...styles.DetectedText, backgroundColor: 'orange'};
-  }, [detectedChar]);
 
   return (
     <View style={{...styles.container, ...style}}>
       <SignifyCamera
         onDetection={onDetection}
         style={styles.camera}
-        frameProcessorFps={5}
+        frameProcessorFps={6}
         frameMaxSize={400}
         frameQuality={30}
+        detectSignFrames={1}
+        onError={onError}
       />
-      {errorText != undefined && <Text style={styles.myText}>{errorText}</Text>}
-      {!errorText && detectedChar && (
-        <Text style={detectedTextStyle}>{detectedChar}</Text>
+      {errorText != undefined && (
+        <Text style={styles.errorText}>{errorText}</Text>
       )}
+      <Text style={styles.predictedText}>{predictedText}</Text>
     </View>
   );
 };
@@ -40,22 +39,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  DetectedText: {
+  errorText: {
     position: 'absolute',
-    left: '4%',
-    top: '5%',
-    backgroundColor: 'green',
-    width: 44,
-    height: 44,
-    borderRadius: 44 / 2,
-    textAlign: 'center',
-    paddingTop: 3,
-    fontSize: 30,
-    color: 'black',
-  },
-  myText: {
-    position: 'absolute',
-    bottom: '5%',
+    top: '60%',
     textAlign: 'center',
     width: '100%',
     fontSize: 30,
@@ -69,7 +55,15 @@ const styles = StyleSheet.create({
     top: '0%',
     left: '0%',
     width: '100%',
-    height: '100%',
+    height: '70%',
+  },
+  predictedText: {
+    position: 'absolute',
+    top: '80%',
+    width: '100%',
+    fontSize: 30,
+    textAlign: 'center',
+    backgroundColor: 'red',
   },
 });
 

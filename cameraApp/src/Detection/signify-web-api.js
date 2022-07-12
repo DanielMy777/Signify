@@ -1,4 +1,9 @@
-import {Exception, HttpMethod, http_method} from '../Network/httpClient';
+import {
+  Exception,
+  HttpMethod,
+  http_method,
+  NetworkException,
+} from '../Network/httpClient';
 class SignifyApiPath {
   static DETECT_HANDS = 'api/img/DetectHands';
   static DETECT_SIGN = 'api/img/DetectHandsSign';
@@ -19,7 +24,7 @@ class SignifyWebDetectionModel {
         2000,
       );
     } catch (err) {
-      throw new Exception('cant reach Server');
+      throw new NetworkException('cant reach Server');
     }
   }
 

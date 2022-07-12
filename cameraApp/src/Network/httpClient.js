@@ -14,6 +14,12 @@ class Exception {
   }
 }
 
+class NetworkException extends Exception {
+  constructor(msg) {
+    super(msg);
+  }
+}
+
 async function http_method(url, method = HttpMethod.GET, data, timeout = 1000) {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
@@ -39,4 +45,5 @@ module.exports = {
   HttpMethod: HttpMethod,
   Exception: Exception,
   http_method: http_method,
+  NetworkException: NetworkException,
 };
