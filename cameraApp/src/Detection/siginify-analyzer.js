@@ -1,3 +1,4 @@
+import {HandsError} from '../Utils/custom-exceptions';
 import {UN_DETECTED_HANDS, EMPTY_RESULTS} from './detection-constants';
 class SignifyDetectionAnalyzer {
   constructor(detection_model) {
@@ -10,26 +11,27 @@ class SignifyDetectionAnalyzer {
     try {
       this.latest_res = await this.detection_model.detectHands(img);
       this.update_hands();
-      return this.latest_res;
     } catch (e) {
       this.latest_res = EMPTY_RESULTS;
       this.stable_handRect = this.new_handRect = UN_DETECTED_HANDS;
-      this.latest_res.error = e.to_string();
-      throw e;
+      this.latest_res.stable = true;
+      this.latest_res.error = e;
     }
+    return this.latest_res;
   }
 
   async detectSign(img) {
     try {
       this.latest_res = await this.detection_model.detectSign(img);
       this.update_hands();
-      return this.latest_res;
     } catch (e) {
       this.latest_res = EMPTY_RESULTS;
+      this.latest_res.stable = true;
       this.stable_handRect = this.new_handRect = UN_DETECTED_HANDS;
-      this.latest_res.error = e.to_string();
-      throw e;
+      this.latest_res.error = e;
     }
+
+    return this.latest_res;
   }
 
   get_stable_handsRect() {
@@ -45,7 +47,7 @@ class SignifyDetectionAnalyzer {
     this.new_handRect.detected = this.new_handRect.v == 1;
     this.stable_handRect = this.get_stable_handRect(this.new_handRect);
     if (!this.new_handRect.detected) {
-      this.latest_res.error = String(this.new_handRect.msg);
+      this.latest_res.error = new HandsError(this.new_handRect.msg);
     }
   }
 

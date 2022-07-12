@@ -1,17 +1,19 @@
 import React, {useState, useEffect, useMemo, useRef, useCallback} from 'react';
 import {StyleSheet, Text, View, Button, Dimensions, Image} from 'react-native';
 import {EMPTY_SIGN} from '../../Detection/detection-constants';
+import {NetworkException} from '../../Network/httpClient';
+import {HandsError} from '../../Utils/custom-exceptions';
 import SignifyCamera from '../Camera/SignifyCamera';
 
 const CameraPage = ({style}) => {
   const [errorText, setErrorText] = useState(undefined);
   const [detectedChar, setDetectedChar] = useState(null);
+  const onError = useCallback(error => {
+    setErrorText(error.to_string());
+  });
   const onDetection = useCallback(res => {
-    const error = res.error;
-    setErrorText(error);
-    //res.sign != undefined when the camera tried to detect the letter
-    //otherwise is just the hand rect
-    if (res.sign) setDetectedChar(res.sign.char);
+    setErrorText(undefined);
+    setDetectedChar(res.sign.char);
   }, []);
   const detectedTextStyle = useMemo(() => {
     return detectedChar != EMPTY_SIGN
@@ -24,9 +26,11 @@ const CameraPage = ({style}) => {
       <SignifyCamera
         onDetection={onDetection}
         style={styles.camera}
-        frameProcessorFps={5}
+        frameProcessorFps={8}
         frameMaxSize={400}
         frameQuality={30}
+        detectSignFrames={1}
+        onError={onError}
       />
       {errorText != undefined && <Text style={styles.myText}>{errorText}</Text>}
       {!errorText && detectedChar && (
@@ -67,9 +71,9 @@ const styles = StyleSheet.create({
   camera: {
     position: 'absolute',
     top: '0%',
-    left: '0%',
-    width: '100%',
-    height: '100%',
+    left: '10%',
+    width: '80%',
+    height: '80%',
   },
 });
 

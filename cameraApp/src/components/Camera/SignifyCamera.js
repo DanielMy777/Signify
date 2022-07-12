@@ -10,6 +10,7 @@ import {
 } from '../../Detection/detection-constants';
 import {DEFAULT_MODEL} from '../../Detection/default-model';
 import {create_hands_style} from '../../Utils/styles-utils';
+import {DetectException} from '../../Utils/custom-exceptions';
 
 const SignifyCamera = ({
   style,
@@ -20,6 +21,8 @@ const SignifyCamera = ({
   DetectModel = DEFAULT_MODEL,
   onDetection,
   detectSignFrames,
+  onSignDetection,
+  onError,
 }) => {
   const [cameraPermission, setCameraPermission] = useState(undefined);
   const [handRect, setHandsRect] = useState(UN_DETECTED_HANDS);
@@ -54,25 +57,28 @@ const SignifyCamera = ({
   const upload_img = useCallback(
     async img => {
       let detect_res = EMPTY_RESULTS;
-      try {
-        const fnumber = updateGetFrameNumber();
-        const detectSignMethod =
-          (fnumber == 1 || (fnumber == frameProcessorFps && false)) &&
-          detectSignFrames !== 0;
-        detect_res = await (detectSignMethod
-          ? DetectModel.detectSign(img)
-          : DetectModel.detectHands(img));
-        if (detect_res.hands.handsRect.stable) {
-          detect_res.hands.detected = true;
-          setHandsRect(detect_res.hands.handsRect);
-        }
-      } catch (err) {
-        setHandsRect(UN_DETECTED_HANDS);
-        detect_res = EMPTY_RESULTS;
-        detect_res.error = err.to_string ? err.to_string() : err;
+
+      const fnumber = updateGetFrameNumber();
+      const detectSignMethod =
+        (fnumber == 1 || (fnumber == frameProcessorFps && false)) &&
+        detectSignFrames !== 0;
+      //console.log(detectSignMethod);
+      detect_res = await (detectSignMethod
+        ? DetectModel.detectSign(img)
+        : DetectModel.detectHands(img));
+      if (detect_res.hands.handsRect.stable) {
+        detect_res.hands.detected = true;
+        setHandsRect(detect_res.hands.handsRect);
       }
 
-      if (onDetection) onDetection(detect_res);
+      if (detect_res.error) {
+        onError(detect_res.error);
+        return;
+      }
+      if (detectSignMethod) {
+        if (onDetection) onDetection(detect_res);
+        if (onSignDetection) onSignDetection(detect_res);
+      }
     },
     [detectSignFrames, updateGetFrameNumber],
   );
