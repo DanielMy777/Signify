@@ -36,6 +36,7 @@ const LearningSignLanguagePage = () => {
 
   const onTranslateButtonPressed = () => {
     setSignText(text);
+    signTextRef.current.clear_detected_letters();
   };
 
   const onTextToSpeechPressed = () => {
