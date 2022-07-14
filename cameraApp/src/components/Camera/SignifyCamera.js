@@ -23,12 +23,15 @@ const SignifyCamera = ({
   detectSignFrames,
   onSignDetection,
   onHandsDetection,
+  showErrors = true,
+  errorStyle,
   onError,
 }) => {
   const [cameraPermission, setCameraPermission] = useState(undefined);
   const [handRect, setHandsRect] = useState(UN_DETECTED_HANDS);
   const frameNumber = useSharedValue(0);
   const [detectedChar, setDetectedChar] = useState('');
+  const [errorText, setErrorText] = useState('');
 
   const detectedTextStyle = useMemo(() => {
     return detectedChar != EMPTY_SIGN
@@ -82,9 +85,11 @@ const SignifyCamera = ({
 
       if (detect_res.error) {
         setDetectedChar('');
-        onError(detect_res.error);
+        setErrorText(detect_res.error.to_string());
+        if (onError) onError(detect_res.error);
         return;
       }
+      setErrorText('');
       if (onDetection) onDetection(detect_res);
       if (onHandsDetection) onHandsDetection(detect_res);
       if (detectSignMethod) {
@@ -103,7 +108,6 @@ const SignifyCamera = ({
           <Base64Camera
             handle_frame={upload_img}
             handsOk={handRect.detected}
-            style={styles.camera}
             frameProcessorFps={frameProcessorFps}
             frameMaxSize={frameMaxSize}
             frameQuality={frameQuality}
@@ -111,6 +115,12 @@ const SignifyCamera = ({
           {handRect.detected && <View style={hands_style}></View>}
           {detectedChar != '' && (
             <Text style={detectedTextStyle}>{detectedChar}</Text>
+          )}
+
+          {errorText.length > 0 && (
+            <Text style={{...styles.errorText, ...errorStyle}}>
+              {errorText}
+            </Text>
           )}
         </View>
       )}
@@ -143,6 +153,17 @@ const styles = StyleSheet.create({
     paddingTop: 3,
     fontSize: 30,
     color: 'black',
+  },
+  errorText: {
+    position: 'absolute',
+    top: '85%',
+    textAlign: 'center',
+    width: '100%',
+    fontSize: 30,
+    color: 'black',
+    backgroundColor: 'red',
+    left: '5%',
+    width: '90%',
   },
 });
 

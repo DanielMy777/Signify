@@ -1,14 +1,38 @@
-import {View, Text, TextInput, ScrollView, StyleSheet} from 'react-native';
-import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  ScrollView,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Keyboard,
+} from 'react-native';
+import React, {useState, useEffect, useRef} from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PressableOpacity} from 'react-native-pressable-opacity';
 import SignifyHeader from '../General/SignifyHeader';
 import Tts from '../../Utils/text-to-speech';
 import SignText from '../General/SignText';
+import SignifyCamera from '../Camera/SignifyCamera';
+import {useKeyBoardOpen} from '../../Utils/custom-hooks';
+import Orientation from 'react-native-orientation-locker';
 const LearningSignLanguagePage = () => {
   const [text, setText] = useState('');
   const [signText, setSignText] = useState('');
+  const keyboardOpen = useKeyBoardOpen();
+  const signTextRef = useRef();
+
+  useEffect(() => {
+    Orientation.lockToPortrait();
+    return () => {
+      Orientation.unlockAllOrientations();
+    };
+  });
+
+  const onSignDetection = detect_obj => {
+    signTextRef.current.detect_letter(detect_obj.sign.char);
+  };
 
   const onTranslateButtonPressed = () => {
     setSignText(text);
@@ -17,6 +41,8 @@ const LearningSignLanguagePage = () => {
   const onTextToSpeechPressed = () => {
     Tts.say(text);
   };
+
+  styles.camera_style.top = (!keyboardOpen ? 50 : 70) + '%';
 
   return (
     <View style={styles.container}>
@@ -49,8 +75,15 @@ const LearningSignLanguagePage = () => {
       </View>
 
       <ScrollView style={{marginBottom: 120}} persistentScrollbar={true}>
-        <SignText text={signText} />
+        <SignText text={signText} ref={signTextRef} />
       </ScrollView>
+      {
+        <SignifyCamera
+          style={styles.camera_style}
+          onSignDetection={onSignDetection}
+          errorStyle={{top: '85%', fontSize: 26}}
+        />
+      }
     </View>
   );
 };
@@ -58,6 +91,7 @@ const styles = StyleSheet.create({
   container: {
     textAlign: 'center',
     alignItems: 'center',
+    flex: 1,
   },
   textBox: {
     borderWidth: 1,
@@ -69,6 +103,11 @@ const styles = StyleSheet.create({
   input: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  camera_style: {
+    position: 'absolute',
+    top: '50%',
+    height: '50%',
   },
 });
 export default LearningSignLanguagePage;

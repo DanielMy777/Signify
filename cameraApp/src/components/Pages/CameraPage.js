@@ -4,13 +4,9 @@ import {EMPTY_SIGN} from '../../Detection/detection-constants';
 import SignifyCamera from '../Camera/SignifyCamera';
 
 const CameraPage = ({style}) => {
-  const [errorText, setErrorText] = useState(undefined);
   const [predictedText, setPredictedText] = useState('');
-  const onError = useCallback(error => {
-    setErrorText(error.to_string());
-  });
+  const onError = useCallback(error => {});
   const onDetection = useCallback(res => {
-    setErrorText(undefined);
     if (res.sign && res.sign.char != EMPTY_SIGN) {
       setPredictedText(prev => prev + res.sign.char);
     }
@@ -27,10 +23,10 @@ const CameraPage = ({style}) => {
         detectSignFrames={1}
         onError={onError}
       />
-      {errorText != undefined && (
-        <Text style={styles.errorText}>{errorText}</Text>
-      )}
-      <Text style={styles.predictedText}>{predictedText}</Text>
+      <View style={styles.predictedTextView}>
+        <Text style={styles.predictedTextTitle}>Predicted Text:</Text>
+        <Text style={styles.predictedText}>{predictedText}</Text>
+      </View>
     </View>
   );
 };
@@ -38,17 +34,6 @@ const CameraPage = ({style}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  errorText: {
-    position: 'absolute',
-    top: '60%',
-    textAlign: 'center',
-    width: '100%',
-    fontSize: 30,
-    color: 'black',
-    backgroundColor: 'red',
-    left: '5%',
-    width: '90%',
   },
   camera: {
     position: 'absolute',
@@ -58,12 +43,16 @@ const styles = StyleSheet.create({
     height: '70%',
   },
   predictedText: {
-    position: 'absolute',
-    top: '80%',
-    width: '100%',
     fontSize: 30,
-    textAlign: 'center',
-    backgroundColor: 'red',
+  },
+  predictedTextView: {
+    position: 'absolute',
+    top: '75%',
+    alignItems: 'center',
+    width: '100%',
+  },
+  predictedTextTitle: {
+    fontSize: 20,
   },
 });
 
