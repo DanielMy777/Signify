@@ -21,17 +21,25 @@ const SignText = (
     return {
       detect_letter: detect_letter,
       get_detected_letters_count: get_detected_letters_count,
+      clear_detected_letters: () => {
+        setDetectedLettersCount(0);
+      },
     };
   });
 
   const detect_letter = letter => {
-    const text_no_spaces = [...text].filter(x => x != ' ');
+    letter = letter.toUpperCase();
+    const text_no_spaces = [...text.toUpperCase()].filter(x => x != ' ');
     if (detectedLettersCount >= text.length) {
       return false;
     }
 
+    console.log(
+      `i_letter = ${letter} current_letter = ${text_no_spaces[detectedLettersCount]}`,
+    );
     const detected_current_letter =
       text_no_spaces[detectedLettersCount] == letter;
+    console.log(detected_current_letter);
     if (detected_current_letter) {
       setDetectedLettersCount(detectedLettersCount + 1);
       if (onLetterDetected) {
