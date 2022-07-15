@@ -1,15 +1,23 @@
 import {SafeAreaView, StyleSheet} from 'react-native';
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import PageName from './PageName';
 import AwesomeButtonRick from 'react-native-really-awesome-button/src/themes/rick';
 import FullScreenBackground from '../General/FullScreenBackground';
 import SignifyHeader from '../General/SignifyHeader';
+import Orientation from 'react-native-orientation-locker';
 const backGroundImg = require('../../../resources/images/HomePageBackground2.jpg');
 
 const HomePage = () => {
   const navigation = useNavigation();
+
+  useEffect(() => {
+    Orientation.lockToPortrait();
+    return () => {
+      //Orientation.unlockAllOrientations();
+    };
+  });
   const handleLiveTranslateButtonClicked = () => {
     navigation.navigate(PageName.CameraPage);
   };

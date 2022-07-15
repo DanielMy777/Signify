@@ -21,7 +21,7 @@ class SignifyWebDetectionModel {
         `http://${this.ip}:${this.port}/${path}`,
         HttpMethod.POST,
         {img: img},
-        2000,
+        1200,
       );
     } catch (err) {
       throw new NetworkException('cant reach Server');

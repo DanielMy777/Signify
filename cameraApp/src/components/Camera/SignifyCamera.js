@@ -11,6 +11,9 @@ import {
 } from '../../Detection/detection-constants';
 import {DEFAULT_MODEL} from '../../Detection/default-model';
 import {create_hands_style} from '../../Utils/styles-utils';
+import {useDeviceOrientation} from '../../Utils/custom-hooks';
+import Orientation from 'react-native-orientation-locker';
+import {OrientationNames} from '../../Utils/OrentationNames';
 
 const SignifyCamera = ({
   style,
@@ -20,7 +23,7 @@ const SignifyCamera = ({
   frameQuality = 30,
   DetectModel = DEFAULT_MODEL,
   onDetection,
-  detectSignFrames,
+  detectSignFrames = 1,
   onSignDetection,
   onHandsDetection,
   showErrors = true,
@@ -32,6 +35,8 @@ const SignifyCamera = ({
   const frameNumber = useSharedValue(0);
   const [detectedChar, setDetectedChar] = useState('');
   const [errorText, setErrorText] = useState('');
+  const device_orientation = useDeviceOrientation();
+  //console.log(device_orientation);
 
   const detectedTextStyle = useMemo(() => {
     return detectedChar != EMPTY_SIGN
@@ -39,13 +44,37 @@ const SignifyCamera = ({
       : {...styles.DetectedText, backgroundColor: 'orange'};
   }, [detectedChar]);
 
+  const fix_hands_rect = hands_rect => {
+    if (Orientation.isLocked()) {
+      if (device_orientation == OrientationNames.LANDSCAPE_LEFT) {
+        hands_rect = {
+          x: 100 - hands_rect.y - hands_rect.h,
+          y: hands_rect.x,
+          w: hands_rect.h,
+          h: hands_rect.w,
+        };
+      }
+
+      if (device_orientation == OrientationNames.LANDSCAPE_RIGHT) {
+        hands_rect = {
+          x: hands_rect.y,
+          y: 100 - hands_rect.x - hands_rect.w,
+          w: hands_rect.h,
+          h: hands_rect.w,
+        };
+      }
+    }
+    return hands_rect;
+  };
+
   hands_style = useMemo(() => {
     return create_hands_style(
-      handRect,
+      fix_hands_rect(handRect),
       styles.hand_rect_default,
       HandRectStyle,
+      device_orientation,
     );
-  }, [handRect]);
+  }, [handRect, device_orientation]);
 
   useEffect(() => {
     check_premessions_interval = setInterval(() => {
@@ -85,6 +114,7 @@ const SignifyCamera = ({
 
       if (detect_res.error) {
         setDetectedChar('');
+        setHandsRect(UN_DETECTED_HANDS);
         setErrorText(detect_res.error.to_string());
         if (onError) onError(detect_res.error);
         return;
@@ -100,8 +130,13 @@ const SignifyCamera = ({
     [detectSignFrames, updateGetFrameNumber],
   );
 
+  const container_style =
+    cameraPermission == true
+      ? {...styles.container, ...style}
+      : styles.fullScreen;
+
   return (
-    <View style={{...styles.container, ...style}}>
+    <View style={container_style}>
       {cameraPermission == false && <PremessionsPage />}
       {cameraPermission && (
         <View style={styles.container}>
@@ -117,7 +152,7 @@ const SignifyCamera = ({
             <Text style={detectedTextStyle}>{detectedChar}</Text>
           )}
 
-          {errorText.length > 0 && (
+          {showErrors && errorText.length > 0 && (
             <Text style={{...styles.errorText, ...errorStyle}}>
               {errorText}
             </Text>
@@ -164,6 +199,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
     left: '5%',
     width: '90%',
+  },
+  fullScreen: {
+    position: 'absolute',
+    top: '0%',
+    height: '100%',
+    width: '100%',
+    zIndex: 10,
+    flex: 1,
   },
 });
 

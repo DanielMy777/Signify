@@ -64,7 +64,7 @@ class SignifyDetectionAnalyzer {
     let w_change = Math.abs(stable_handRect.w - new_handRect.w);
     let h_change = Math.abs(stable_handRect.h - new_handRect.h);
     return (
-      x_change > 6 ||
+      x_change > 3 ||
       y_change > 3 ||
       w_change > 3 ||
       stable_handRect.detected ^ new_handRect.detected

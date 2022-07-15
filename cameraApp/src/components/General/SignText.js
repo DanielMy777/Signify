@@ -34,12 +34,9 @@ const SignText = (
       return false;
     }
 
-    console.log(
-      `i_letter = ${letter} current_letter = ${text_no_spaces[detectedLettersCount]}`,
-    );
     const detected_current_letter =
       text_no_spaces[detectedLettersCount] == letter;
-    console.log(detected_current_letter);
+
     if (detected_current_letter) {
       setDetectedLettersCount(detectedLettersCount + 1);
       if (onLetterDetected) {

@@ -1,20 +1,26 @@
-import React, {useState, useEffect, useMemo, useRef} from 'react';
-import {StyleSheet, Text, View, Button, Dimensions, Image} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {StyleSheet, View} from 'react-native';
 import Reanimated, {useSharedValue, runOnJS} from 'react-native-reanimated';
 import {
   Camera,
   useCameraDevices,
   useFrameProcessor,
-  Frame,
   sortFormats,
-  frameRateIncluded,
 } from 'react-native-vision-camera';
 import Orientation from 'react-native-orientation-locker';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PressableOpacity} from 'react-native-pressable-opacity';
+import {normal_rotation_obj} from '../../Utils/frame-rotation';
 
-function scanQRCodes(frame, orientation, isFrontDevice, frameMaxSize, quality) {
+function scanQRCodes(
+  frame,
+  orientation,
+  isFrontDevice,
+  frameMaxSize,
+  quality,
+  rotation_degree,
+) {
   'worklet';
   return __scanQRCodes(
     frame,
@@ -22,6 +28,7 @@ function scanQRCodes(frame, orientation, isFrontDevice, frameMaxSize, quality) {
     isFrontDevice,
     frameMaxSize,
     quality,
+    rotation_degree,
   );
 }
 
@@ -34,6 +41,7 @@ const Base64Camera = React.forwardRef(
       frameMaxSize,
       frameQuality,
       handsOk = false,
+      rotationObject = normal_rotation_obj,
     },
     ref,
   ) => {
@@ -44,10 +52,10 @@ const Base64Camera = React.forwardRef(
       const update_orientation = value => {
         orientation_obj.value = value;
       };
-      Orientation.getOrientation(update_orientation);
-      Orientation.addOrientationListener(update_orientation);
+      Orientation.getDeviceOrientation(update_orientation);
+      Orientation.addDeviceOrientationListener(update_orientation);
       return () => {
-        Orientation.removeOrientationListener(update_orientation);
+        Orientation.removeDeviceOrientationListener(update_orientation);
       };
     }, []);
     const flipCamera = () => {
@@ -58,18 +66,34 @@ const Base64Camera = React.forwardRef(
     const frameProcessor = useFrameProcessor(
       async frame => {
         'worklet';
+
+        const camera_orienation =
+          (isFrontCamera.value ? 'selfie_' : '') +
+          orientation_obj.value.toLocaleLowerCase();
+        //console.log(camera_orienation);
+        const rotatation_degree = rotationObject[camera_orienation];
+        if (!rotatation_degree)
+          rotatation_degree =
+            rotationObject[orientation_obj.value.toLocaleLowerCase()];
+
+        if (!rotatation_degree) rotatation_degree = 0;
+        // console.log(rotatation_degree);
+        //console.log(orientation_obj.value);
+        //console.log(rotatation_degree);
+
         let base64_img = scanQRCodes(
           frame,
           orientation_obj.value,
           isFrontCamera.value,
           frameMaxSize,
           frameQuality,
+          rotatation_degree,
         );
         if (handle_frame) {
           runOnJS(handle_frame)(base64_img);
         }
       },
-      [orientation_obj, frameMaxSize, frameQuality],
+      [orientation_obj, frameMaxSize, frameQuality, rotationObject],
     );
 
     const devices = useCameraDevices();

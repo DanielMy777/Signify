@@ -1,6 +1,11 @@
 import {getNumInStr, copyProps} from './utils';
 
-create_hands_style = (handsRect, handsRectDefaultStyle, handsRectStyle) => {
+create_hands_style = (
+  handsRect,
+  handsRectDefaultStyle,
+  handsRectStyle,
+  orientation,
+) => {
   const rect_style = {...handsRectDefaultStyle, ...handsRectStyle};
   rect_style.top = handsRect.y + '%';
   rect_style.left = handsRect.x + '%';
