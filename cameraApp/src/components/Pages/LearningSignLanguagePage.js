@@ -26,7 +26,7 @@ const LearningSignLanguagePage = () => {
   useEffect(() => {
     Orientation.lockToPortrait();
     return () => {
-      Orientation.unlockAllOrientations();
+      // Orientation.unlockAllOrientations();
     };
   });
 
@@ -82,6 +82,10 @@ const LearningSignLanguagePage = () => {
         <SignifyCamera
           style={styles.camera_style}
           onSignDetection={onSignDetection}
+          frameProcessorFps={1}
+          detectSignFrames={0}
+          frameQuality={30}
+          frameMaxSize={250}
           errorStyle={{top: '85%', fontSize: 26}}
         />
       }
@@ -109,6 +113,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '50%',
     height: '50%',
+    //transform: [{rotate: '360deg'}],
   },
 });
 export default LearningSignLanguagePage;

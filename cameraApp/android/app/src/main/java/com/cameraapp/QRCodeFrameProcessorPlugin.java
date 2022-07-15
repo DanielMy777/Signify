@@ -35,8 +35,10 @@ public class QRCodeFrameProcessorPlugin extends FrameProcessorPlugin {
       selfieCamera = ((Boolean)params[1]);
       Double smallSize = ((Double)params[2]);
       Double quality = ((Double)params[3]);
+      int rotateDegree = ((Double)params[4]).intValue();
       Bitmap rgbFrameBitmap = toBitMap(image.getImage());
-      rgbFrameBitmap = rotateBitMap(rgbFrameBitmap,getRotateDegree(orientation));
+      
+      rgbFrameBitmap = rotateBitMap(rgbFrameBitmap,rotateDegree);
       if(selfieCamera) // fix selfie mirroring
       {
           rgbFrameBitmap= mirrorBitmap(rgbFrameBitmap);

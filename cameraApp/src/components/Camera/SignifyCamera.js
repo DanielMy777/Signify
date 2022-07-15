@@ -11,6 +11,7 @@ import {
 } from '../../Detection/detection-constants';
 import {DEFAULT_MODEL} from '../../Detection/default-model';
 import {create_hands_style} from '../../Utils/styles-utils';
+import {useDeviceOrientation} from '../../Utils/custom-hooks';
 
 const SignifyCamera = ({
   style,
@@ -20,7 +21,7 @@ const SignifyCamera = ({
   frameQuality = 30,
   DetectModel = DEFAULT_MODEL,
   onDetection,
-  detectSignFrames,
+  detectSignFrames = 1,
   onSignDetection,
   onHandsDetection,
   showErrors = true,
@@ -32,20 +33,22 @@ const SignifyCamera = ({
   const frameNumber = useSharedValue(0);
   const [detectedChar, setDetectedChar] = useState('');
   const [errorText, setErrorText] = useState('');
+  const device_orientation = useDeviceOrientation();
+  //console.log(device_orientation);
 
   const detectedTextStyle = useMemo(() => {
     return detectedChar != EMPTY_SIGN
       ? styles.DetectedText
       : {...styles.DetectedText, backgroundColor: 'orange'};
   }, [detectedChar]);
-
   hands_style = useMemo(() => {
     return create_hands_style(
       handRect,
       styles.hand_rect_default,
       HandRectStyle,
+      device_orientation,
     );
-  }, [handRect]);
+  }, [handRect, device_orientation]);
 
   useEffect(() => {
     check_premessions_interval = setInterval(() => {
@@ -85,6 +88,7 @@ const SignifyCamera = ({
 
       if (detect_res.error) {
         setDetectedChar('');
+        setHandsRect(UN_DETECTED_HANDS);
         setErrorText(detect_res.error.to_string());
         if (onError) onError(detect_res.error);
         return;
@@ -100,8 +104,13 @@ const SignifyCamera = ({
     [detectSignFrames, updateGetFrameNumber],
   );
 
+  const container_style =
+    cameraPermission == true
+      ? {...styles.container, ...style}
+      : styles.fullScreen;
+
   return (
-    <View style={{...styles.container, ...style}}>
+    <View style={container_style}>
       {cameraPermission == false && <PremessionsPage />}
       {cameraPermission && (
         <View style={styles.container}>
@@ -117,7 +126,7 @@ const SignifyCamera = ({
             <Text style={detectedTextStyle}>{detectedChar}</Text>
           )}
 
-          {errorText.length > 0 && (
+          {showErrors && errorText.length > 0 && (
             <Text style={{...styles.errorText, ...errorStyle}}>
               {errorText}
             </Text>
@@ -164,6 +173,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
     left: '5%',
     width: '90%',
+  },
+  fullScreen: {
+    position: 'absolute',
+    top: '0%',
+    height: '100%',
+    width: '100%',
+    zIndex: 10,
+    flex: 1,
   },
 });
 
