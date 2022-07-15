@@ -23,6 +23,9 @@ const LearningSignLanguagePage = () => {
   const signTextRef = useRef();
 
   const onSignDetection = detect_obj => {
+    if (!signTextRef.current) {
+      return;
+    }
     signTextRef.current.detect_letter(detect_obj.sign.char);
   };
 

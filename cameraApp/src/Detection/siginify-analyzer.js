@@ -7,31 +7,30 @@ class SignifyDetectionAnalyzer {
     this.sign_res = undefined;
   }
 
-  async detectHands(img) {
+  detectHands(img) {
+    return this.detect(this.detection_model.detectHands, img);
+  }
+
+  detectWord(img) {
+    return this.detect(this.detection_model.detectWord, img);
+  }
+
+  async detect(detect_function, img) {
     try {
-      this.latest_res = await this.detection_model.detectHands(img);
+      this.latest_res = await detect_function(img);
       this.update_hands();
     } catch (e) {
       this.latest_res = EMPTY_RESULTS;
-      this.stable_handRect = this.new_handRect = UN_DETECTED_HANDS;
       this.latest_res.stable = true;
+      this.stable_handRect = this.new_handRect = UN_DETECTED_HANDS;
       this.latest_res.error = e;
     }
+
     return this.latest_res;
   }
 
   async detectSign(img) {
-    try {
-      this.latest_res = await this.detection_model.detectSign(img);
-      this.update_hands();
-    } catch (e) {
-      this.latest_res = EMPTY_RESULTS;
-      this.latest_res.stable = true;
-      this.stable_handRect = this.new_handRect = UN_DETECTED_HANDS;
-      this.latest_res.error = e;
-    }
-
-    return this.latest_res;
+    return this.detect(this.detection_model.detectSign, img);
   }
 
   get_stable_handsRect() {

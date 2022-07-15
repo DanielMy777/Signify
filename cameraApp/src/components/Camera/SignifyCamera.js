@@ -8,6 +8,7 @@ import PremessionsPage from '../Pages/PremessionsPage';
 import {
   EMPTY_RESULTS,
   UN_DETECTED_HANDS,
+  DetectionType,
 } from '../../Detection/detection-constants';
 import {DEFAULT_MODEL} from '../../Detection/default-model';
 import {create_hands_style} from '../../Utils/styles-utils';
@@ -35,6 +36,7 @@ const SignifyCamera = ({
   const frameNumber = useSharedValue(0);
   const [detectedChar, setDetectedChar] = useState('');
   const [errorText, setErrorText] = useState('');
+  const [detectType, setDetectType] = useState(DetectionType.LETTER);
   const device_orientation = useDeviceOrientation();
   //console.log(device_orientation);
 
@@ -85,6 +87,23 @@ const SignifyCamera = ({
       clearInterval(check_premessions_interval);
     };
   }, []);
+
+  const getDetectTypeIcon = () => {
+    return {
+      name:
+        detectType == DetectionType.LETTER
+          ? 'format-letter-case'
+          : 'file-word-outline',
+      color: 'white',
+      onPress: () => {
+        setDetectType(
+          detectType == DetectionType.LETTER
+            ? DetectionType.WORD
+            : DetectionType.LETTER,
+        );
+      },
+    };
+  };
 
   const updateGetFrameNumber = useCallback(() => {
     let value = frameNumber.value;
@@ -146,6 +165,7 @@ const SignifyCamera = ({
             frameProcessorFps={frameProcessorFps}
             frameMaxSize={frameMaxSize}
             frameQuality={frameQuality}
+            rightMaterialIconsButtons={[getDetectTypeIcon()]}
           />
           {handRect.detected && <View style={hands_style}></View>}
           {detectedChar != '' && (
