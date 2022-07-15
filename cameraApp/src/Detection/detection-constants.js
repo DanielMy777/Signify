@@ -5,8 +5,15 @@ const EMPTY_RESULTS = {
 };
 const EMPTY_SIGN = '!';
 
+class DetectionType {
+  static HANDS = 'hands';
+  static WORD = 'WORD';
+  static LETTER = 'letter';
+}
+
 module.exports = {
   UN_DETECTED_HANDS,
   EMPTY_RESULTS,
   EMPTY_SIGN,
+  DetectionType,
 };

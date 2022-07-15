@@ -42,6 +42,8 @@ const Base64Camera = React.forwardRef(
       frameQuality,
       handsOk = false,
       rotationObject = normal_rotation_obj,
+      rightMaterialIconsButtons,
+      rightButtonsSize = 40,
     },
     ref,
   ) => {
@@ -63,6 +65,21 @@ const Base64Camera = React.forwardRef(
       isFrontCamera.value = !isFrontCamera.value;
     };
 
+    const convert_button_icon_obj_to_element = (icon_button, index) => {
+      return (
+        <PressableOpacity
+          style={styles.button}
+          onPress={icon_button.onPress}
+          key={index}>
+          <MaterialCommunityIcons
+            name={icon_button.name}
+            color={icon_button.color ? icon_button.color : 'white'}
+            size={rightButtonsSize}
+          />
+        </PressableOpacity>
+      );
+    };
+
     const frameProcessor = useFrameProcessor(
       async frame => {
         'worklet';
@@ -77,9 +94,6 @@ const Base64Camera = React.forwardRef(
             rotationObject[orientation_obj.value.toLocaleLowerCase()];
 
         if (!rotatation_degree) rotatation_degree = 0;
-        // console.log(rotatation_degree);
-        //console.log(orientation_obj.value);
-        //console.log(rotatation_degree);
 
         let base64_img = scanQRCodes(
           frame,
@@ -126,13 +140,21 @@ const Base64Camera = React.forwardRef(
             style={styles.button}
             disabledOpacity={0.4}
             onPress={flipCamera}>
-            <IonIcon name="camera-reverse" color="white" size={40} />
+            <IonIcon
+              name="camera-reverse"
+              color="white"
+              size={rightButtonsSize}
+            />
           </PressableOpacity>
+          {rightMaterialIconsButtons &&
+            rightMaterialIconsButtons.map((icon_button, index) =>
+              convert_button_icon_obj_to_element(icon_button, index),
+            )}
           {handsOk && (
             <View style={{...styles.button, backgroundColor: 'green'}}>
               <MaterialCommunityIcons
                 name="hand-okay"
-                size={40}
+                size={rightButtonsSize}
                 color="white"
               />
             </View>

@@ -7,12 +7,16 @@ import {
 class SignifyApiPath {
   static DETECT_HANDS = 'api/img/DetectHands';
   static DETECT_SIGN = 'api/img/DetectHandsSign';
+  static DETECT_WORD = 'api/img/DetectHandsWord';
 }
 class SignifyWebDetectionModel {
   constructor(ip, port, apiPath = SignifyApiPath) {
     this.ip = ip;
     this.port = port;
     this.apiPath = apiPath;
+    this.detectSign = this.detectSign.bind(this);
+    this.detectHands = this.detectHands.bind(this);
+    this.detectWord = this.detectWord.bind(this);
   }
 
   async sendRequest(path, img) {
@@ -34,6 +38,10 @@ class SignifyWebDetectionModel {
 
   detectHands(img) {
     return this.sendRequest(this.apiPath.DETECT_HANDS, img);
+  }
+
+  detectWord(img) {
+    return this.sendRequest(this.apiPath.DETECT_WORD, img);
   }
 }
 
