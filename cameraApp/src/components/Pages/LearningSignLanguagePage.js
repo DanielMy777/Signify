@@ -79,8 +79,8 @@ const LearningSignLanguagePage = () => {
           onSignDetection={onSignDetection}
           frameProcessorFps={5}
           detectSignFrames={1}
-          frameQuality={30}
-          frameMaxSize={250}
+          frameQuality={80}
+          frameMaxSize={700}
           errorStyle={{top: '85%', fontSize: 26}}
         />
       }

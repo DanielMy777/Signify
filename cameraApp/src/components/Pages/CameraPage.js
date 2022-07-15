@@ -18,8 +18,8 @@ const CameraPage = ({style}) => {
         onDetection={onDetection}
         style={styles.camera}
         frameProcessorFps={6}
-        frameMaxSize={400}
-        frameQuality={30}
+        frameMaxSize={700}
+        frameQuality={80}
         detectSignFrames={1}
         onError={onError}
       />
