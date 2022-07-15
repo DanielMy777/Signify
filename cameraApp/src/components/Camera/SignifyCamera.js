@@ -12,6 +12,8 @@ import {
 import {DEFAULT_MODEL} from '../../Detection/default-model';
 import {create_hands_style} from '../../Utils/styles-utils';
 import {useDeviceOrientation} from '../../Utils/custom-hooks';
+import Orientation from 'react-native-orientation-locker';
+import {OrientationNames} from '../../Utils/OrentationNames';
 
 const SignifyCamera = ({
   style,
@@ -41,9 +43,33 @@ const SignifyCamera = ({
       ? styles.DetectedText
       : {...styles.DetectedText, backgroundColor: 'orange'};
   }, [detectedChar]);
+
+  const fix_hands_rect = hands_rect => {
+    if (Orientation.isLocked()) {
+      if (device_orientation == OrientationNames.LANDSCAPE_LEFT) {
+        hands_rect = {
+          x: 100 - hands_rect.y - hands_rect.h,
+          y: hands_rect.x,
+          w: hands_rect.h,
+          h: hands_rect.w,
+        };
+      }
+
+      if (device_orientation == OrientationNames.LANDSCAPE_RIGHT) {
+        hands_rect = {
+          x: hands_rect.y,
+          y: 100 - hands_rect.x - hands_rect.w,
+          w: hands_rect.h,
+          h: hands_rect.w,
+        };
+      }
+    }
+    return hands_rect;
+  };
+
   hands_style = useMemo(() => {
     return create_hands_style(
-      handRect,
+      fix_hands_rect(handRect),
       styles.hand_rect_default,
       HandRectStyle,
       device_orientation,

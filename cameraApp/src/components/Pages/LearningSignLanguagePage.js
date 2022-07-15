@@ -16,19 +16,11 @@ import Tts from '../../Utils/text-to-speech';
 import SignText from '../General/SignText';
 import SignifyCamera from '../Camera/SignifyCamera';
 import {useKeyBoardOpen} from '../../Utils/custom-hooks';
-import Orientation from 'react-native-orientation-locker';
 const LearningSignLanguagePage = () => {
   const [text, setText] = useState('');
   const [signText, setSignText] = useState('');
   const keyboardOpen = useKeyBoardOpen();
   const signTextRef = useRef();
-
-  useEffect(() => {
-    Orientation.lockToPortrait();
-    return () => {
-      // Orientation.unlockAllOrientations();
-    };
-  });
 
   const onSignDetection = detect_obj => {
     signTextRef.current.detect_letter(detect_obj.sign.char);
@@ -43,7 +35,7 @@ const LearningSignLanguagePage = () => {
     Tts.say(text);
   };
 
-  styles.camera_style.top = (!keyboardOpen ? 50 : 70) + '%';
+  styles.camera_style.top = (!keyboardOpen ? 50 : 75) + '%';
 
   return (
     <View style={styles.container}>
@@ -82,8 +74,8 @@ const LearningSignLanguagePage = () => {
         <SignifyCamera
           style={styles.camera_style}
           onSignDetection={onSignDetection}
-          frameProcessorFps={1}
-          detectSignFrames={0}
+          frameProcessorFps={5}
+          detectSignFrames={1}
           frameQuality={30}
           frameMaxSize={250}
           errorStyle={{top: '85%', fontSize: 26}}
