@@ -43,7 +43,7 @@ const runTiming = clock => {
   };
 
   const config = {
-    duration: 5000,
+    duration: 20000,
     toValue: 1,
     easing: EasingNode.inOut(EasingNode.linear),
   };
@@ -106,7 +106,7 @@ export const AnimatedBackground = () => {
         style={[styles.image, {transform: [{translateY: translateX}]}]}>
         <Image
           style={styles.image}
-          source={require('../../../resources/images/SignifyScreen.png')}
+          source={require('../../../resources/images/SignifyScreen.jpg')}
           resizeMode="stretch"
         />
       </Animated.View>
