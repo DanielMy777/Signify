@@ -8,8 +8,9 @@ import HomePage from '../Pages/HomePage';
 import PageName from '../Pages/PageName';
 import SettingsPage from '../Pages/SettingsPage';
 import LearningSignLanguagePage from '../Pages/LearningSignLanguagePage';
+import {AnimatedBackground} from '../General/AnimatedBackground';
 const ScreensStack = createNativeStackNavigator();
-
+//<ScreensStack.Screen name={'meow'} component={AnimatedBackground} />
 const SignifyApp = () => {
   return (
     <NavigationContainer>
@@ -18,7 +19,7 @@ const SignifyApp = () => {
           <ScreensStack.Screen name={PageName.HomePage} component={HomePage} />
           <ScreensStack.Screen
             name={PageName.SettingsPage}
-            component={SettingsPage}
+            component={AnimatedBackground}
           />
           <ScreensStack.Screen
             name={PageName.CameraPage}
