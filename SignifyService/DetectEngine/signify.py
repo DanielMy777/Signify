@@ -155,9 +155,9 @@ def get_match(img, keys):
     sec_char = '!'
 
     img = pad_image(img)
-    cv2.imshow('outi',img)
     
     curr_char = compare_to_db(img)[0]
+
     if curr_char in FISTS:
         curr_char = confirmer.detect_fist(keys)
     elif(not confirmer.confirm(curr_char, keys)):

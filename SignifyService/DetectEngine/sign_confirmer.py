@@ -288,6 +288,8 @@ class Confirmer:
                 return 'D'
             if(self.confirm_b(keys)):
                 return 'B'
+            if(self.confirm_e(keys)):
+                return 'E'
         elif(char in sign_points):
             if(self.confirm_x(keys)):
                 return 'X'
