@@ -26,7 +26,7 @@ app.get("/", (_: Request, res: Response) => {
 });
 
 app.post("/api/img/DetectHands", async (req: Request, res: Response) => {
-  console.log("In Detect Hands");
+  //console.log("In Detect Hands");
   handPool
     .exec(req.body.img)
     .then((data) => {
@@ -36,7 +36,7 @@ app.post("/api/img/DetectHands", async (req: Request, res: Response) => {
 });
 
 app.post("/api/img/DetectHandsSign", async (req: Request, res: Response) => {
-  console.log("In Detect Sign");
+  //console.log("In Detect Sign");
   signPool
     .exec(req.body.img)
     .then((data) => {

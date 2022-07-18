@@ -16,7 +16,7 @@ const getRecognitionPromise = (
       resData += decoder.write(data);
       if (resData.slice(-1) === "\n") {
         resData = resData.trimEnd();
-        console.log(`finale resData = ${resData}`);
+        // console.log(`finale resData = ${resData}`);
         bus.emit(FINISHED_READING);
       }
     };
@@ -26,7 +26,7 @@ const getRecognitionPromise = (
 
     bus.once(FINISHED_READING, () => {
       child.stdout!.removeListener("data", listener);
-      console.log(`resData before sending = ${resData}`);
+      // console.log(`resData before sending = ${resData}`);
       resolve(resData);
     });
   });
