@@ -1,7 +1,7 @@
 from click import confirm
 import cv2
 import mediapipe as mp
-import time
+import numpy as np
 
 sign_undetected = ['!']
 sign_points = ['D', 'U', 'K', 'Z', 'R']
@@ -65,6 +65,8 @@ class Confirmer:
             return self.confirm_y(keys)
         if char == 'Z':
             return self.confirm_z(keys)
+        if self.confirm_space(keys):
+            return ' '
         else:
             return True
 
@@ -245,6 +247,14 @@ class Confirmer:
         keys[14][1] > keys[13][1] and
         keys[18][1] > keys[17][1]) # pointing at camera and fist closed
 
+    def confirm_space(self, keys):
+        heights = [k[2] for k in keys]
+        ind = np.argpartition(heights, -3)[-3:]
+        if 2 in ind and 3 in ind and 4 in ind:
+            return True
+        return False
+
+
     # finger 1 = thumb
     # finger 5 = pinkie
 
@@ -291,17 +301,86 @@ class Confirmer:
                 #return 'Z'
                 return '!'
         elif(char in sign_fists):
-            if(self.confirm_e(keys)):
-                return 'E'
-            if(self.confirm_m(keys)):
-                return 'M'
-            if(self.confirm_t(keys)):
-                return 'T'
-            if(self.confirm_s(keys)):
-                return 'S'
-            if(self.confirm_n(keys)):
-                return 'N'
-            if(self.confirm_a(keys)):
-                return 'A'
+            return self.detect_fist(keys)
 
         return '!'
+
+    
+    def detect_angle(self, keys):
+        p1 = (keys[5][1], keys[5][2])
+        p2 = (keys[17][1], keys[17][2])
+        ang1 = np.arctan2(*p1[::-1])
+        ang2 = np.arctan2(*p2[::-1])
+        return (np.rad2deg((ang1 - ang2) % (2 * np.pi)))
+
+
+    def rotate_key(self, p, origin, degrees=0):
+        angle = np.deg2rad(degrees)
+        R = np.array([[np.cos(angle), -np.sin(angle)],
+                    [np.sin(angle),  np.cos(angle)]])
+        o = np.atleast_2d(origin)
+        p = np.atleast_2d(p)
+        return np.squeeze((R @ (p.T-o.T) + o.T).T)
+
+
+    #0 - Thumb, 4 - Pinkie
+    def decide_fist(self, fist_keys, tip_heights):
+        if (max(tip_heights) == tip_heights[0]):
+            return 'E'
+
+        elif (fist_keys[0][1] > fist_keys[1][1] and fist_keys[0][1] > fist_keys[2][1] and
+            fist_keys[0][0] > fist_keys[3][0] and fist_keys[0][0] > fist_keys[4][0] and
+            fist_keys[0][0] < fist_keys[1][0] and
+            abs(fist_keys[0][0] - fist_keys[2][0]) < abs(fist_keys[0][0] - fist_keys[3][0])):
+            return 'S'
+
+        elif fist_keys[0][0] > fist_keys[1][0]:
+            return 'A'
+        elif fist_keys[0][0] > fist_keys[2][0] and fist_keys[0][1] < fist_keys[2][1]:
+            return 'T'
+        elif fist_keys[0][1] < fist_keys[3][1]:
+            return 'N'
+        elif fist_keys[0][1] < fist_keys[4][1] and fist_keys[0][1] > fist_keys[3][1]:
+            return 'M'
+        else:
+            return '!'
+
+
+    def detect_fist(self, keys, imsize = 300):
+        angle = Confirmer.detect_angle(None, keys)
+        
+        fist_keys = []
+        tip_heights = []
+        base = tuple(np.array((imsize, imsize)) / 2)
+        for i in [4, 6, 10, 14, 18]:
+            fist_keys.append(Confirmer.rotate_key(None, (keys[i][1], keys[i][2]), base, angle))
+        for j in [4, 8, 12, 16, 20]:
+            tip_heights.append(keys[j][2])
+
+        return Confirmer.decide_fist(None, fist_keys, tip_heights)
+
+
+
+# import hand_detector as htm
+# detector = htm.handDetector(detectionCon=1)
+# img = cv2.imread("SignifyService/DetectEngine/test/9.jpg")
+# marked_img = detector.findHands(img)
+# detector.isPoseValid(marked_img)
+# keys = detector.findPosition(marked_img, draw=False)
+
+# print(Confirmer.detect_fist(keys))
+
+# angle = Confirmer.detect_angle(None, keys)
+
+# fist_keys = []
+# tip_heights = []
+# base = image_center = tuple(np.array(img.shape[1::-1]) / 2)
+# for i in [4, 6, 10, 14, 18]:
+#     fist_keys.append(Confirmer.rotate_key(None, (keys[i][1], keys[i][2]), base, angle))
+# for j in [4, 8, 12, 16, 20]:
+#     tip_heights.append(keys[j][2])
+
+# print(keys[4], keys[6], keys[10], keys[14], keys[18])
+# print(fist_keys)
+
+# print(Confirmer.decide_fist(None, fist_keys, tip_heights))
