@@ -31,6 +31,7 @@ from sign_confirmer import Confirmer
 IM_SIZE = 300
 ERROR = (0, 0, 255)
 WARNING = (255, 255, 0)
+FISTS = ['A', 'S', 'T', 'N', 'N', 'E'] # HARD
 
 # ====== Hand Detector
 detector = htm.handDetector(detectionCon=1)
@@ -157,8 +158,9 @@ def get_match(img, keys):
     cv2.imshow('outi',img)
     
     curr_char = compare_to_db(img)[0]
-
-    if(not confirmer.confirm(curr_char, keys)):
+    if curr_char in FISTS:
+        curr_char = confirmer.detect_fist(keys)
+    elif(not confirmer.confirm(curr_char, keys)):
         sec_char = curr_char
         curr_char = '!'
 
