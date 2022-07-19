@@ -8,14 +8,18 @@ import FullScreenBackground from '../General/FullScreenBackground';
 import SignifyHeader from '../General/SignifyHeader';
 import Orientation from 'react-native-orientation-locker';
 const backGroundImg = require('../../../resources/images/HomePageBackground2.jpg');
+import KeepAwake from 'react-native-keep-awake';
 
 const HomePage = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
     Orientation.lockToPortrait();
+    KeepAwake.activate();
+    // console.log('hey');
     return () => {
       //Orientation.unlockAllOrientations();
+      //KeepAwake.deactivate()
     };
   });
   const handleLiveTranslateButtonClicked = () => {

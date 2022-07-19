@@ -18,6 +18,8 @@ target 'cameraApp' do
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
+  pod 'react-native-keep-awake', :path => '../node_modules/react-native-keep-awake'
+
   target 'cameraAppTests' do
     inherit! :complete
     # Pods for testing
