@@ -65,8 +65,6 @@ class Confirmer:
             return self.confirm_y(keys)
         if char == 'Z':
             return self.confirm_z(keys)
-        if self.confirm_space(keys):
-            return ' '
         else:
             return True
 
@@ -104,7 +102,8 @@ class Confirmer:
         keys[3][2] > keys[8][2]) # thumb is lower than index 
 
     def confirm_f(self, keys):
-        return (not self.is_finger_2_open(keys) and 
+        return (not keys[8][2] < keys[12][2] and
+        not self.is_finger_2_open(keys) and 
         self.is_finger_3_open(keys) and 
         self.is_finger_4_open(keys) and 
         self.is_finger_5_open(keys)) 
@@ -249,7 +248,7 @@ class Confirmer:
 
     def confirm_space(self, keys):
         heights = [k[2] for k in keys]
-        ind = np.argpartition(heights, -3)[-3:]
+        ind = np.argpartition(heights, 3)[:3]
         if 2 in ind and 3 in ind and 4 in ind:
             return True
         return False
@@ -276,6 +275,8 @@ class Confirmer:
 
     def semantic_corrent(self, char, keys):
         if(char in sign_undetected): # handle undetecteds
+            if(self.confirm_space(keys)):
+                return ' '
             if(self.confirm_i(keys)):
                 return 'I'
             if(self.confirm_f(keys)):
