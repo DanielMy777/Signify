@@ -32,7 +32,7 @@ const CameraPage = ({style}) => {
         onSignDetection={onSignDetection}
         style={styles.camera}
         frameProcessorFps={5}
-        frameMaxSize={250}
+        frameMaxSize={700}
         frameQuality={80}
         detectSignFrames={1}
         onError={onError}
