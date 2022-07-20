@@ -28,14 +28,14 @@ class Pool {
         return;
       }
 
-      if (worker_id >= (this._workers.length + idStart) || worker_id < idStart) {
+      if (worker_id >= this._workers.length + idStart || worker_id < idStart) {
         console.log(
           `event with worker_id out of range... worker_id = ${worker_id}`
         );
         return;
       }
 
-      this.runWorker(this._workers[worker_id], task);
+      this.runWorker(this._workers[worker_id - idStart], task);
     });
 
     this._timeOut = timeout;
