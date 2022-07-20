@@ -28,7 +28,7 @@ class Pool {
         return;
       }
 
-      if (worker_id >= this._workers.length || worker_id < 0) {
+      if (worker_id >= (this._workers.length + idStart) || worker_id < idStart) {
         console.log(
           `event with worker_id out of range... worker_id = ${worker_id}`
         );
