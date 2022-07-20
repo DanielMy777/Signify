@@ -87,6 +87,10 @@ class Confirmer:
         return True #todo
 
     def confirm_d(self, keys):
+        index_diffs = [keys[7][2] - keys[8][2], keys[6][2] - keys[7][2], keys[5][2] - keys[6][2]]
+        for diff in index_diffs:
+            if(diff < 10):
+                return False        # not straight up
         return (not self.is_finger_1_open(keys) and 
         self.is_finger_2_open(keys) and 
         not self.is_finger_3_open(keys) and 
@@ -99,7 +103,7 @@ class Confirmer:
         not self.is_finger_3_open(keys) and 
         not self.is_finger_4_open(keys) and 
         not self.is_finger_5_open(keys) and
-        keys[3][2] > keys[8][2]) # thumb is lower than index 
+        keys[3][2] > keys[12][2]) # thumb is lower than middle 
 
     def confirm_f(self, keys):
         return (not keys[8][2] < keys[12][2] and
@@ -221,16 +225,16 @@ class Confirmer:
         not self.is_finger_5_open(keys)) 
 
     def confirm_x(self, keys):
-        return (not self.is_finger_1_open(keys) and 
-        keys[8][2] > keys[7][2] and # index tip lower than knuckle 
+        return (keys[8][2] > keys[7][2] and # index tip lower than knuckle 
         keys[8][2] < keys[5][2] and # index tip higher than base 
-        keys[4][2] < keys[12][2] and # thumb is up - differ from E
+        keys[4][2] < keys[16][2] and # thumb is up - differ from E
         not self.is_finger_3_open(keys) and 
         not self.is_finger_4_open(keys) and 
         not self.is_finger_5_open(keys)) 
 
     def confirm_y(self, keys):
-        return (self.is_finger_1_open(keys) and 
+        return (keys[4][1] - keys[2][1] > 10 and
+        self.is_finger_1_open(keys) and 
         not self.is_finger_2_open(keys) and 
         not self.is_finger_3_open(keys) and 
         not self.is_finger_4_open(keys) and 
@@ -281,10 +285,10 @@ class Confirmer:
                 return 'I'
             if(self.confirm_f(keys)):
                 return 'F'
-            if(self.confirm_x(keys)):
-                return 'X'
             if(self.confirm_z(keys)):
                 return 'Z'
+            if(self.confirm_x(keys)):
+                return 'X'
             if(self.confirm_d(keys)):
                 return 'D'
             if(self.confirm_b(keys)):
@@ -334,7 +338,8 @@ class Confirmer:
         elif (fist_keys[0][1] > fist_keys[1][1] and fist_keys[0][1] > fist_keys[2][1] and
             fist_keys[0][0] > fist_keys[3][0] and fist_keys[0][0] > fist_keys[4][0] and
             fist_keys[0][0] < fist_keys[1][0] and
-            abs(fist_keys[0][0] - fist_keys[2][0]) < abs(fist_keys[0][0] - fist_keys[3][0])):
+            abs(fist_keys[0][0] - fist_keys[2][0]) < abs(fist_keys[0][0] - fist_keys[3][0]) and
+            tip_heights[0] < tip_heights[1]):
             return 'S'
 
         elif fist_keys[0][0] > fist_keys[1][0]:
@@ -361,6 +366,16 @@ class Confirmer:
             tip_heights.append(keys[j][2])
 
         return Confirmer.decide_fist(None, fist_keys, tip_heights)
+
+    def straight_keys(self, keys, imsize = 300):
+        angle = Confirmer.detect_angle(None, keys)
+        base = tuple(np.array((imsize, imsize)) / 2)
+
+        rotated_keys = []
+        for i in range(21):
+            rotated_keys.append((0, Confirmer.rotate_key(None, (keys[i][1], keys[i][2]), base, angle)))
+        
+        return rotated_keys
 
 
 
