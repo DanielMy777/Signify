@@ -3,8 +3,9 @@ import {StyleSheet, Text, View, ScrollView} from 'react-native';
 import {useSharedValue} from 'react-native-reanimated';
 import {EMPTY_SIGN} from '../../Detection/detection-constants';
 import SignifyCamera from '../Camera/SignifyCamera';
+import {count_char_sequence_from_end_at_str} from '../../Utils/utils';
 
-const CameraPage = ({style}) => {
+const CameraPage = ({style, CharMaxSequence = 2}) => {
   const [predictedText, setPredictedText] = useState('');
   const predictedTextScrollViewRef = useRef();
   const signToNotAllowInsertTwiceInARow = useSharedValue(EMPTY_SIGN);
@@ -16,7 +17,12 @@ const CameraPage = ({style}) => {
       res.sign.char != EMPTY_SIGN &&
       signToNotAllowInsertTwiceInARow.value != res.sign.char
     ) {
-      setPredictedText(prev => prev + res.sign.char);
+      setPredictedText(prev =>
+        count_char_sequence_from_end_at_str(prev, res.sign.char) <
+        CharMaxSequence
+          ? prev + res.sign.char
+          : prev,
+      );
     } else if (res.sign.char != EMPTY_SIGN) {
     }
 

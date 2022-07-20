@@ -11,4 +11,18 @@ const getPercent = (num, percent) => {
   return Math.round(num * (percent / 100));
 };
 
-module.exports = {getNumInStr, copyProps, getPercent};
+const count_char_sequence_from_end_at_str = (str, char) => {
+  let count_char_seq_from_end = 0;
+  for (let i = str.length - 1; i >= 0 && str[i] == char; i--) {
+    count_char_seq_from_end++;
+  }
+
+  return count_char_seq_from_end;
+};
+
+module.exports = {
+  getNumInStr,
+  copyProps,
+  getPercent,
+  count_char_sequence_from_end_at_str,
+};
