@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Animated, {EasingNode, stopClock} from 'react-native-reanimated';
 
+const signifyLogo = require('../../../resources/images/SignifyLogo.png');
 const imageSize = {
   width: 198,
   height: 2409,
@@ -106,7 +107,19 @@ export const AnimatedBackground = ({AnimationTimeSeconds = 20, children}) => {
 
   return (
     <View>
-      <View style={styles.childrens_view}>{children}</View>
+      <View style={styles.childrens_view}>
+        <Image
+          source={signifyLogo}
+          style={{
+            zIndex: 10000,
+            position: 'absolute',
+            top: '8%',
+            left: '25%',
+          }}
+        />
+        {children}
+      </View>
+
       <TouchableWithoutFeedback
         style={styles.container}
         onPress={() => setPlay(!play)}>
