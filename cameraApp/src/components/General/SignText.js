@@ -64,7 +64,10 @@ const SignText = (
   };
   let letter_index = 0; // only the indexes of chars that are not ' '
   return (
-    <Text style={{...styles.signText, fontSize}}>
+    <Text
+      style={{...styles.signText, fontSize}}
+      adjustsFontSizeToFit={true}
+      numberOfLines={5}>
       {text.split('').map((letter, index) => {
         letter_color = getLetterColor(letter, letter_index);
         letter_index += letter != ' ';
@@ -80,7 +83,7 @@ const SignText = (
 
 const styles = StyleSheet.create({
   signText: {
-    fontSize: 120,
+    fontSize: 100,
     fontFamily: FontName.AmericanSignLanguage,
     color: 'black',
   },

@@ -5,6 +5,8 @@ import {
   StyleSheet,
   Dimensions,
   View,
+  Text,
+  useWindowDimensions,
 } from 'react-native';
 import Animated, {EasingNode, stopClock} from 'react-native-reanimated';
 
@@ -34,7 +36,7 @@ const {
   and,
 } = Animated;
 
-const runTiming = clock => {
+const runTiming = (clock, AnimationTimeSeconds) => {
   const state = {
     finished: new Value(0),
     position: new Value(0),
@@ -42,8 +44,8 @@ const runTiming = clock => {
     frameTime: new Value(0),
   };
 
-  const config = {
-    duration: 20000,
+  let config = {
+    duration: AnimationTimeSeconds * 1000,
     toValue: 1,
     easing: EasingNode.inOut(EasingNode.linear),
   };
@@ -65,7 +67,8 @@ const runTiming = clock => {
   ]);
 };
 
-export const AnimatedBackground = () => {
+export const AnimatedBackground = ({AnimationTimeSeconds = 20, children}) => {
+  const window_size = useWindowDimensions();
   const [play, setPlay] = useState(true);
   const {progress, clock, isPlaying} = useMemo(
     () => ({
@@ -88,7 +91,7 @@ export const AnimatedBackground = () => {
           startClock(clock),
         ),
         cond(and(clockRunning(clock), eq(isPlaying, 0)), stopClock(clock)),
-        set(progress, runTiming(clock)),
+        set(progress, runTiming(clock, AnimationTimeSeconds)),
       ]),
     [progress, clock],
   );
@@ -98,29 +101,47 @@ export const AnimatedBackground = () => {
     outputRange: [0, imageSize.height * 2],
   });
 
+  styles.childrens_view.width = window_size.width;
+  styles.childrens_view.height = window_size.height;
+
   return (
-    <TouchableWithoutFeedback
-      style={styles.container}
-      onPress={() => setPlay(!play)}>
-      <Animated.View
-        style={[styles.image, {transform: [{translateY: translateX}]}]}>
-        <Image
-          style={styles.image}
-          source={require('../../../resources/images/SignifyScreen.jpg')}
-          resizeMode="stretch"
-        />
-      </Animated.View>
-    </TouchableWithoutFeedback>
+    <View>
+      <View style={styles.childrens_view}>{children}</View>
+      <TouchableWithoutFeedback
+        style={styles.container}
+        onPress={() => setPlay(!play)}>
+        <Animated.View
+          style={[styles.image, {transform: [{translateY: translateX}]}]}>
+          <Image
+            style={styles.image}
+            source={require('../../../resources/images/SignifyScreen.jpg')}
+            resizeMode="stretch"
+          />
+        </Animated.View>
+      </TouchableWithoutFeedback>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    position: 'absolute',
+    top: 0,
+    width: '100%',
+    height: '100%',
   },
   image: {
     top: -imageSize.height,
     width: '100%',
     height: animatedHeight + imageSize.height,
+  },
+  childrens_view: {
+    zIndex: 1000,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: 0,
+    height: 0,
   },
 });

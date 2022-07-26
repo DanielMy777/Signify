@@ -18,8 +18,7 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
       signToNotAllowInsertTwiceInARow.value != res.sign.char
     ) {
       setPredictedText(prev =>
-        count_char_sequence_from_str_end(prev, res.sign.char) <
-        CharMaxSequence
+        count_char_sequence_from_str_end(prev, res.sign.char) < CharMaxSequence
           ? prev + res.sign.char
           : prev,
       );

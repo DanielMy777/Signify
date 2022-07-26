@@ -62,13 +62,12 @@ const LearningSignLanguagePage = () => {
   return (
     <View style={styles.container}>
       <View style={signTranslateViewStyleFixed}>
-        <SignifyHeader fontSize={50} />
         <View style={styles.input}>
           <TextInput
             style={styles.textBox}
             value={text}
             onChangeText={setText}
-            placeholder="word to translate"
+            placeholder="sentence to translate"
             onSubmitEditing={onTranslateButtonPressed}
           />
           <PressableOpacity
@@ -108,7 +107,6 @@ const LearningSignLanguagePage = () => {
           detectSignFrames={1}
           frameQuality={80}
           frameMaxSize={700}
-          errorStyle={{top: '85%', fontSize: 26}}
         />
       }
     </View>
@@ -139,9 +137,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     alignItems: 'center',
     position: 'relative',
-    top: '0%',
+    top: '2%',
     width: '100%',
-    height: '50%',
+    height: '48%',
   },
   signTextScrollView: {textAlign: 'center'},
 });
