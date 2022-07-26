@@ -1,4 +1,11 @@
-import {SafeAreaView, StyleSheet} from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  Button,
+  TouchableOpacity,
+  Text,
+  View,
+} from 'react-native';
 
 import React, {useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
@@ -9,6 +16,7 @@ import {AnimatedBackground} from '../General/AnimatedBackground';
 import Orientation from 'react-native-orientation-locker';
 const backGroundImg = require('../../../resources/images/HomePageBackground2.jpg');
 import KeepAwake from 'react-native-keep-awake';
+import HomePageButtons from '../General/HomePageButtons';
 
 const HomePage = () => {
   const navigation = useNavigation();
@@ -36,31 +44,22 @@ const HomePage = () => {
   return (
     <AnimatedBackground>
       <SafeAreaView style={styles.container}>
-        <AwesomeButtonRick
-          type="primary"
+        <HomePageButtons
           onPress={handleLiveTranslateButtonClicked}
-          backgroundColor="yellow"
-          textColor="black"
-          backgroundDarker={null}>
-          Live Translation
-        </AwesomeButtonRick>
+          style={styles.button}
+          Text="Live Translation"
+        />
 
-        <AwesomeButtonRick
-          type="primary"
+        <HomePageButtons
           onPress={handleLearnSignLanguageButtonClicked}
-          backgroundColor="red"
-          textColor="black"
-          backgroundDarker={null}>
-          Learn Sign Language
-        </AwesomeButtonRick>
-        <AwesomeButtonRick
-          type="primary"
+          style={styles.button}
+          Text="Learn Sign Language"
+        />
+        <HomePageButtons
+          Text="Settings"
           onPress={handleSettingsButtonClicked}
-          backgroundColor="gray"
-          textColor="white"
-          backgroundDarker={null}>
-          Settings
-        </AwesomeButtonRick>
+          style={styles.button}
+        />
       </SafeAreaView>
     </AnimatedBackground>
   );
@@ -72,11 +71,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     height: '100%',
+    top: '5%',
   },
   title: {
     fontSize: 30,
     fontWeight: 'bold',
     color: '#20315f',
+  },
+  button: {
+    marginBottom: 10,
+    alignItems: 'center',
+    width: '80%',
   },
 });
 export default HomePage;
