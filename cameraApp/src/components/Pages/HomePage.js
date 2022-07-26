@@ -5,7 +5,7 @@ import {useNavigation} from '@react-navigation/native';
 import PageName from './PageName';
 import AwesomeButtonRick from 'react-native-really-awesome-button/src/themes/rick';
 import FullScreenBackground from '../General/FullScreenBackground';
-import SignifyHeader from '../General/SignifyHeader';
+import {AnimatedBackground} from '../General/AnimatedBackground';
 import Orientation from 'react-native-orientation-locker';
 const backGroundImg = require('../../../resources/images/HomePageBackground2.jpg');
 import KeepAwake from 'react-native-keep-awake';
@@ -34,8 +34,7 @@ const HomePage = () => {
   };
   //<MaterialIcons name="arrow-forward-ios" color="#fff" size={15} />
   return (
-    <FullScreenBackground source={backGroundImg}>
-      <SignifyHeader fontSize={80} />
+    <AnimatedBackground>
       <SafeAreaView style={styles.container}>
         <AwesomeButtonRick
           type="primary"
@@ -63,15 +62,16 @@ const HomePage = () => {
           Settings
         </AwesomeButtonRick>
       </SafeAreaView>
-    </FullScreenBackground>
+    </AnimatedBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    width: '100%',
+    height: '100%',
   },
   title: {
     fontSize: 30,

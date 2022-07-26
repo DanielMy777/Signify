@@ -15,6 +15,7 @@ import {create_hands_style} from '../../Utils/styles-utils';
 import {useDeviceOrientation} from '../../Utils/custom-hooks';
 import Orientation from 'react-native-orientation-locker';
 import {OrientationNames} from '../../Utils/OrentationNames';
+import {VectorIconType} from '../General/Icons';
 
 const SignifyCamera = ({
   style,
@@ -93,8 +94,9 @@ const SignifyCamera = ({
       name:
         detectType == DetectionType.LETTER
           ? 'format-letter-case'
-          : 'file-word-outline',
-      color: 'white',
+          : 'file-word-box-outline',
+      icon_type: VectorIconType.MatterialCommunity,
+      color: 'black',
       onPress: () => {
         setDetectType(
           detectType == DetectionType.LETTER

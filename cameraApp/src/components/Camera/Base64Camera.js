@@ -73,7 +73,7 @@ const Base64Camera = React.forwardRef(
           key={index}>
           <MaterialCommunityIcons
             name={icon_button.name}
-            color={icon_button.color ? icon_button.color : 'white'}
+            color={icon_button.color ? icon_button.color : 'black'}
             size={rightButtonsSize}
           />
         </PressableOpacity>
@@ -142,7 +142,7 @@ const Base64Camera = React.forwardRef(
             onPress={flipCamera}>
             <IonIcon
               name="camera-reverse"
-              color="white"
+              color="black"
               size={rightButtonsSize}
             />
           </PressableOpacity>
@@ -165,8 +165,8 @@ const Base64Camera = React.forwardRef(
   },
 );
 
-const CONTENT_SPACING = 15;
-const BUTTON_SIZE = 40;
+const CONTENT_SPACING = 10;
+const BUTTON_SIZE = 45;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -187,14 +187,15 @@ const styles = StyleSheet.create({
     width: BUTTON_SIZE,
     height: BUTTON_SIZE,
     borderRadius: BUTTON_SIZE / 2,
-    backgroundColor: 'rgba(140, 140, 140, 0.8)',
+    backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
   },
+  //'rgba(140, 140, 140, 0.8)'
   rightButtons: {
     position: 'absolute',
     top: '5%',
-    right: '5%',
+    right: '2%',
     zIndex: 2,
   },
 });
