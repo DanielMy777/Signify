@@ -151,11 +151,11 @@ const Base64Camera = React.forwardRef(
               convert_button_icon_obj_to_element(icon_button, index),
             )}
           {handsOk && (
-            <View style={{...styles.button, backgroundColor: 'green'}}>
+            <View style={{...styles.button, backgroundColor: '#00ff7e'}}>
               <MaterialCommunityIcons
                 name="hand-okay"
                 size={rightButtonsSize}
-                color="white"
+                color="black"
               />
             </View>
           )}
