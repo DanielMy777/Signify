@@ -67,7 +67,7 @@ const runTiming = (clock, AnimationTimeSeconds) => {
   ]);
 };
 
-export const AnimatedBackground = ({AnimationTimeSeconds = 20, children}) => {
+export const AnimatedBackground = ({AnimationTimeSeconds = 40, children}) => {
   const window_size = useWindowDimensions();
   const [play, setPlay] = useState(true);
   const {progress, clock, isPlaying} = useMemo(
