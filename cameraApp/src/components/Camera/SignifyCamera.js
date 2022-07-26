@@ -16,6 +16,8 @@ import {useDeviceOrientation} from '../../Utils/custom-hooks';
 import Orientation from 'react-native-orientation-locker';
 import {OrientationNames} from '../../Utils/OrentationNames';
 import {VectorIconType} from '../General/Icons';
+import FontName from '../General/FontName';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const SignifyCamera = ({
   style,
@@ -170,8 +172,14 @@ const SignifyCamera = ({
             rightMaterialIconsButtons={[getDetectTypeIcon()]}
           />
           {handRect.detected && <View style={hands_style}></View>}
-          {detectedChar != '' && (
+          {detectedChar != '' && detectedChar != ' ' && (
             <Text style={detectedTextStyle}>{detectedChar}</Text>
+          )}
+
+          {detectedChar != '' && detectedChar == ' ' && (
+            <View style={detectedTextStyle}>
+              <MaterialCommunityIcons name="keyboard-space" size={30} />
+            </View>
           )}
 
           {showErrors && errorText.length > 0 && (
@@ -195,7 +203,7 @@ const styles = StyleSheet.create({
 
   hand_rect_default: {
     borderWidth: 4,
-    borderColor: 'green',
+    borderColor: '#00ff7e', //#42df90
     position: 'absolute',
   },
   DetectedText: {
@@ -207,8 +215,10 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 44 / 2,
     textAlign: 'center',
-    paddingTop: 3,
+    alignItems: 'center',
+    paddingTop: 1,
     fontSize: 30,
+    backgroundColor: '#00ff7e',
     color: 'black',
   },
   errorText: {
@@ -218,9 +228,11 @@ const styles = StyleSheet.create({
     width: '100%',
     fontSize: 30,
     color: 'black',
-    backgroundColor: 'red',
+    backgroundColor: 'rgba(255, 190, 0, 0.7)',
+    borderRadius: 50,
     left: '5%',
     width: '90%',
+    fontFamily: FontName.BerlinSans,
   },
   fullScreen: {
     position: 'absolute',

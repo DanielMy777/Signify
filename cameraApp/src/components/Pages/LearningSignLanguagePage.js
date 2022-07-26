@@ -61,6 +61,7 @@ const LearningSignLanguagePage = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.backgroundColor} />
       <View style={signTranslateViewStyleFixed}>
         <View style={styles.input}>
           <TextInput
@@ -115,6 +116,11 @@ const LearningSignLanguagePage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  backgroundColor: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
   },
   textBox: {
     borderWidth: 1,

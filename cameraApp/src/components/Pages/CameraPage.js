@@ -4,9 +4,12 @@ import {useSharedValue} from 'react-native-reanimated';
 import {EMPTY_SIGN} from '../../Detection/detection-constants';
 import SignifyCamera from '../Camera/SignifyCamera';
 import {count_char_sequence_from_str_end} from '../../Utils/utils';
+import FontName from '../General/FontName';
 
 const CameraPage = ({style, CharMaxSequence = 2}) => {
-  const [predictedText, setPredictedText] = useState('');
+  const [predictedText, setPredictedText] = useState(
+    'hello how are you cat sadsadsadsadsa',
+  );
   const predictedTextScrollViewRef = useRef();
   const signToNotAllowInsertTwiceInARow = useSharedValue(EMPTY_SIGN);
   const onError = useCallback(error => {
@@ -43,14 +46,18 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
         onError={onError}
       />
       <View style={styles.predictedTextView}>
-        <Text style={styles.predictedTextTitle}>Predicted Text:</Text>
+        <View style={{borderBottomWidth: 1, bottom: '15%'}}>
+          <Text style={styles.predictedTextTitle}>Predicted Text:</Text>
+        </View>
         <ScrollView
           contentContainerStyle={styles.prdeictedScrollView}
           ref={predictedTextScrollViewRef}
           onContentSizeChange={() =>
             predictedTextScrollViewRef.current.scrollToEnd({animated: true})
           }>
-          <Text style={styles.predictedText}>{predictedText}</Text>
+          <Text style={styles.predictedText}>
+            {predictedText.toUpperCase()}
+          </Text>
         </ScrollView>
       </View>
     </View>
@@ -69,21 +76,27 @@ const styles = StyleSheet.create({
     height: '70%',
   },
   predictedText: {
+    marginTop: 5,
     fontSize: 30,
+    fontFamily: FontName.Blocks,
+    color: '#71797a',
   },
   prdeictedScrollView: {
     width: '100%',
-    textAlign: 'center',
   },
   predictedTextView: {
     position: 'absolute',
     top: '75%',
     height: '24%',
-    width: '100%',
+    width: '97%',
+    left: '2%',
+    right: '1%',
     alignItems: 'center',
   },
   predictedTextTitle: {
-    fontSize: 20,
+    fontSize: 23,
+    fontFamily: FontName.BerlinSans,
+    marginBottom: 10,
   },
 });
 
