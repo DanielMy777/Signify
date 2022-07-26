@@ -108,6 +108,7 @@ const LearningSignLanguagePage = () => {
           detectSignFrames={1}
           frameQuality={80}
           frameMaxSize={700}
+          errorStyle={{top: '80%'}}
         />
       }
     </View>
