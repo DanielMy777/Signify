@@ -1,15 +1,19 @@
-import React, {useState, useRef, useCallback} from 'react';
+import React, {useState, useRef, useCallback, useMemo} from 'react';
 import {StyleSheet, Text, View, ScrollView} from 'react-native';
 import {useSharedValue} from 'react-native-reanimated';
 import {EMPTY_SIGN} from '../../Detection/detection-constants';
 import SignifyCamera from '../Camera/SignifyCamera';
-import {count_char_sequence_from_str_end} from '../../Utils/utils';
+import {
+  count_char_sequence_from_str_end,
+  get_str_last_char,
+} from '../../Utils/utils';
 import FontName from '../General/FontName';
-import {TextInput} from 'react-native-gesture-handler';
+import IconButtonsContainer from '../General/IconButtonsContainer';
+import Tts from '../../Utils/text-to-speech';
 
 const CameraPage = ({style, CharMaxSequence = 2}) => {
   const [predictedText, setPredictedText] = useState(
-    'hello how are you cat sadsadsadsadsa',
+    'abye how are you my dear  dear cathope you doing well ab',
   );
 
   const predictedTextScrollViewRef = useRef();
@@ -24,10 +28,11 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
       signToNotAllowInsertTwiceInARow.value != res.sign.char
     ) {
       setPredictedText(prev => {
-        return count_char_sequence_from_str_end(prev, res.sign.char) <
-          CharMaxSequence
-          ? prev + res.sign.char
-          : prev;
+        const add_new_char =
+          count_char_sequence_from_str_end(prev, res.sign.char) <
+            CharMaxSequence &&
+          !(res.sign.char == ' ' && get_str_last_char(prev) == ' ');
+        return add_new_char ? prev + res.sign.char : prev;
       });
     }
 
@@ -36,6 +41,23 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
         ? res.sign.char
         : EMPTY_SIGN;
   }, []);
+
+  const create_button_obj = (name, onPress = undefined) => {
+    return {name, onPress};
+  };
+
+  const buttons = useMemo(
+    () => [
+      create_button_obj('delete', () => {
+        setPredictedText('');
+      }),
+      create_button_obj('volume-high', () => {
+        Tts.say(predictedText);
+      }),
+      create_button_obj('google-translate', () => {}),
+    ],
+    [predictedText],
+  );
 
   return (
     <View style={{...styles.container, ...style}}>
@@ -49,12 +71,13 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
         onError={onError}
       />
       <View style={styles.predictedTextView}>
-        <View style={{borderBottomWidth: 1, bottom: '15%'}}>
+        <View style={{borderBottomWidth: 1, bottom: '10%'}}>
           <Text style={styles.predictedTextTitle}>Predicted Text:</Text>
         </View>
         <ScrollView
           contentContainerStyle={styles.prdeictedScrollView}
           ref={predictedTextScrollViewRef}
+          persistentScrollbar={true}
           onContentSizeChange={() =>
             predictedTextScrollViewRef.current.scrollToEnd({animated: true})
           }>
@@ -63,6 +86,7 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
           </Text>
         </ScrollView>
       </View>
+      <IconButtonsContainer Buttons={buttons} style={styles.bottomButtons} />
     </View>
   );
 };
@@ -76,7 +100,7 @@ const styles = StyleSheet.create({
     top: '0%',
     left: '0%',
     width: '100%',
-    height: '70%',
+    height: '60%',
   },
   predictedText: {
     marginTop: 5,
@@ -88,9 +112,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   predictedTextView: {
-    position: 'absolute',
-    top: '75%',
-    height: '24%',
+    top: '64%',
+    height: '27%',
     width: '97%',
     left: '2%',
     right: '1%',
@@ -99,7 +122,19 @@ const styles = StyleSheet.create({
   predictedTextTitle: {
     fontSize: 23,
     fontFamily: FontName.BerlinSans,
-    marginBottom: 10,
+  },
+  bottomButtons: {
+    position: 'absolute',
+    top: '93%',
+    width: '96%',
+    backgroundColor: '#efefef',
+    height: '7%',
+    left: '2%',
+    right: '2%',
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    flexDirection: 'row',
   },
 });
 
