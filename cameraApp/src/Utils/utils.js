@@ -11,6 +11,11 @@ const getPercent = (num, percent) => {
   return Math.round(num * (percent / 100));
 };
 
+const get_str_last_char = string => {
+  if (string.length == 0) return '';
+  return string[string.length - 1];
+};
+
 const count_char_sequence_from_str_end = (str, char) => {
   let count_char_seq_from_end = 0;
   for (let i = str.length - 1; i >= 0 && str[i] == char; i--) {
@@ -25,4 +30,5 @@ module.exports = {
   copyProps,
   getPercent,
   count_char_sequence_from_str_end,
+  get_str_last_char,
 };

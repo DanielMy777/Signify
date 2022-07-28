@@ -11,7 +11,6 @@ import React, {useState, useCallback, useRef, useMemo} from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PressableOpacity} from 'react-native-pressable-opacity';
-import SignifyHeader from '../General/SignifyHeader';
 import Tts from '../../Utils/text-to-speech';
 import SignText from '../General/SignText';
 import SignifyCamera from '../Camera/SignifyCamera';
