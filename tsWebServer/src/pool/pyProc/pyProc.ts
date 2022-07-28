@@ -40,8 +40,8 @@ class PyProc {
   waitForSpwan(): Promise<void> {
     return new Promise((resolve, _) => {
       let readyData = "";
-      const onData = (data: string) => {
-        readyData += data;
+      const onData = (data: Buffer) => {
+        readyData += data.toString("utf-8");
         if (readyData === "ready") {
           this._child.stdout!.removeListener("data", onData);
           this._ready = true;
