@@ -5,27 +5,30 @@ import {EMPTY_SIGN} from '../../Detection/detection-constants';
 import SignifyCamera from '../Camera/SignifyCamera';
 import {count_char_sequence_from_str_end} from '../../Utils/utils';
 import FontName from '../General/FontName';
+import {TextInput} from 'react-native-gesture-handler';
 
 const CameraPage = ({style, CharMaxSequence = 2}) => {
   const [predictedText, setPredictedText] = useState(
     'hello how are you cat sadsadsadsadsa',
   );
+
   const predictedTextScrollViewRef = useRef();
   const signToNotAllowInsertTwiceInARow = useSharedValue(EMPTY_SIGN);
   const onError = useCallback(error => {
     signToNotAllowInsertTwiceInARow.value = EMPTY_SIGN;
   }, []);
+
   const onSignDetection = useCallback(res => {
     if (
       res.sign.char != EMPTY_SIGN &&
       signToNotAllowInsertTwiceInARow.value != res.sign.char
     ) {
-      setPredictedText(prev =>
-        count_char_sequence_from_str_end(prev, res.sign.char) < CharMaxSequence
+      setPredictedText(prev => {
+        return count_char_sequence_from_str_end(prev, res.sign.char) <
+          CharMaxSequence
           ? prev + res.sign.char
-          : prev,
-      );
-    } else if (res.sign.char != EMPTY_SIGN) {
+          : prev;
+      });
     }
 
     signToNotAllowInsertTwiceInARow.value =

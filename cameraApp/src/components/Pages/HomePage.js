@@ -1,26 +1,14 @@
-import {
-  SafeAreaView,
-  StyleSheet,
-  Button,
-  TouchableOpacity,
-  Text,
-  View,
-} from 'react-native';
-
+import {SafeAreaView, StyleSheet} from 'react-native';
 import React, {useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import PageName from './PageName';
-import AwesomeButtonRick from 'react-native-really-awesome-button/src/themes/rick';
-import FullScreenBackground from '../General/FullScreenBackground';
 import {AnimatedBackground} from '../General/AnimatedBackground';
 import Orientation from 'react-native-orientation-locker';
-const backGroundImg = require('../../../resources/images/HomePageBackground2.jpg');
 import KeepAwake from 'react-native-keep-awake';
 import HomePageButtons from '../General/HomePageButtons';
 
 const HomePage = () => {
   const navigation = useNavigation();
-
   useEffect(() => {
     Orientation.lockToPortrait();
     KeepAwake.activate();
@@ -30,9 +18,11 @@ const HomePage = () => {
       //KeepAwake.deactivate()
     };
   });
+
   const handleLiveTranslateButtonClicked = () => {
     navigation.navigate(PageName.CameraPage);
   };
+
   const handleLearnSignLanguageButtonClicked = () => {
     navigation.navigate(PageName.LearningPage);
   };
@@ -40,6 +30,7 @@ const HomePage = () => {
   const handleSettingsButtonClicked = () => {
     navigation.navigate(PageName.SettingsPage);
   };
+
   //<MaterialIcons name="arrow-forward-ios" color="#fff" size={15} />
   return (
     <AnimatedBackground>
@@ -49,7 +40,6 @@ const HomePage = () => {
           style={styles.button}
           Text="Live Translation"
         />
-
         <HomePageButtons
           onPress={handleLearnSignLanguageButtonClicked}
           style={styles.button}
