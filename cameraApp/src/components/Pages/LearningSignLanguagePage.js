@@ -20,8 +20,8 @@ const LearningSignLanguagePage = () => {
   const [signText, setSignText] = useState('');
   const keyboardOpen = useKeyBoardOpen();
   const signTextRef = useRef();
-  const signTranslateViewHeight = 50,
-    signTranslateViewHeightWhenKeyboardOpen = 75;
+  const signTranslateViewHeight = 44,
+    signTranslateViewHeightWhenKeyboardOpen = signTranslateViewHeight + 25;
 
   const onSignDetection = useCallback(
     detect_obj => {
@@ -43,20 +43,18 @@ const LearningSignLanguagePage = () => {
     Tts.say(text);
   };
 
+  const sign_translate_view_height_current = !keyboardOpen
+    ? signTranslateViewHeight
+    : signTranslateViewHeightWhenKeyboardOpen;
   const signTranslateViewStyleFixed = useMemo(
     () => ({
       ...styles.signTranslateView,
-      height:
-        (!keyboardOpen
-          ? signTranslateViewHeight
-          : signTranslateViewHeightWhenKeyboardOpen) + '%',
+      height: sign_translate_view_height_current + '%',
     }),
     [keyboardOpen],
   );
-  styles.camera_style.top =
-    (!keyboardOpen
-      ? signTranslateViewHeight
-      : signTranslateViewHeightWhenKeyboardOpen) + '%';
+  styles.camera_style.top = sign_translate_view_height_current + '%';
+  styles.camera_style.height = 100 - signTranslateViewHeight + '%';
 
   return (
     <View style={styles.container}>
@@ -107,7 +105,7 @@ const LearningSignLanguagePage = () => {
           detectSignFrames={1}
           frameQuality={80}
           frameMaxSize={700}
-          errorStyle={{top: '80%'}}
+          errorStyle={{top: '82%'}}
         />
       }
     </View>
@@ -135,8 +133,8 @@ const styles = StyleSheet.create({
   },
   camera_style: {
     position: 'absolute',
-    top: '50%',
-    height: '50%',
+    top: '40%',
+    height: '60%',
     //transform: [{rotate: '360deg'}],
   },
   signTranslateView: {
@@ -145,7 +143,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     top: '2%',
     width: '100%',
-    height: '48%',
+    height: '40%',
   },
   signTextScrollView: {textAlign: 'center'},
 });
