@@ -25,10 +25,16 @@ const count_char_sequence_from_str_end = (str, char) => {
   return count_char_seq_from_end;
 };
 
+const get_random_item_list = list => {
+  if (list.length == 0) return null;
+  return list[Math.floor(Math.random() * list.length)];
+};
+
 module.exports = {
   getNumInStr,
   copyProps,
   getPercent,
   count_char_sequence_from_str_end,
   get_str_last_char,
+  get_random_item_list,
 };
