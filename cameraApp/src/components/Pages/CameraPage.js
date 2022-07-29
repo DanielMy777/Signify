@@ -54,7 +54,9 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
       create_button_obj('volume-high', () => {
         Tts.say(predictedText);
       }),
-      create_button_obj('google-translate', () => {}),
+      create_button_obj('google-translate', () => {
+        setPredictedText(prev => prev + 'A');
+      }),
     ],
     [predictedText],
   );
@@ -69,24 +71,30 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
         frameQuality={80}
         detectSignFrames={1}
         onError={onError}
+        errorStyle={{fontSize: 28, top: '88%'}}
       />
       <View style={styles.predictedTextView}>
-        <View style={{borderBottomWidth: 1, bottom: '10%'}}>
+        <View style={styles.predictedTextTitleView}>
           <Text style={styles.predictedTextTitle}>Predicted Text:</Text>
         </View>
         <ScrollView
           contentContainerStyle={styles.prdeictedScrollView}
           ref={predictedTextScrollViewRef}
           persistentScrollbar={true}
-          onContentSizeChange={() =>
-            predictedTextScrollViewRef.current.scrollToEnd({animated: true})
-          }>
+          style={{width: '100%'}}
+          onContentSizeChange={() => {
+            predictedTextScrollViewRef.current.scrollToEnd({animated: true});
+          }}>
           <Text style={styles.predictedText}>
             {predictedText.toUpperCase()}
           </Text>
         </ScrollView>
       </View>
-      <IconButtonsContainer Buttons={buttons} style={styles.bottomButtons} />
+      <IconButtonsContainer
+        Buttons={buttons}
+        style={styles.bottomButtons}
+        IconSize={35}
+      />
     </View>
   );
 };
@@ -104,20 +112,25 @@ const styles = StyleSheet.create({
   },
   predictedText: {
     marginTop: 5,
-    fontSize: 30,
+    fontSize: 25,
     fontFamily: FontName.Blocks,
     color: '#71797a',
   },
   prdeictedScrollView: {
     width: '100%',
+    alignItems: 'center',
   },
   predictedTextView: {
     top: '64%',
-    height: '27%',
+    height: '29%',
     width: '97%',
     left: '2%',
     right: '1%',
     alignItems: 'center',
+  },
+  predictedTextTitleView: {
+    borderBottomWidth: 1,
+    bottom: '10%',
   },
   predictedTextTitle: {
     fontSize: 23,
@@ -125,10 +138,10 @@ const styles = StyleSheet.create({
   },
   bottomButtons: {
     position: 'absolute',
-    top: '93%',
+    top: '95%',
     width: '96%',
     backgroundColor: '#efefef',
-    height: '7%',
+    height: '5%',
     left: '2%',
     right: '2%',
     borderRadius: 15,
