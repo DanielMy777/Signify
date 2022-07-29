@@ -6,6 +6,7 @@ import {AnimatedBackground} from '../General/AnimatedBackground';
 import Orientation from 'react-native-orientation-locker';
 import KeepAwake from 'react-native-keep-awake';
 import HomePageButtons from '../General/HomePageButtons';
+import {VectorIconType} from '../General/Icons';
 
 const HomePage = () => {
   const navigation = useNavigation();
@@ -38,17 +39,21 @@ const HomePage = () => {
         <HomePageButtons
           onPress={handleLiveTranslateButtonClicked}
           style={styles.button}
-          Text="Live Translation"
+          Label="Live Translation"
+          IconName="video"
         />
         <HomePageButtons
           onPress={handleLearnSignLanguageButtonClicked}
           style={styles.button}
-          Text="Learn Sign Language"
+          Label="Learn Sign Language"
+          IconName="school"
         />
         <HomePageButtons
-          Text="Settings"
+          Label="Settings"
           onPress={handleSettingsButtonClicked}
           style={styles.button}
+          IconName="settings"
+          IconType={VectorIconType.IonIcons}
         />
       </SafeAreaView>
     </AnimatedBackground>
