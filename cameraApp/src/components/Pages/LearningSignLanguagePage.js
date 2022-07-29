@@ -15,7 +15,9 @@ import Tts from '../../Utils/text-to-speech';
 import SignText from '../General/SignText';
 import SignifyCamera from '../Camera/SignifyCamera';
 import {useKeyBoardOpen} from '../../Utils/custom-hooks';
-const LearningSignLanguagePage = () => {
+import {play_random_sound} from '../../Utils/sound';
+
+const LearningSignLanguagePage = ({enableSoundDetection = true}) => {
   const [text, setText] = useState('');
   const [signText, setSignText] = useState('');
   const keyboardOpen = useKeyBoardOpen();
@@ -32,6 +34,10 @@ const LearningSignLanguagePage = () => {
     },
     [signTextRef],
   );
+
+  const onLetterDetected = () => {
+    if (enableSoundDetection) play_random_sound();
+  };
 
   const onTranslateButtonPressed = () => {
     setSignText(text);
@@ -94,7 +100,11 @@ const LearningSignLanguagePage = () => {
         <ScrollView
           contentContainerStyle={styles.signTextScrollView}
           persistentScrollbar={true}>
-          <SignText text={signText} ref={signTextRef} />
+          <SignText
+            text={signText}
+            ref={signTextRef}
+            onLetterDetected={onLetterDetected}
+          />
         </ScrollView>
       </View>
       {
