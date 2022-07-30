@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 import {Keyboard} from 'react-native';
 import Orientation from 'react-native-orientation-locker';
+import {useAnimatedGestureHandler} from 'react-native-reanimated';
 
 useKeyBoardOpen = () => {
   const [keyboardOpen, setKeyboardOpen] = useState(false);
@@ -33,4 +34,11 @@ useDeviceOrientation = () => {
   return deviceOrientation.toLowerCase();
 };
 
-module.exports = {useKeyBoardOpen, useDeviceOrientation};
+useForceRender = () => {
+  const [someState, setSomeSate] = useState(false);
+  return () => {
+    setSomeSate(prev => !prev);
+  };
+};
+
+module.exports = {useKeyBoardOpen, useDeviceOrientation, useForceRender};
