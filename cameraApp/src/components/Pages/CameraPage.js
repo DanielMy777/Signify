@@ -10,11 +10,17 @@ import {
 import FontName from '../General/FontName';
 import IconButtonsContainer from '../General/IconButtonsContainer';
 import Tts from '../../Utils/text-to-speech';
+import TextTranslator from '../General/TextTranslator';
+import {useForceRender} from '../../Utils/custom-hooks';
 
 const CameraPage = ({style, CharMaxSequence = 2}) => {
   const [predictedText, setPredictedText] = useState(
     'abye how are you my dear  dear cathope you doing well ab',
   );
+
+  const [googleTranslateEnabled, setGoogleTranslateEnabled] = useState(false);
+  const detectSoundEnabled = useSharedValue(true);
+  const forceRender = useForceRender();
 
   const predictedTextScrollViewRef = useRef();
   const signToNotAllowInsertTwiceInARow = useSharedValue(EMPTY_SIGN);
@@ -32,6 +38,9 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
           count_char_sequence_from_str_end(prev, res.sign.char) <
             CharMaxSequence &&
           !(res.sign.char == ' ' && get_str_last_char(prev) == ' ');
+        if (detectSoundEnabled.value && add_new_char && res.sign.char != ' ') {
+          Tts.say(res.sign.char);
+        }
         return add_new_char ? prev + res.sign.char : prev;
       });
     }
@@ -42,23 +51,30 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
         : EMPTY_SIGN;
   }, []);
 
-  const create_button_obj = (name, onPress = undefined) => {
-    return {name, onPress};
+  const create_button_obj = (name, onPress = undefined, color) => {
+    return {name, onPress, color};
   };
-
   const buttons = useMemo(
     () => [
       create_button_obj('delete', () => {
         setPredictedText('');
       }),
-      create_button_obj('volume-high', () => {
-        Tts.say(predictedText);
-      }),
-      create_button_obj('google-translate', () => {
-        setPredictedText(prev => prev + 'A');
-      }),
+      create_button_obj(
+        detectSoundEnabled.value ? 'volume-high' : 'volume-mute',
+        () => {
+          detectSoundEnabled.value = !detectSoundEnabled.value;
+          forceRender();
+        },
+      ),
+      create_button_obj(
+        'google-translate',
+        () => {
+          setGoogleTranslateEnabled(!googleTranslateEnabled);
+        },
+        googleTranslateEnabled ? 'black' : 'red',
+      ),
     ],
-    [predictedText],
+    [predictedText, googleTranslateEnabled, detectSoundEnabled.value],
   );
 
   return (
@@ -77,18 +93,27 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
         <View style={styles.predictedTextTitleView}>
           <Text style={styles.predictedTextTitle}>Predicted Text:</Text>
         </View>
-        <ScrollView
-          contentContainerStyle={styles.prdeictedScrollView}
-          ref={predictedTextScrollViewRef}
-          persistentScrollbar={true}
-          style={{width: '100%'}}
-          onContentSizeChange={() => {
-            predictedTextScrollViewRef.current.scrollToEnd({animated: true});
-          }}>
-          <Text style={styles.predictedText}>
-            {predictedText.toUpperCase()}
-          </Text>
-        </ScrollView>
+        {!googleTranslateEnabled && (
+          <ScrollView
+            contentContainerStyle={styles.prdeictedScrollView}
+            ref={predictedTextScrollViewRef}
+            persistentScrollbar={true}
+            style={{width: '100%'}}
+            onContentSizeChange={() => {
+              predictedTextScrollViewRef.current.scrollToEnd({animated: true});
+            }}>
+            <Text style={styles.predictedText}>
+              {predictedText.toUpperCase()}
+            </Text>
+          </ScrollView>
+        )}
+        {googleTranslateEnabled && (
+          <TextTranslator
+            text={predictedText.toUpperCase()}
+            style={{height: '94%', top: '-4%'}}
+            textStyle={[styles.predictedText, {fontSize: 15}]}
+          />
+        )}
       </View>
       <IconButtonsContainer
         Buttons={buttons}
@@ -112,7 +137,7 @@ const styles = StyleSheet.create({
   },
   predictedText: {
     marginTop: 5,
-    fontSize: 25,
+    fontSize: 24,
     fontFamily: FontName.Blocks,
     color: '#71797a',
   },

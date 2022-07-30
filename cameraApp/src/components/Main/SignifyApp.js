@@ -19,7 +19,7 @@ const SignifyApp = () => {
           <ScreensStack.Screen name={PageName.HomePage} component={HomePage} />
           <ScreensStack.Screen
             name={PageName.SettingsPage}
-            component={AnimatedBackground}
+            component={SettingsPage}
           />
           <ScreensStack.Screen
             name={PageName.CameraPage}

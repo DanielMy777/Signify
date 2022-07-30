@@ -1,6 +1,6 @@
 import {View, StyleSheet} from 'react-native';
 import React from 'react';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {GeneralIcon, VectorIconType} from './Icons';
 import {PressableOpacity} from 'react-native-pressable-opacity';
 const IconButtonsContainer = ({
   style,
@@ -13,10 +13,13 @@ const IconButtonsContainer = ({
       {Buttons.map((button, index) => {
         return (
           <PressableOpacity key={index} onPress={button.onPress}>
-            <MaterialCommunityIcons
+            <GeneralIcon
+              Type={
+                button.type ? button.type : VectorIconType.MatterialCommunity
+              }
               name={button.name}
               size={IconSize}
-              color={IconColor}
+              color={button.color ? button.color : IconColor}
             />
           </PressableOpacity>
         );
