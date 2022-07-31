@@ -12,6 +12,7 @@ import IconButtonsContainer from '../General/IconButtonsContainer';
 import Tts from '../../Utils/text-to-speech';
 import TextTranslator from '../General/TextTranslator';
 import {useForceRender} from '../../Utils/custom-hooks';
+import {play_random_sound} from '../../Utils/sound';
 
 const CameraPage = ({style, CharMaxSequence = 2}) => {
   const [predictedText, setPredictedText] = useState(
@@ -38,8 +39,15 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
           count_char_sequence_from_str_end(prev, res.sign.char) <
             CharMaxSequence &&
           !(res.sign.char == ' ' && get_str_last_char(prev) == ' ');
-        if (detectSoundEnabled.value && add_new_char && res.sign.char != ' ') {
-          Tts.say(res.sign.char);
+        if (
+          detectSoundEnabled.value &&
+          res.sign.char != signToNotAllowInsertTwiceInARow.value
+        ) {
+          if (res.sign.char != ' ') {
+            Tts.say(res.sign.char);
+          } else {
+            play_random_sound();
+          }
         }
         return add_new_char ? prev + res.sign.char : prev;
       });
