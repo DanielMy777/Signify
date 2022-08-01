@@ -25,16 +25,16 @@ except ImportError as ie:
 logger.write('after imports\n')
 logger.flush()
 
-def createSignObject(img_cv):
+def createSignObject(img_cv, is_letter: bool):
     start = time.time()
-    res2 = signify.process_image(img_cv)
+    res2 = signify.process_image(img_cv, is_letter)
     logger.write(f'time for detection = {time.time() - start}\n')
     logger.write(f'detected char = {res2[0]}\n')
     logger.flush()
-    sign_obj = {"char": res2[0], "detected": res2[0] != '!'}
+    sign_obj = {"char": res2[0], "detected": res2[0] != '!', "is_word": not is_letter}
     return sign_obj
 
-def createResponse(img_cv, detectSign: bool):
+def createResponse(img_cv, detectSign: bool, is_letter: bool):
     start = time.time()
     res = signify.get_rect(img_cv)
     logger.write(f'time for get_rect = {time.time() - start}\n')
@@ -42,7 +42,7 @@ def createResponse(img_cv, detectSign: bool):
 
     res_object = {"hands": {"handsRect": res}}
     if detectSign:
-        res_object = {"hands": {"handsRect": res}, "sign": createSignObject(img_cv)}
+        res_object = {"hands": {"handsRect": res}, "sign": createSignObject(img_cv, is_letter)}
 
     return res_object
 
@@ -64,11 +64,14 @@ def main() -> None:
     sys.stdout.flush()
     while True:
         try:
-            img_base64 = sys.stdin.readline().rstrip('\n')
+            server_input = sys.stdin.readline().rstrip('\n')
+            is_letter = server_input[-1] == '1'
+            img_base64 = server_input[:-1]
             logger.write(f'img_base64 length = {len(img_base64)}\n')
+            logger.write(f'is_letter = {is_letter}\n')
             logger.flush()
             img_cv = base64ToCv(img_base64)
-            res_object = createResponse(img_cv, detectSign)
+            res_object = createResponse(img_cv, detectSign, is_letter)
             res_json = json.dumps(res_object)
             logger.write(f'{res_json}\n')
             logger.flush()

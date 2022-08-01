@@ -7,6 +7,7 @@ const FINISHED_READING = "finished";
 
 const getRecognitionPromise = (
   img: string,
+  is_letter: boolean,
   child: ChildProcess
 ): Promise<string> => {
   return new Promise((resolve, _) => {
@@ -22,7 +23,7 @@ const getRecognitionPromise = (
     };
 
     child.stdout!.on("data", listener);
-    child.stdin!.write(img.replace(/\s/g, "") + "\n");
+    child.stdin!.write(img.replace(/\s/g, "") + (is_letter ? "1" : "0") + "\n");
 
     bus.once(FINISHED_READING, () => {
       child.stdout!.removeListener("data", listener);

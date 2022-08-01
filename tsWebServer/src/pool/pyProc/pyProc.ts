@@ -53,7 +53,11 @@ class PyProc {
     });
   }
 
-  run(img: string, timeOut: number | undefined = undefined): Promise<string> {
+  run(
+    img: string,
+    is_letter: boolean,
+    timeOut: number | undefined = undefined
+  ): Promise<string> {
     if (!this._ready) {
       throw "Process is not ready! await waitForSpwan() to be ready";
     }
@@ -71,7 +75,7 @@ class PyProc {
         }, timeOut);
       }
 
-      getRecognitionPromise(img, this._child)
+      getRecognitionPromise(img, is_letter, this._child)
         .then((res) => resolve(res))
         .catch((err) => reject(err))
         .finally(() => clearTimeout(timeoutid));

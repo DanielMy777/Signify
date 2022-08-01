@@ -50,10 +50,10 @@ class Pool {
   }
 
   private runWorker(worker: PyProc, task: Task) {
-    const { img, resolve, reject } = task;
+    const { img, is_letter, resolve, reject } = task;
     worker.free = false;
     worker
-      .run(img)
+      .run(img, is_letter)
       .then((res) => resolve(res))
       .catch((err) => reject(err))
       .finally(() => {
@@ -96,14 +96,14 @@ class Pool {
     });
   }
 
-  exec(img: string): Promise<string> {
+  exec(img: string, is_letter: boolean = true): Promise<string> {
     return new Promise((resolve, reject) => {
       if (this._timeOut) {
         setTimeout(() => reject("time out"), this._timeOut);
       }
 
       const worker = this._workers.find((w) => w.free);
-      const task = { img, resolve, reject };
+      const task = { img, is_letter, resolve, reject };
       if (worker) {
         this.runWorker(worker, task);
       } else {
