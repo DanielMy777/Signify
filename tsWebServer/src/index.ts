@@ -7,6 +7,7 @@ const app = express();
 const PORT = 3000;
 const SIGN_CHILD_NUM = 1;
 const HAND_CHILD_NUM = 1;
+const IS_LETTER = true;
 // const TIME_OUT = 5000;
 const PROCESS_NAME = "../SignifyService/signifyService.py";
 
@@ -38,7 +39,17 @@ app.post("/api/img/DetectHands", async (req: Request, res: Response) => {
 app.post("/api/img/DetectHandsSign", async (req: Request, res: Response) => {
   //console.log("In Detect Sign");
   signPool
-    .exec(req.body.img)
+    .exec(req.body.img, IS_LETTER)
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => res.send(err));
+});
+
+app.post("/api/img/DetectHandsWord", async (req: Request, res: Response) => {
+  //console.log("In Detect Sign");
+  signPool
+    .exec(req.body.img, !IS_LETTER)
     .then((data) => {
       res.send(data);
     })
