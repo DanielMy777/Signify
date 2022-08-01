@@ -26,6 +26,7 @@ import cv2
 from glob import glob
 import hand_detector as htm
 from sign_confirmer import Confirmer
+from word_detector_maker import detect_word
 
 # ====== Constants
 IM_SIZE = 300
@@ -228,9 +229,15 @@ def write_message(src, message, type):
             (50,50), 
             cv2.FONT_HERSHEY_SIMPLEX, 1, type, 3, cv2.LINE_AA)
 
-
 # ====== Process a single image (or video frame)
-def process_image(img):
+def process_image(img, is_letter):
+    if is_letter:
+        return process_image_letter(img)
+    else: # Word
+        return process_image_word(img)
+
+# ====== Process a single image (or video frame) to get the letter it represents
+def process_image_letter(img):
     dst = img.copy()
     h, w, _ = dst.shape
     char = '!'
@@ -253,6 +260,14 @@ def process_image(img):
             dst = draw_square(dst, keys_dict, char)
     return (char, dst)
 
+
+# ====== Process a single image (or video frame) to get the word it represents
+def process_image_word(img):
+    dst = img.copy()
+    h, w, _ = dst.shape
+    word = detect_word(dst)
+    #TODO: if word == error
+    return (word, dst)
 
 # ===== Main code snippet
 def main():
@@ -282,7 +297,7 @@ def main():
         ret, frame = cap.read()
 
         if ret == True:
-            char, reframe = process_image(frame)
+            char, reframe = process_image(frame, True)
             reframe = print_identify(reframe, identified)
             if (identified is not None):
                 identified = None
