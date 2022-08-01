@@ -6,6 +6,7 @@ import SignifyCamera from '../Camera/SignifyCamera';
 import {
   count_char_sequence_from_str_end,
   get_str_last_char,
+  get_last_word,
 } from '../../Utils/utils';
 import FontName from '../General/FontName';
 import IconButtonsContainer from '../General/IconButtonsContainer';
@@ -30,15 +31,19 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
   }, []);
 
   const onSignDetection = useCallback(res => {
+    is_word = res.sign.is_word;
     if (
       res.sign.char != EMPTY_SIGN &&
       signToNotAllowInsertTwiceInARow.value != res.sign.char
     ) {
       setPredictedText(prev => {
-        const add_new_char =
-          count_char_sequence_from_str_end(prev, res.sign.char) <
-            CharMaxSequence &&
-          !(res.sign.char == ' ' && get_str_last_char(prev) == ' ');
+        const add_new_text =
+          (!is_word &&
+            count_char_sequence_from_str_end(prev, res.sign.char) <
+              CharMaxSequence &&
+            !(res.sign.char == ' ' && get_str_last_char(prev) == ' ')) ||
+          (is_word && get_last_word(prev) != res.sign.char);
+
         if (
           detectSoundEnabled.value &&
           res.sign.char != signToNotAllowInsertTwiceInARow.value
@@ -49,7 +54,9 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
             play_random_sound();
           }
         }
-        return add_new_char ? prev + res.sign.char : prev;
+        add_if_word =
+          is_word && prev != '' && get_str_last_char(prev) != ' ' ? ' ' : '';
+        return add_new_text ? prev + add_if_word + res.sign.char : prev;
       });
     }
 

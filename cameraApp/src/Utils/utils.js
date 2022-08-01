@@ -30,6 +30,11 @@ const get_random_item_list = list => {
   return list[Math.floor(Math.random() * list.length)];
 };
 
+const get_last_word = str => {
+  words = str.split(' ');
+  return words.length == 0 ? null : words[words.length - 1];
+};
+
 module.exports = {
   getNumInStr,
   copyProps,
@@ -37,4 +42,5 @@ module.exports = {
   count_char_sequence_from_str_end,
   get_str_last_char,
   get_random_item_list,
+  get_last_word,
 };

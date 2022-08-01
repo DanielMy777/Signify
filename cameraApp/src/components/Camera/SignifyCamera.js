@@ -17,6 +17,7 @@ import Orientation from 'react-native-orientation-locker';
 import {OrientationNames} from '../../Utils/OrentationNames';
 import {VectorIconType} from '../General/Icons';
 import FontName from '../General/FontName';
+import {useForceRender} from '../../Utils/custom-hooks';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const SignifyCamera = ({
@@ -39,14 +40,21 @@ const SignifyCamera = ({
   const frameNumber = useSharedValue(0);
   const [detectedChar, setDetectedChar] = useState('');
   const [errorText, setErrorText] = useState('');
-  const [detectType, setDetectType] = useState(DetectionType.LETTER);
+  const detectType = useSharedValue(DetectionType.LETTER);
   const device_orientation = useDeviceOrientation();
+  const reRender = useForceRender();
   //console.log(device_orientation);
+
+  const getDetectedStyleByDetectionType = () => {
+    return detectType.value == DetectionType.LETTER
+      ? styles.DetectedLetterText
+      : styles.DetectedWordText;
+  };
 
   const detectedTextStyle = useMemo(() => {
     return detectedChar != EMPTY_SIGN
-      ? styles.DetectedText
-      : {...styles.DetectedText, backgroundColor: 'orange'};
+      ? getDetectedStyleByDetectionType()
+      : {...getDetectedStyleByDetectionType(), backgroundColor: 'orange'};
   }, [detectedChar]);
 
   const fix_hands_rect = hands_rect => {
@@ -94,17 +102,17 @@ const SignifyCamera = ({
   const getDetectTypeIcon = () => {
     return {
       name:
-        detectType == DetectionType.LETTER
+        detectType.value == DetectionType.LETTER
           ? 'format-letter-case'
           : 'file-word-box-outline',
       icon_type: VectorIconType.MatterialCommunity,
       color: 'black',
       onPress: () => {
-        setDetectType(
-          detectType == DetectionType.LETTER
+        detectType.value =
+          detectType.value == DetectionType.LETTER
             ? DetectionType.WORD
-            : DetectionType.LETTER,
-        );
+            : DetectionType.LETTER;
+        reRender();
       },
     };
   };
@@ -126,9 +134,15 @@ const SignifyCamera = ({
         (fnumber == 1 || (fnumber == frameProcessorFps && false)) &&
         detectSignFrames !== 0;
 
-      detect_res = await (detectSignMethod
-        ? DetectModel.detectSign(img)
-        : DetectModel.detectHands(img));
+      //console.log(detectType.value);
+      if (detectSignMethod) {
+        detect_res = await (detectType.value == DetectionType.LETTER
+          ? DetectModel.detectSign(img)
+          : DetectModel.detectWord(img));
+      } else {
+        detect_res = await DetectModel.detectHands(img);
+      }
+
       if (detect_res.hands.handsRect.stable) {
         //update only when needs make it look smooth
         detect_res.hands.detected = true;
@@ -206,7 +220,7 @@ const styles = StyleSheet.create({
     borderColor: '#00ff7e', //#42df90
     position: 'absolute',
   },
-  DetectedText: {
+  DetectedLetterText: {
     position: 'absolute',
     left: '4%',
     top: '5%',
@@ -217,6 +231,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     alignItems: 'center',
     paddingTop: 1,
+    fontSize: 30,
+    backgroundColor: '#00ff7e',
+    color: 'black',
+  },
+  DetectedWordText: {
+    position: 'absolute',
+    left: '4%',
+    top: '5%',
+    backgroundColor: 'green',
+    height: 44,
+    textAlign: 'center',
+    alignItems: 'center',
+    paddingLeft: 4,
+    paddingRight: 4,
+    borderRadius: 10,
     fontSize: 30,
     backgroundColor: '#00ff7e',
     color: 'black',
