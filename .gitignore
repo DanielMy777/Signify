@@ -134,3 +134,4 @@ secrets.js
 #media
 media/
 output*
+words_script.py
