@@ -8,8 +8,8 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 
-cv2.namedWindow('out', cv2.WINDOW_NORMAL)
-cv2.resizeWindow('out', 500, 600)
+# cv2.namedWindow('out', cv2.WINDOW_NORMAL)
+# cv2.resizeWindow('out', 500, 600)
 
 abs_dir = os.path.abspath( os.path.dirname( __file__ ))
 sys.path.append(abs_dir)                 # path will contain this dir no matter the script exec point
@@ -30,7 +30,7 @@ mp_hands = mp_mpHands.Hands(mp_mode, mp_maxHands,
 mpDraw = mp.solutions.drawing_utils
 
 # Extract all pictures
-file_names = glob.glob(abs_dir + "/../Resources/Words/*.jpg")
+file_names = glob.glob(abs_dir + "/../Resources/Words-sml/*.jpg")
 num_files = len(file_names)
 curr_file = 1
 
@@ -63,25 +63,35 @@ def extract_data(file, w, h, hand_lms, pose_lms):
     return values
     
 
-def process_word_image(img, file_name):
+def process_word_image(img, file_name, is_check):
     h, w, _ = img.shape
     pose_results = mp_pose.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
     hand_results = mp_hands.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
 
+    if not pose_results.pose_landmarks:
+        raise Exception(f"Undetected body")
+    
     pose_vis = [lm.visibility for lm in pose_results.pose_landmarks.landmark][:23]
     if(any(np.array(pose_vis) < 0.5)):
-        print(f"File {file_name} invalid pose")
-        return None
+        raise Exception(f"Invalid pose")
 
     if not hand_results.multi_hand_landmarks:
-        print(f"File {file_name} invalid hands")
-        return None
+        raise Exception(f"Undetected hands")
+
+    pose_lms = [get_real_lms(h, w, lm) for lm in pose_results.pose_landmarks.landmark]
+    pose_per = ((pose_lms[24][1] - pose_lms[12][1]) / h) * 100
+    print(file_name, pose_per)
+    if (pose_per > 40):
+        raise Exception("Please move further")  
+    if (pose_per < 20):
+        raise Exception("Please move closer")
     
+    if is_check:
+        return (hand_results, pose_results)
 
     hand_no = 0 if (len(hand_results.multi_hand_landmarks) == 1 or 
         hand_results.multi_handedness[0].classification[0].label == "Left") else 1
     hand_lms = [get_real_lms(h, w, lm) for lm in hand_results.multi_hand_landmarks[hand_no].landmark]
-    pose_lms = [get_real_lms(h, w, lm) for lm in pose_results.pose_landmarks.landmark]
 
     values = extract_data(file_name.split("\\")[-1], w, h, hand_lms, pose_lms)
 
@@ -94,7 +104,7 @@ def main():
     for pic in file_names:
         img = cv2.imread(pic)
         
-        values = process_word_image(img, pic)
+        values = process_word_image(img, pic, False)
         if(values is not None):
             data.loc[len(data.index)] = values
             print(f"Processed file {curr_file} out of {num_files}\n")

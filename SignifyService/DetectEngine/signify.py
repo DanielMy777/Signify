@@ -26,7 +26,9 @@ import cv2
 from glob import glob
 import hand_detector as htm
 from sign_confirmer import Confirmer
-from word_detector_maker import detect_word
+from word_detector import wordDetector
+from word_confirmer import wordConfirmer
+from word_detector import detect_word
 
 # ====== Constants
 IM_SIZE = 300
@@ -35,8 +37,10 @@ WARNING = (255, 255, 0)
 FISTS = ['A', 'S', 'T', 'N', 'N', 'E'] # HARD
 
 # ====== Hand Detector
-detector = htm.handDetector(detectionCon=1)
-confirmer = Confirmer(hand='right')
+letter_detector = htm.handDetector(detectionCon=1)
+letter_confirmer = Confirmer(hand='right')
+word_detector = wordDetector()
+word_confirmer = wordConfirmer()
 
 # ====== Neural Network
 model = None
@@ -160,15 +164,15 @@ def get_match(img, keys):
     curr_char = compare_to_db(img)[0]
 
     if curr_char in FISTS:
-        curr_char = confirmer.detect_fist(keys)
-    elif(not confirmer.confirm(curr_char, keys)):
+        curr_char = letter_confirmer.detect_fist(keys)
+    elif(not letter_confirmer.confirm(curr_char, keys)):
         sec_char = curr_char
         curr_char = '!'
 
     if(curr_char == '!'):
-        curr_char = confirmer.semantic_corrent(sec_char, keys)
+        curr_char = letter_confirmer.semantic_corrent(sec_char, keys)
         if(curr_char == '!'):
-            curr_char = confirmer.semantic_corrent(curr_char, keys)
+            curr_char = letter_confirmer.semantic_corrent(curr_char, keys)
 
     return curr_char
 
@@ -190,22 +194,29 @@ def draw_square(img, keys_dict, letter):
         return dst
 
 
-# ====== Get the bounding rectange coordinates for the detected hand
-def get_rect(img):
+# ====== Get the bounding rectange coordinates for the detected hand or hands
+def get_rect(img, one_handed):
+    if one_handed:
+        return get_rect_1_hand(img)
+    else:
+        return get_rect_2_hand(img)
+
+# ====== Get the bounding rectangle coordinates for the detected raised hand
+def get_rect_1_hand(img):
     coords = {'x': 0, 'y': 0, 'h': 0, 'w': 0, 'v': 1, 'msg': "OK"}
     dst = img.copy()
     h, w, _ = dst.shape
-    marked_img = detector.findHands(dst)
-    if not detector.isPoseValid(dst): # invalid position
+    marked_img = letter_detector.findHands(dst)
+    if not letter_detector.isPoseValid(dst): # invalid position
         coords['v'] = 0
         coords['msg'] = "Please raise one hand"
     else:
-        keys = detector.findPosition(marked_img, draw=False)
+        keys = letter_detector.findPosition(marked_img, draw=False)
         if(keys is None or len(keys) == 0): # no hand detected
             coords['v'] = 0
             coords['msg'] = "No hand detected"
         else:
-            keys_dict = detector.getHandCoordsByKeys(keys, h, w)
+            keys_dict = letter_detector.getHandCoordsByKeys(keys, h, w)
             cut_img = cut_hand(dst, keys_dict)
             if(cut_img is None): # hand detected, but to close to edges
                 coords['v'] = 0
@@ -217,6 +228,49 @@ def get_rect(img):
             coords['y'] = round((top_left_p[1] / h) * 100)
             coords['w'] = round(((bottom_right_p[0] - top_left_p[0]) / w) * 100)
             coords['h'] = round(((bottom_right_p[1] - top_left_p[1]) / h) * 100)
+
+    return coords
+
+
+# ====== Get the bounding rectangles coordinates for the detected hands
+def get_rect_2_hand(img):
+    coords = {'th': 0, 'x1': 0, 'y1': 0, 'h1': 0, 'w1': 0, 'x2': 0, 'y2': 0, 'h2': 0, 'w2': 0, 'v': 1, 'msg': "OK"}
+    dst = img.copy()
+    h, w, _ = dst.shape
+    pose_val = word_detector.detect_pose(dst)
+    if not pose_val[0]: # invalid position
+        coords['v'] = 0
+        coords['msg'] = pose_val[1]
+    else:
+        num_hands = 2 if word_detector.hand2 is not None else 1
+        for i in range(1, num_hands+1):
+            keys_dict = word_detector.hand1 if i==1 else word_detector.hand2
+            padding = max(get_hand_measures(keys_dict), int(max(w, h) / 64))
+            top_left_p = (keys_dict['left-val'] - padding, keys_dict['top-val'] - padding)
+            bottom_right_p = (keys_dict['right-val'] + padding, keys_dict['bottom-val'] + padding)
+            coords['x' + str(i)] = round((top_left_p[0] / w) * 100)
+            coords['y' + str(i)] = round((top_left_p[1] / h) * 100)
+            coords['w' + str(i)] = round(((bottom_right_p[0] - top_left_p[0]) / w) * 100)
+            coords['h' + str(i)] = round(((bottom_right_p[1] - top_left_p[1]) / h) * 100)
+        if num_hands == 2:
+            coords['th'] = 1
+            if(((coords["x1"] >= coords["x2"] and coords["x1"] <= coords["x2"] + coords["w2"]) or 
+                (coords["x2"] >= coords["x1"] and coords["x2"] <= coords["x1"] + coords["w1"])) and
+                ((coords["y1"] >= coords["y2"] and coords["y1"] <= coords["y2"] + coords["h2"]) or 
+                (coords["y2"] >= coords["y1"] and coords["y2"] <= coords["y1"] + coords["h1"]))): # Overlap
+                coords['th'] = 0
+                xmin = 1 if min(coords["x1"], coords["x2"]) == coords["x1"] else 2
+                ymin = 1 if min(coords["y1"], coords["y2"]) == coords["y1"] else 2
+                xmax = 1 if xmin == 2 else 2
+                ymax = 1 if ymin == 2 else 2
+                x = min(coords["x1"], coords["x2"])
+                y =  min(coords["y1"], coords["y2"])
+                wid = coords["x" + str(xmax)] - coords["x" + str(xmin)] + coords["w" + str(xmax)]
+                hei = coords["y" + str(ymax)] - coords["y" + str(ymin)] + coords["h" + str(ymax)]
+                coords["x1"] = x
+                coords["y1"] = y
+                coords["w1"] = wid
+                coords["h1"] = hei
 
     return coords
 
@@ -241,20 +295,20 @@ def process_image_letter(img):
     dst = img.copy()
     h, w, _ = dst.shape
     char = '!'
-    marked_img = detector.findHands(img)
-    if not detector.isPoseValid(dst): # invalid position
+    marked_img = letter_detector.findHands(img)
+    if not letter_detector.isPoseValid(dst): # invalid position
         write_message(dst, "Please raise one hand", WARNING)
         return (char, dst)
-    keys = detector.findPosition(marked_img, draw=False)
+    keys = letter_detector.findPosition(marked_img, draw=False)
     if(keys is None or len(keys) == 0): # no hand detected
         write_message(dst, "Unable To Read", ERROR)
     else:
-        keys_dict = detector.getHandCoordsByKeys(keys, h, w)
+        keys_dict = letter_detector.getHandCoordsByKeys(keys, h, w)
         cut_img = cut_hand(dst, keys_dict)
         if(cut_img is None): # hand detected, but to close to edges
             write_message(dst, "Please centrelize your hand", ERROR)
         else: # good hand positioning
-            fixed_img, fixed_keys = flip_image(cut_img, keys, w, detector.detectedSide)
+            fixed_img, fixed_keys = flip_image(cut_img, keys, w, letter_detector.detectedSide)
             char = get_match(fixed_img, fixed_keys)
             check_identify(char)
             dst = draw_square(dst, keys_dict, char)
@@ -264,10 +318,10 @@ def process_image_letter(img):
 # ====== Process a single image (or video frame) to get the word it represents
 def process_image_word(img):
     dst = img.copy()
+    dst = cv2.imread(abs_dir + "/../Resources/Test/i-test4.jpg")
     h, w, _ = dst.shape
     word = detect_word(dst)
-    #TODO: if word == error
-    return (word, dst)
+    return (word_confirmer.confirm(word, word_detector.pose, word_detector.hand), dst)
 
 # ===== Main code snippet
 def main():
@@ -297,7 +351,8 @@ def main():
         ret, frame = cap.read()
 
         if ret == True:
-            char, reframe = process_image(frame, True)
+            char, reframe = process_image(frame, False)
+            print(char)
             reframe = print_identify(reframe, identified)
             if (identified is not None):
                 identified = None
@@ -319,3 +374,5 @@ if __name__ =='__main__':
     main()
 
 
+
+# %%
