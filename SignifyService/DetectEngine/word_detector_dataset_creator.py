@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
+import copy
 
 # cv2.namedWindow('out', cv2.WINDOW_NORMAL)
 # cv2.resizeWindow('out', 500, 600)
@@ -80,14 +81,36 @@ def process_word_image(img, file_name, is_check):
 
     pose_lms = [get_real_lms(h, w, lm) for lm in pose_results.pose_landmarks.landmark]
     pose_per = ((pose_lms[24][1] - pose_lms[12][1]) / h) * 100
-    print(file_name, pose_per)
     if (pose_per > 40):
         raise Exception("Please move further")  
     if (pose_per < 20):
         raise Exception("Please move closer")
     
+    left_down = pose_lms[22][1] > pose_lms[24][1]
+    right_down = pose_lms[21][1] > pose_lms[23][1]
+    if(left_down and right_down):
+        raise Exception("Please raise a hand")
+    
+    hand_rect_res = copy.copy(hand_results)
+    if len(hand_results.multi_hand_landmarks) == 2:
+        hand0x = hand_results.multi_hand_landmarks[0].landmark[4].x
+        hand1x = hand_results.multi_hand_landmarks[1].landmark[4].x
+        leftx = pose_results.pose_landmarks.landmark[22].x
+        left_hand_num = 0 if abs(hand0x - leftx) < abs(hand1x - leftx) else 1
+        
+        if left_down:
+            hand_rect_res.multi_hand_landmarks[0] = hand_results.multi_hand_landmarks[1-left_hand_num]
+            del hand_rect_res.multi_hand_landmarks[1]
+        elif right_down:
+            hand_rect_res.multi_hand_landmarks[0] = hand_results.multi_hand_landmarks[left_hand_num]
+            del hand_rect_res.multi_hand_landmarks[1]
+
+    if(len(hand_rect_res.multi_hand_landmarks) == 1 and
+        hand_rect_res.multi_hand_landmarks[0].landmark[4].y > pose_results.pose_landmarks.landmark[23].y):
+        raise Exception("Please retry")
+
     if is_check:
-        return (hand_results, pose_results)
+        return (hand_rect_res, pose_results)
 
     hand_no = 0 if (len(hand_results.multi_hand_landmarks) == 1 or 
         hand_results.multi_handedness[0].classification[0].label == "Left") else 1
@@ -104,7 +127,11 @@ def main():
     for pic in file_names:
         img = cv2.imread(pic)
         
-        values = process_word_image(img, pic, False)
+        try:
+            values = process_word_image(img, pic, False)
+        except Exception as e:
+            print(pic, str(e))
+            continue
         if(values is not None):
             data.loc[len(data.index)] = values
             print(f"Processed file {curr_file} out of {num_files}\n")
