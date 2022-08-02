@@ -36,7 +36,7 @@ def createSignObject(img_cv, is_letter: bool):
 
 def createResponse(img_cv, detectSign: bool, is_letter: bool):
     start = time.time()
-    res = signify.get_rect(img_cv)
+    res = signify.get_rect(img_cv,is_letter)
     logger.write(f'time for get_rect = {time.time() - start}\n')
     logger.flush()
 
