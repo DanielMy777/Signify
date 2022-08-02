@@ -72,7 +72,7 @@ class wordDetector:
             if len(hand_lms.multi_hand_landmarks) < 2:
                 hand_no = 0
             else:
-                hand_no = 0 if hand_lms.multi_hand_landmarks[0].landmark[0] < hand_lms.multi_hand_landmarks[1].landmark[0] else 1
+                hand_no = 0 if hand_lms.multi_hand_landmarks[0].landmark[0].x < hand_lms.multi_hand_landmarks[1].landmark[0].x else 1
             self.pose = [get_real_lms(h, w, lm) for lm in pose_lms.pose_landmarks.landmark]
             self.hand = [get_real_lms(h, w, lm) for lm in hand_lms.multi_hand_landmarks[hand_no].landmark]
             self.hand1 = self.get_hands_coords(h, w, 0, hand_lms)

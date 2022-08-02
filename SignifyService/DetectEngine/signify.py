@@ -28,7 +28,6 @@ import hand_detector as htm
 from sign_confirmer import Confirmer
 from word_detector import wordDetector
 from word_confirmer import wordConfirmer
-from word_detector import detect_word
 
 # ====== Constants
 IM_SIZE = 300
@@ -318,9 +317,12 @@ def process_image_letter(img):
 # ====== Process a single image (or video frame) to get the word it represents
 def process_image_word(img):
     dst = img.copy()
-    dst = cv2.imread(abs_dir + "/../Resources/Test/i-test4.jpg")
     h, w, _ = dst.shape
-    word = detect_word(dst)
+    val = word_detector.detect_pose(dst)[0]
+    if val:
+        word = word_detector.detect_word(dst)
+    else:
+        word = '!'
     return (word_confirmer.confirm(word, word_detector.pose, word_detector.hand), dst)
 
 # ===== Main code snippet
@@ -351,8 +353,7 @@ def main():
         ret, frame = cap.read()
 
         if ret == True:
-            char, reframe = process_image(frame, False)
-            print(char)
+            char, reframe = process_image(frame, True)
             reframe = print_identify(reframe, identified)
             if (identified is not None):
                 identified = None
