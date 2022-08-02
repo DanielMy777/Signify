@@ -29,7 +29,17 @@ app.get("/", (_: Request, res: Response) => {
 app.post("/api/img/DetectHands", async (req: Request, res: Response) => {
   //console.log("In Detect Hands");
   handPool
-    .exec(req.body.img)
+    .exec(req.body.img, IS_LETTER)
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => res.send(err));
+});
+
+app.post("/api/img/Detect2Hands", async (req: Request, res: Response) => {
+  //console.log("In Detect 2Hands");
+  handPool
+    .exec(req.body.img, !IS_LETTER)
     .then((data) => {
       res.send(data);
     })
