@@ -37,6 +37,7 @@ const SignifyCamera = ({
 }) => {
   const [cameraPermission, setCameraPermission] = useState(undefined);
   const [handRect, setHandsRect] = useState(UN_DETECTED_HANDS);
+  const [hand2Rect, setHand2Rect] = useState(UN_DETECTED_HANDS);
   const frameNumber = useSharedValue(0);
   const [detectedChar, setDetectedChar] = useState('');
   const [errorText, setErrorText] = useState('');
@@ -80,7 +81,7 @@ const SignifyCamera = ({
     return hands_rect;
   };
 
-  hands_style = useMemo(() => {
+  hand1_style = useMemo(() => {
     return create_hands_style(
       fix_hands_rect(handRect),
       styles.hand_rect_default,
@@ -88,6 +89,15 @@ const SignifyCamera = ({
       device_orientation,
     );
   }, [handRect, device_orientation]);
+
+  hand2_style = useMemo(() => {
+    return create_hands_style(
+      fix_hands_rect(hand2Rect),
+      styles.hand_rect_default,
+      HandRectStyle,
+      device_orientation,
+    );
+  }, [hand2Rect, device_orientation]);
 
   useEffect(() => {
     check_premessions_interval = setInterval(() => {
@@ -135,18 +145,20 @@ const SignifyCamera = ({
         detectSignFrames !== 0;
 
       //console.log(detectType.value);
-      if (detectSignMethod) {
-        detect_res = await (detectType.value == DetectionType.LETTER
-          ? DetectModel.detectSign(img)
-          : DetectModel.detectWord(img));
-      } else {
-        detect_res = await DetectModel.detectHands(img);
+
+      detect_method = detectSignMethod
+        ? DetectModel.detectSignLanguageByDetectionType
+        : DetectModel.detectHandsByDetectType;
+      detect_res = await detect_method(img, detectType.value);
+      const hands = detect_res.hands;
+      //console.log(hands);
+      hands.hand1.stable = hands.hand2.stable = true;
+      if (hands.hand1.stable) {
+        setHandsRect(hands.hand1);
       }
 
-      if (detect_res.hands.handsRect.stable) {
-        //update only when needs make it look smooth
-        detect_res.hands.detected = true;
-        setHandsRect(detect_res.hands.handsRect);
+      if (hands.hand2.stable) {
+        setHand2Rect(hands.hand2);
       }
 
       if (detect_res.error) {
@@ -185,7 +197,8 @@ const SignifyCamera = ({
             frameQuality={frameQuality}
             rightMaterialIconsButtons={[getDetectTypeIcon()]}
           />
-          {handRect.detected && <View style={hands_style}></View>}
+          {handRect.detected && <View style={hand1_style}></View>}
+          {hand2Rect.detected && <View style={hand2_style} />}
           {detectedChar != '' && detectedChar != ' ' && (
             <Text style={detectedTextStyle}>{detectedChar}</Text>
           )}
