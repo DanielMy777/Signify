@@ -6,6 +6,7 @@ import {
 } from '../Network/httpClient';
 class SignifyApiPath {
   static DETECT_HANDS = 'api/img/DetectHands';
+  static DETECT_TWO_HANDS = 'api/img/Detect2Hands';
   static DETECT_SIGN = 'api/img/DetectHandsSign';
   static DETECT_WORD = 'api/img/DetectHandsWord';
 }
@@ -17,6 +18,7 @@ class SignifyWebDetectionModel {
     this.detectSign = this.detectSign.bind(this);
     this.detectHands = this.detectHands.bind(this);
     this.detectWord = this.detectWord.bind(this);
+    this.detectTwoHands = this.detectTwoHands.bind(this);
   }
 
   async sendRequest(path, img) {
@@ -38,6 +40,10 @@ class SignifyWebDetectionModel {
 
   detectHands(img) {
     return this.sendRequest(this.apiPath.DETECT_HANDS, img);
+  }
+
+  detectTwoHands(img) {
+    return this.sendRequest(this.apiPath.DETECT_TWO_HANDS, img);
   }
 
   detectWord(img) {
