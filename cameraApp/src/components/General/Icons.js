@@ -1,10 +1,12 @@
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import IonIcon from 'react-native-vector-icons/Ionicons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import React from 'react';
 
 class VectorIconType {
   static MatterialCommunity = 'MaterialCommunityIcons';
   static IonIcons = 'IonIcons';
+  static MaterialIcons = 'MaterialIcons';
 }
 
 const GeneralIcon = ({Type, name, size, color, style}) => {
@@ -21,6 +23,11 @@ const GeneralIcon = ({Type, name, size, color, style}) => {
     }
     if (type == VectorIconType.IonIcons) {
       return <IonIcon name={name} size={size} color={color} style={style} />;
+    }
+    if (type == VectorIconType.MaterialIcons) {
+      return (
+        <MaterialIcons size={size} name={name} style={style} color={color} />
+      );
     }
 
     throw 'IconType not supported';

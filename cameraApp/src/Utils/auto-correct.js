@@ -7,6 +7,24 @@ class AutoCorrect {
     return dict.has(word);
   }
 
+  correct_sentence(prev) {
+    let correct_text = prev;
+    const words = prev.split(' ');
+    const last_word = words.length == 0 ? null : words[words.length - 1];
+    if (
+      last_word !== null &&
+      last_word !== '' &&
+      !this.is_word_correct(last_word)
+    ) {
+      const matches = this.get_best_matches(last_word, 3);
+      console.log(matches);
+      correct_text =
+        words.slice(0, words.length - 1).join(' ') + ' ' + matches[0];
+    }
+
+    return correct_text;
+  }
+
   get_best_matches(word, number_of_matches) {
     if (number_of_matches <= 0) {
       return [];

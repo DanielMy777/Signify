@@ -15,6 +15,7 @@ import TextTranslator from '../General/TextTranslator';
 import {useForceRender} from '../../Utils/custom-hooks';
 import {play_random_sound} from '../../Utils/sound';
 import {AutoCorrect} from '../../Utils/auto-correct';
+import {VectorIconType} from '../General/Icons';
 
 const auto_correct = new AutoCorrect();
 
@@ -25,6 +26,7 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
 
   const [googleTranslateEnabled, setGoogleTranslateEnabled] = useState(false);
   const detectSoundEnabled = useSharedValue(true);
+  const autoCorrectEnabled = useSharedValue(false);
   const forceRender = useForceRender();
 
   const predictedTextScrollViewRef = useRef();
@@ -33,6 +35,30 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
     signToNotAllowInsertTwiceInARow.value = EMPTY_SIGN;
   }, []);
 
+  const sayTextIfEnabled = text => {
+    if (
+      detectSoundEnabled.value &&
+      text != signToNotAllowInsertTwiceInARow.value
+    ) {
+      if (text != ' ') {
+        Tts.say(text);
+      } else {
+        play_random_sound();
+      }
+    }
+  };
+
+  const is_to_add_text = (prev, res) => {
+    const is_word = res.sign.is_word;
+    const add_new_text =
+      (!is_word &&
+        count_char_sequence_from_str_end(prev, res.sign.char) <
+          CharMaxSequence &&
+        !(res.sign.char == ' ' && get_str_last_char(prev) == ' ')) ||
+      (is_word && get_last_word(prev) != res.sign.char);
+    return add_new_text;
+  };
+
   const onSignDetection = useCallback(res => {
     is_word = res.sign.is_word;
     if (
@@ -40,23 +66,9 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
       signToNotAllowInsertTwiceInARow.value != res.sign.char
     ) {
       setPredictedText(prev => {
-        const add_new_text =
-          (!is_word &&
-            count_char_sequence_from_str_end(prev, res.sign.char) <
-              CharMaxSequence &&
-            !(res.sign.char == ' ' && get_str_last_char(prev) == ' ')) ||
-          (is_word && get_last_word(prev) != res.sign.char);
+        const add_new_text = is_to_add_text(prev, res);
 
-        if (
-          detectSoundEnabled.value &&
-          res.sign.char != signToNotAllowInsertTwiceInARow.value
-        ) {
-          if (res.sign.char != ' ') {
-            Tts.say(res.sign.char);
-          } else {
-            play_random_sound();
-          }
-        }
+        sayTextIfEnabled(res.sign.char);
         add_if_word =
           is_word && prev != '' && get_str_last_char(prev) != ' ' ? ' ' : '';
 
@@ -67,18 +79,7 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
           get_str_last_char(prev) !== ' ' &&
           res.sign.char === ' '
         ) {
-          const words = prev.split(' ');
-          const last_word = words.length == 0 ? null : words[words.length - 1];
-          if (
-            last_word !== null &&
-            last_word !== '' &&
-            !auto_correct.is_word_correct(last_word)
-          ) {
-            const matches = auto_correct.get_best_matches(last_word, 3);
-            console.log(matches);
-            prev =
-              words.slice(0, words.length - 1).join(' ') + ' ' + matches[0];
-          }
+          return auto_correct.correct_sentence(prev) + ' ';
         }
 
         return add_new_text ? prev + add_if_word + res.sign.char : prev;
@@ -106,6 +107,16 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
           forceRender();
         },
       ),
+      {
+        ...create_button_obj(
+          autoCorrectEnabled.value ? 'auto-fix-normal' : 'auto-fix-off',
+          () => {
+            autoCorrectEnabled.value = !autoCorrectEnabled.value;
+            forceRender();
+          },
+        ),
+        type: VectorIconType.MaterialIcons,
+      },
       create_button_obj(
         'google-translate',
         () => {
@@ -114,7 +125,12 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
         googleTranslateEnabled ? 'black' : 'red',
       ),
     ],
-    [predictedText, googleTranslateEnabled, detectSoundEnabled.value],
+    [
+      predictedText,
+      googleTranslateEnabled,
+      detectSoundEnabled.value,
+      autoCorrectEnabled.value,
+    ],
   );
 
   return (
