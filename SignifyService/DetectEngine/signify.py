@@ -1,6 +1,7 @@
 # %% [markdown]
 # # Epsilon Team
 
+import math
 import sys
 import os
 
@@ -193,6 +194,14 @@ def draw_square(img, keys_dict, letter):
         return dst
 
 
+# ====== Get z index of hand from cam
+def get_hand_z(h, w, keys):
+    base_xy = keys[0][1], keys[0][2]
+    palm_xy = keys[9][1], keys[9][2]
+    dist = math.dist(base_xy, palm_xy)
+    return (dist / (h*w)) * 100
+
+
 # ====== Get the bounding rectange coordinates for the detected hand or hands
 def get_rect(img, one_handed):
     if one_handed:
@@ -227,6 +236,13 @@ def get_rect_1_hand(img):
             coords['y'] = round((top_left_p[1] / h) * 100)
             coords['w'] = round(((bottom_right_p[0] - top_left_p[0]) / w) * 100)
             coords['h'] = round(((bottom_right_p[1] - top_left_p[1]) / h) * 100)
+            z = get_hand_z(h, w, keys)
+            if z > 0.045:
+                coords['v'] = 0
+                coords['msg'] = "Too close to cam"
+            elif z < 0.01:
+                coords['v'] = 0
+                coords['msg'] = "Too far from cam"
 
     return coords
 
@@ -318,12 +334,15 @@ def process_image_letter(img):
 def process_image_word(img):
     dst = img.copy()
     h, w, _ = dst.shape
-    val = word_detector.detect_pose(dst)[0]
-    if val:
-        word = word_detector.detect_word(dst)
-    else:
-        word = '!'
-    return (word_confirmer.confirm(word, word_detector.pose, word_detector.hand), dst)
+    try:
+        val = word_detector.detect_pose(dst)[0]
+        if val:
+            word = word_detector.detect_word(dst)
+        else:
+            word = '!'
+        return (word_confirmer.confirm(word, word_detector.pose, word_detector.hand), dst)
+    except:
+        return ('!', dst)
 
 # ===== Main code snippet
 def main():
