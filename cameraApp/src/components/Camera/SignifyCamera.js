@@ -152,7 +152,7 @@ const SignifyCamera = ({
       detect_res = await detect_method(img, detectType.value);
       const hands = detect_res.hands;
       //console.log(hands);
-      hands.hand1.stable = hands.hand2.stable = true;
+      //hands.hand1.stable = hands.hand2.stable = true;
       if (hands.hand1.stable) {
         setHandsRect(hands.hand1);
       }
