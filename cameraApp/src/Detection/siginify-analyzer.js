@@ -57,10 +57,22 @@ class SignifyDetectionAnalyzer {
     hands = res.hands.handsRect;
     hand1 = res.hands.handsRect;
     hand2 = UN_DETECTED_HANDS;
-    num_hands = 1;
+    const num_hands = !is_letter && hands.th == 1 ? 2 : 1;
+    const increase = !is_letter ? 2 : 0;
     if (!is_letter) {
-      hand1 = {x: hands.x1, y: hands.y1, w: hands.w1, h: hands.h1};
-      hand2 = {x: hands.x2, y: hands.y2, w: hands.w2, h: hands.h2};
+      hand1 = {
+        x: hands.x1,
+        y: hands.y1,
+        w: hands.w1 + increase,
+        h: hands.h1 + increase,
+      };
+      if (num_hands == 2)
+        hand2 = {
+          x: hands.x2,
+          y: hands.y2,
+          w: hands.w2 + increase,
+          h: hands.h2 + increase,
+        };
     }
 
     return {
@@ -124,12 +136,18 @@ class SignifyDetectionAnalyzer {
     let y_change = Math.abs(stable_handRect.y - new_handRect.y);
     let w_change = Math.abs(stable_handRect.w - new_handRect.w);
     let h_change = Math.abs(stable_handRect.h - new_handRect.h);
-    return (
+    const new_stable =
       x_change > 3 ||
       y_change > 3 ||
       w_change > 3 ||
-      stable_handRect.detected ^ new_handRect.detected
-    );
+      stable_handRect.detected ^ new_handRect.detected;
+    /*
+    if (new_stable) {
+      console.log(
+        `wchange = ${w_change} x_change = ${x_change} y_change = ${y_change}`,
+      ); 
+    }*/
+    return new_stable;
   }
 }
 
