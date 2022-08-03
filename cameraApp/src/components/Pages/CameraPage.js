@@ -14,6 +14,9 @@ import Tts from '../../Utils/text-to-speech';
 import TextTranslator from '../General/TextTranslator';
 import {useForceRender} from '../../Utils/custom-hooks';
 import {play_random_sound} from '../../Utils/sound';
+import {AutoCorrect} from '../../Utils/auto-correct';
+
+const auto_correct = new AutoCorrect();
 
 const CameraPage = ({style, CharMaxSequence = 2}) => {
   const [predictedText, setPredictedText] = useState(
@@ -56,6 +59,28 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
         }
         add_if_word =
           is_word && prev != '' && get_str_last_char(prev) != ' ' ? ' ' : '';
+
+        if (
+          add_new_text &&
+          !is_word &&
+          prev.length > 0 &&
+          get_str_last_char(prev) !== ' ' &&
+          res.sign.char === ' '
+        ) {
+          const words = prev.split(' ');
+          const last_word = words.length == 0 ? null : words[words.length - 1];
+          if (
+            last_word !== null &&
+            last_word !== '' &&
+            !auto_correct.is_word_correct(last_word)
+          ) {
+            const matches = auto_correct.get_best_matches(last_word, 3);
+            console.log(matches);
+            prev =
+              words.slice(0, words.length - 1).join(' ') + ' ' + matches[0];
+          }
+        }
+
         return add_new_text ? prev + add_if_word + res.sign.char : prev;
       });
     }
