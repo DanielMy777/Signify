@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {AppState} from 'react-native';
 const AppContext = React.createContext();
 import {AsyncStorageGetItem, AsyncStorageSetItem} from '../Utils/async-storage';
 const heabrewEanbledItem = 'heabrewEnabled';
@@ -20,7 +19,6 @@ const AppProvider = ({children}) => {
         await AsyncStorageGetItem(heabrewEanbledItem, false),
       );
       setLoaded(true);
-      console.log('here');
     };
 
     fetchSettings();
