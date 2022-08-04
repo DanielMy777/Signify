@@ -14,10 +14,8 @@ import Tts from '../../Utils/text-to-speech';
 import TextTranslator from '../General/TextTranslator';
 import {useForceRender} from '../../Utils/custom-hooks';
 import {play_random_sound} from '../../Utils/sound';
-import {AutoCorrect} from '../../Utils/auto-correct';
 import {VectorIconType} from '../General/Icons';
-
-const auto_correct = new AutoCorrect();
+import {correct_sentence} from '../../Utils/correct-sentence';
 
 const CameraPage = ({style, CharMaxSequence = 2}) => {
   const [predictedText, setPredictedText] = useState(
@@ -79,7 +77,8 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
           get_str_last_char(prev) !== ' ' &&
           res.sign.char === ' '
         ) {
-          return auto_correct.correct_sentence(prev) + ' ';
+          const PRINT_MATCHES = true;
+          return correct_sentence(prev, 3, !PRINT_MATCHES) + ' ';
         }
 
         return add_new_text ? prev + add_if_word + res.sign.char : prev;
