@@ -1,4 +1,11 @@
-import React, {useState, useRef, useCallback, useMemo} from 'react';
+import React, {
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+  useContext,
+  useEffect,
+} from 'react';
 import {StyleSheet, Text, View, ScrollView} from 'react-native';
 import {useSharedValue} from 'react-native-reanimated';
 import {EMPTY_SIGN} from '../../Detection/detection-constants';
@@ -16,22 +23,38 @@ import {useForceRender} from '../../Utils/custom-hooks';
 import {play_random_sound} from '../../Utils/sound';
 import {VectorIconType} from '../General/Icons';
 import {correct_sentence} from '../../Utils/correct-sentence';
-
+import {AppContext} from '../../Context/AppContext';
+let autoCorrectHistory = false;
+let detectSoundHistory = true;
 const CameraPage = ({style, CharMaxSequence = 2}) => {
-  const [predictedText, setPredictedText] = useState(
-    'abye how are you my dear  dear cathope you doing well ab',
-  );
-
+  const {heabrewDetectionEnabled} = useContext(AppContext);
+  const [predictedText, setPredictedText] = useState('');
   const [googleTranslateEnabled, setGoogleTranslateEnabled] = useState(false);
-  const detectSoundEnabled = useSharedValue(true);
-  const autoCorrectEnabled = useSharedValue(false);
+  const detectSoundEnabled = useSharedValue(detectSoundHistory);
+  const autoCorrectEnabled = useSharedValue(autoCorrectHistory);
   const forceRender = useForceRender();
 
   const predictedTextScrollViewRef = useRef();
   const signToNotAllowInsertTwiceInARow = useSharedValue(EMPTY_SIGN);
+
+  useEffect(() => {
+    if (heabrewDetectionEnabled) {
+      autoCorrectEnabled.value = false;
+    }
+  }, [heabrewDetectionEnabled]);
   const onError = useCallback(error => {
     signToNotAllowInsertTwiceInARow.value = EMPTY_SIGN;
   }, []);
+
+  const setDetectSound = val => {
+    detectSoundEnabled.value = val;
+    detectSoundHistory = val;
+  };
+
+  const setAutoCorrect = val => {
+    autoCorrectEnabled.value = val;
+    autoCorrectHistory = val;
+  };
 
   const sayTextIfEnabled = text => {
     if (
@@ -73,6 +96,7 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
         if (
           add_new_text &&
           !is_word &&
+          autoCorrectEnabled.value &&
           prev.length > 0 &&
           get_str_last_char(prev) !== ' ' &&
           res.sign.char === ' '
@@ -80,7 +104,6 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
           const PRINT_MATCHES = true;
           return correct_sentence(prev, 3, !PRINT_MATCHES) + ' ';
         }
-
         return add_new_text ? prev + add_if_word + res.sign.char : prev;
       });
     }
@@ -102,19 +125,22 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
       create_button_obj(
         detectSoundEnabled.value ? 'volume-high' : 'volume-mute',
         () => {
-          detectSoundEnabled.value = !detectSoundEnabled.value;
+          setDetectSound(!detectSoundEnabled.value);
           forceRender();
         },
       ),
       {
         ...create_button_obj(
-          autoCorrectEnabled.value ? 'auto-fix-normal' : 'auto-fix-off',
+          autoCorrectEnabled.value && !heabrewDetectionEnabled
+            ? 'auto-fix-normal'
+            : 'auto-fix-off',
           () => {
-            autoCorrectEnabled.value = !autoCorrectEnabled.value;
+            setAutoCorrect(!autoCorrectEnabled.value);
             forceRender();
           },
         ),
         type: VectorIconType.MaterialIcons,
+        disabled: heabrewDetectionEnabled,
       },
       create_button_obj(
         'google-translate',
@@ -129,6 +155,7 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
       googleTranslateEnabled,
       detectSoundEnabled.value,
       autoCorrectEnabled.value,
+      heabrewDetectionEnabled,
     ],
   );
 
@@ -141,6 +168,7 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
         frameMaxSize={700}
         frameQuality={80}
         detectSignFrames={1}
+        hebrewLanguage={heabrewDetectionEnabled}
         onError={onError}
         errorStyle={{fontSize: 28, top: '88%'}}
       />

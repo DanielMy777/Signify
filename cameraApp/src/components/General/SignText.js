@@ -21,6 +21,7 @@ const SignText = (
     return {
       detect_letter: detect_letter,
       get_detected_letters_count: get_detected_letters_count,
+      setDetectedLettersCount: setDetectedLettersCount,
       clear_detected_letters: () => {
         setDetectedLettersCount(0);
       },

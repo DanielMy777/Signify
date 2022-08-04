@@ -7,7 +7,14 @@ import {
   KeyboardAvoidingView,
   Keyboard,
 } from 'react-native';
-import React, {useState, useCallback, useRef, useMemo} from 'react';
+import React, {
+  useState,
+  useCallback,
+  useRef,
+  useMemo,
+  useContext,
+  useEffect,
+} from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PressableOpacity} from 'react-native-pressable-opacity';
@@ -16,14 +23,23 @@ import SignText from '../General/SignText';
 import SignifyCamera from '../Camera/SignifyCamera';
 import {useKeyBoardOpen} from '../../Utils/custom-hooks';
 import {play_random_sound} from '../../Utils/sound';
+import {AppContext} from '../../Context/AppContext';
+import {useSharedValue} from 'react-native-reanimated';
 
-const LearningSignLanguagePage = ({enableSoundDetection = true}) => {
-  const [text, setText] = useState('');
-  const [signText, setSignText] = useState('');
+let signTextHistory = '';
+let detectedCharsHistory = 0;
+let sentenceToTranslateHistory = '';
+const LearningSignLanguagePage = () => {
+  const [text, setText] = useState(sentenceToTranslateHistory);
+  const [signText, setSignText] = useState(signTextHistory);
+  const {learningSoundEffectsEnabled} = useContext(AppContext);
   const keyboardOpen = useKeyBoardOpen();
   const signTextRef = useRef();
   const signTranslateViewHeight = 44,
     signTranslateViewHeightWhenKeyboardOpen = signTranslateViewHeight + 25;
+  useEffect(() => {
+    signTextRef.current.setDetectedLettersCount(detectedCharsHistory);
+  }, [signTextRef]);
 
   const onSignDetection = useCallback(
     detect_obj => {
@@ -36,11 +52,14 @@ const LearningSignLanguagePage = ({enableSoundDetection = true}) => {
   );
 
   const onLetterDetected = () => {
-    if (enableSoundDetection) play_random_sound();
+    if (learningSoundEffectsEnabled) play_random_sound();
+    detectedCharsHistory += 1;
   };
 
   const onTranslateButtonPressed = () => {
     setSignText(text);
+    signTextHistory = text;
+    detectedCharsHistory = 0;
     Keyboard.dismiss();
     signTextRef.current.clear_detected_letters();
   };
@@ -61,6 +80,10 @@ const LearningSignLanguagePage = ({enableSoundDetection = true}) => {
   );
   styles.camera_style.top = sign_translate_view_height_current + '%';
   styles.camera_style.height = 100 - signTranslateViewHeight + '%';
+  const setTextFixed = text => {
+    setText(text);
+    sentenceToTranslateHistory = text;
+  };
 
   return (
     <View style={styles.container}>
@@ -70,7 +93,7 @@ const LearningSignLanguagePage = ({enableSoundDetection = true}) => {
           <TextInput
             style={styles.textBox}
             value={text}
-            onChangeText={setText}
+            onChangeText={setTextFixed}
             placeholder="sentence to translate"
             onSubmitEditing={onTranslateButtonPressed}
           />

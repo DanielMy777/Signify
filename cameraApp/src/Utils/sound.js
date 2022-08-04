@@ -29,6 +29,4 @@ const make_sound = sound_path => {
 const play_random_sound = () => {
   make_sound(get_random_item_list(random_sounds));
 };
-
-
 module.exports = {make_sound, play_random_sound};

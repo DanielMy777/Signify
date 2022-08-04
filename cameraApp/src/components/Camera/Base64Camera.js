@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, Text} from 'react-native';
 import Reanimated, {useSharedValue, runOnJS} from 'react-native-reanimated';
 import {
   Camera,
@@ -12,6 +12,7 @@ import IonIcon from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PressableOpacity} from 'react-native-pressable-opacity';
 import {normal_rotation_obj} from '../../Utils/frame-rotation';
+import FontName from '../General/FontName';
 
 function scanQRCodes(
   frame,
@@ -146,6 +147,7 @@ const Base64Camera = React.forwardRef(
               size={rightButtonsSize}
             />
           </PressableOpacity>
+
           {rightMaterialIconsButtons &&
             rightMaterialIconsButtons.map((icon_button, index) =>
               convert_button_icon_obj_to_element(icon_button, index),
@@ -197,6 +199,10 @@ const styles = StyleSheet.create({
     top: '5%',
     right: '2%',
     zIndex: 2,
+  },
+  rightButtonText: {
+    color: 'black',
+    fontSize: 25,
   },
 });
 
