@@ -24,11 +24,16 @@ import {play_random_sound} from '../../Utils/sound';
 import {VectorIconType} from '../General/Icons';
 import {correct_sentence} from '../../Utils/correct-sentence';
 import {AppContext} from '../../Context/AppContext';
+import Languages from '../../Utils/Languages';
 let autoCorrectHistory = false;
 let detectSoundHistory = true;
-const CameraPage = ({style, CharMaxSequence = 2}) => {
+let predictedTextHistory = '';
+let is_heabrew = false;
+const CameraPage = ({style, CharMaxSequence = 2, history = true}) => {
   const {heabrewDetectionEnabled} = useContext(AppContext);
-  const [predictedText, setPredictedText] = useState('');
+  const [predictedText, setPredictedText] = useState(
+    history ? predictedTextHistory : '',
+  );
   const [googleTranslateEnabled, setGoogleTranslateEnabled] = useState(false);
   const detectSoundEnabled = useSharedValue(detectSoundHistory);
   const autoCorrectEnabled = useSharedValue(autoCorrectHistory);
@@ -38,9 +43,17 @@ const CameraPage = ({style, CharMaxSequence = 2}) => {
   const signToNotAllowInsertTwiceInARow = useSharedValue(EMPTY_SIGN);
 
   useEffect(() => {
+    predictedTextHistory = predictedText;
+  }, [predictedText]);
+
+  useEffect(() => {
     if (heabrewDetectionEnabled) {
       autoCorrectEnabled.value = false;
     }
+    if (heabrewDetectionEnabled != is_heabrew) {
+      setPredictedText('');
+    }
+    is_heabrew = heabrewDetectionEnabled;
   }, [heabrewDetectionEnabled]);
   const onError = useCallback(error => {
     signToNotAllowInsertTwiceInARow.value = EMPTY_SIGN;

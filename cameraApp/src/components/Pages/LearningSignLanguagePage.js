@@ -29,16 +29,17 @@ import {useSharedValue} from 'react-native-reanimated';
 let signTextHistory = '';
 let detectedCharsHistory = 0;
 let sentenceToTranslateHistory = '';
-const LearningSignLanguagePage = () => {
-  const [text, setText] = useState(sentenceToTranslateHistory);
-  const [signText, setSignText] = useState(signTextHistory);
+const LearningSignLanguagePage = ({history = true}) => {
+  const [text, setText] = useState(history ? sentenceToTranslateHistory : '');
+  const [signText, setSignText] = useState(history ? signTextHistory : '');
   const {learningSoundEffectsEnabled} = useContext(AppContext);
   const keyboardOpen = useKeyBoardOpen();
   const signTextRef = useRef();
   const signTranslateViewHeight = 44,
     signTranslateViewHeightWhenKeyboardOpen = signTranslateViewHeight + 25;
   useEffect(() => {
-    signTextRef.current.setDetectedLettersCount(detectedCharsHistory);
+    if (history)
+      signTextRef.current.setDetectedLettersCount(detectedCharsHistory);
   }, [signTextRef]);
 
   const onSignDetection = useCallback(

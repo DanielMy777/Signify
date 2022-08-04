@@ -11,7 +11,6 @@ const SettingsPage = () => {
     learningSoundEffectsEnabled,
     setLearningSoundEffectsEnabled,
   } = useContext(AppContext);
-  console.log(heabrewDetectionEnabled);
   return (
     <AnimatedBackground animation={false}>
       <View style={styles.container}>

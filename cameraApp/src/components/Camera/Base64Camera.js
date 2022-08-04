@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {StyleSheet, View, Text} from 'react-native';
 import Reanimated, {useSharedValue, runOnJS} from 'react-native-reanimated';
 import {
@@ -116,11 +116,12 @@ const Base64Camera = React.forwardRef(
 
     const formats =
       device && device.formats ? device.formats.sort(sortFormats) : [];
-
+    const onError = useCallback(error => {
+      console.log('camera Error');
+      console.log(error);
+    }, []);
     if (device == null) {
       console.log('device is null');
-    }
-    if (device == null) {
       return <View></View>;
     }
 
@@ -134,6 +135,7 @@ const Base64Camera = React.forwardRef(
           frameProcessor={frameProcessor}
           hdr={true}
           frameProcessorFps={frameProcessorFps}
+          onError={onError}
         />
 
         <View style={styles.rightButtons}>
