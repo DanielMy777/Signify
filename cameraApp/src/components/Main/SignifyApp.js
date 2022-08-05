@@ -8,34 +8,42 @@ import HomePage from '../Pages/HomePage';
 import PageName from '../Pages/PageName';
 import SettingsPage from '../Pages/SettingsPage';
 import LearningSignLanguagePage from '../Pages/LearningSignLanguagePage';
-import {AnimatedBackground} from '../General/AnimatedBackground';
+import TestsPage from '../Pages/TestsPage';
+import {AppProvider} from '../../Context/AppContext';
 const ScreensStack = createNativeStackNavigator();
 //<ScreensStack.Screen name={'meow'} component={AnimatedBackground} />
 const SignifyApp = () => {
   return (
-    <NavigationContainer>
-      <ScreensStack.Navigator screenOptions={{headerShown: false}}>
-        <ScreensStack.Group>
-          <ScreensStack.Screen name={PageName.HomePage} component={HomePage} />
-          <ScreensStack.Screen
-            name={PageName.SettingsPage}
-            component={SettingsPage}
-          />
-          <ScreensStack.Screen
-            name={PageName.CameraPage}
-            component={CameraPage}
-          />
-          <ScreensStack.Screen
-            name="PremessionPage"
-            component={PremessionsPage}
-          />
-          <ScreensStack.Screen
-            name={PageName.LearningPage}
-            component={LearningSignLanguagePage}
-          />
-        </ScreensStack.Group>
-      </ScreensStack.Navigator>
-    </NavigationContainer>
+    <AppProvider>
+      <NavigationContainer>
+        <ScreensStack.Navigator screenOptions={{headerShown: false}}>
+          <ScreensStack.Group>
+            <ScreensStack.Screen
+              name={PageName.HomePage}
+              component={HomePage}
+            />
+            <ScreensStack.Screen
+              name={PageName.SettingsPage}
+              component={SettingsPage}
+            />
+            <ScreensStack.Screen
+              name={PageName.CameraPage}
+              component={CameraPage}
+            />
+            <ScreensStack.Screen
+              name="PremessionPage"
+              component={PremessionsPage}
+            />
+            <ScreensStack.Screen
+              name={PageName.LearningPage}
+              component={LearningSignLanguagePage}
+            />
+
+            <ScreensStack.Screen name={'TestPage'} component={TestsPage} />
+          </ScreensStack.Group>
+        </ScreensStack.Navigator>
+      </NavigationContainer>
+    </AppProvider>
   );
 };
 

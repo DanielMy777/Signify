@@ -12,7 +12,10 @@ const IconButtonsContainer = ({
     <View style={[style, styles.shadowProp]}>
       {Buttons.map((button, index) => {
         return (
-          <PressableOpacity key={index} onPress={button.onPress}>
+          <PressableOpacity
+            key={index}
+            onPress={button.onPress}
+            disabled={button.disabled}>
             <GeneralIcon
               Type={
                 button.type ? button.type : VectorIconType.MatterialCommunity

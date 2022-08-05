@@ -34,6 +34,12 @@ const get_last_word = str => {
   words = str.split(' ');
   return words.length == 0 ? null : words[words.length - 1];
 };
+const heabrew_letters = 'ןםאבגדהוזחטיכלמנסעפצקרשתץ';
+const is_heabrew_text = text => {
+  return (
+    [...text].filter(x => x != ' ' && !heabrew_letters.includes(x)).length == 0
+  );
+};
 
 module.exports = {
   getNumInStr,
@@ -43,4 +49,5 @@ module.exports = {
   get_str_last_char,
   get_random_item_list,
   get_last_word,
+  is_heabrew_text,
 };

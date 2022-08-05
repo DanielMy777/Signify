@@ -10,12 +10,14 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.17.7",
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/native-stack": "^6.6.1",
     "heapify": "^0.6.0",
     "leven": "^4.0.0",
     "react": "17.0.2",
     "react-native": "0.67.2",
+    "react-native-bouncy-checkbox": "^3.0.2",
     "react-native-gesture-handler": "^2.3.1",
     "react-native-keep-awake": "^4.0.0",
     "react-native-orientation-locker": "^1.4.0",

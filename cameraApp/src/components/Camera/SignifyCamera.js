@@ -18,6 +18,8 @@ import {OrientationNames} from '../../Utils/OrentationNames';
 import {VectorIconType} from '../General/Icons';
 import FontName from '../General/FontName';
 import {useForceRender} from '../../Utils/custom-hooks';
+import Languages from '../../Utils/Languages';
+import {en_he_sign_convertor} from '../../Detection/en-sign-he-convertor';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const SignifyCamera = ({
@@ -34,6 +36,7 @@ const SignifyCamera = ({
   showErrors = true,
   errorStyle,
   onError,
+  hebrewLanguage = false,
 }) => {
   const [cameraPermission, setCameraPermission] = useState(undefined);
   const [handRect, setHandsRect] = useState(UN_DETECTED_HANDS);
@@ -44,12 +47,25 @@ const SignifyCamera = ({
   const detectType = useSharedValue(DetectionType.LETTER);
   const device_orientation = useDeviceOrientation();
   const reRender = useForceRender();
+  const isHeabrew = useSharedValue(false);
   //console.log(device_orientation);
+
+  useEffect(() => {
+    isHeabrew.value = hebrewLanguage;
+  }, [hebrewLanguage]);
 
   const getDetectedStyleByDetectionType = () => {
     return detectType.value == DetectionType.LETTER
       ? styles.DetectedLetterText
       : styles.DetectedWordText;
+  };
+
+  const updateResultsByLanguage = detect_res => {
+    detect_res.sign.language = Languages.ENGLISH;
+    if (isHeabrew.value) {
+      detect_res.sign.language = Languages.HEABREW;
+      detect_res.sign.char = en_he_sign_convertor.convert(detect_res.sign);
+    }
   };
 
   const detectedTextStyle = useMemo(() => {
@@ -164,6 +180,7 @@ const SignifyCamera = ({
       if (detect_res.error) {
         setDetectedChar('');
         setHandsRect(UN_DETECTED_HANDS);
+        setHand2Rect(UN_DETECTED_HANDS);
         setErrorText(detect_res.error.to_string());
         if (onError) onError(detect_res.error);
         return;
@@ -172,6 +189,7 @@ const SignifyCamera = ({
       if (onDetection) onDetection(detect_res);
       if (onHandsDetection) onHandsDetection(detect_res);
       if (detectSignMethod) {
+        updateResultsByLanguage(detect_res);
         if (onSignDetection) onSignDetection(detect_res);
         setDetectedChar(detect_res.sign.char);
       }
