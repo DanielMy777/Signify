@@ -9,7 +9,13 @@ class VectorIconType {
   static MaterialIcons = 'MaterialIcons';
 }
 
-const GeneralIcon = ({Type, name, size, color, style}) => {
+const GeneralIcon = ({
+  Type = VectorIconType.MatterialCommunity,
+  name,
+  size,
+  color,
+  style,
+}) => {
   const create_icon = (type, name, size, color, style) => {
     if (type == VectorIconType.MatterialCommunity) {
       return (

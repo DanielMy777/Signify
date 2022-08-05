@@ -55,6 +55,16 @@ const HomePage = () => {
           IconName="settings"
           IconType={VectorIconType.IonIcons}
         />
+
+        <HomePageButtons
+          Label="Test"
+          onPress={() => {
+            navigation.navigate('TestPage');
+          }}
+          style={styles.button}
+          IconName="settings"
+          IconType={VectorIconType.IonIcons}
+        />
       </SafeAreaView>
     </AnimatedBackground>
   );

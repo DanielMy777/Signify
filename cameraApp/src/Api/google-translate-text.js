@@ -1,4 +1,4 @@
-import {Exception, http_method} from '../Network/httpClient';
+import {Exception, http_method, NetworkException} from '../Network/httpClient';
 class GoogleTranslateApiPath {
   constructor(key) {
     this.key = key;
@@ -29,7 +29,9 @@ class GoogleCloudTranslateApi {
         translated_text: translate_data.translatedText,
       };
     } catch (err) {
-      return {error: err};
+      if (err && err.msg && err.msg.error && err.msg.error.message)
+        return {error: new Exception(err.msg.error.message)};
+      return {error: new NetworkException('cant reach api server')};
     }
   }
 }
