@@ -206,8 +206,8 @@ const CameraPage = ({style, CharMaxSequence = 2, history = true}) => {
         {googleTranslateEnabled && (
           <TextTranslator
             text={predictedText.toUpperCase()}
-            style={{height: '94%', top: '-4%'}}
-            textStyle={[styles.predictedText, {fontSize: 15}]}
+            style={{height: '94%', top: '-6%'}}
+            textStyle={[{fontSize: 20}]}
           />
         )}
       </View>
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
   },
   predictedTextView: {
     top: '64%',
-    height: '29%',
+    height: '28%',
     width: '97%',
     left: '2%',
     right: '1%',
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   },
   bottomButtons: {
     position: 'absolute',
-    top: '95%',
+    top: '94%',
     width: '96%',
     backgroundColor: '#efefef',
     height: '5%',

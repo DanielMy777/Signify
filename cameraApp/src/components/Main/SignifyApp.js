@@ -10,6 +10,7 @@ import SettingsPage from '../Pages/SettingsPage';
 import LearningSignLanguagePage from '../Pages/LearningSignLanguagePage';
 import TestsPage from '../Pages/TestsPage';
 import {AppProvider} from '../../Context/AppContext';
+import FlashMessage from 'react-native-flash-message';
 const ScreensStack = createNativeStackNavigator();
 //<ScreensStack.Screen name={'meow'} component={AnimatedBackground} />
 const SignifyApp = () => {
@@ -18,7 +19,6 @@ const SignifyApp = () => {
       <NavigationContainer>
         <ScreensStack.Navigator screenOptions={{headerShown: false}}>
           <ScreensStack.Group>
-            <ScreensStack.Screen name={'TestPage'} component={TestsPage} />
             <ScreensStack.Screen
               name={PageName.HomePage}
               component={HomePage}
@@ -39,9 +39,12 @@ const SignifyApp = () => {
               name={PageName.LearningPage}
               component={LearningSignLanguagePage}
             />
+
+            <ScreensStack.Screen name={'TestPage'} component={TestsPage} />
           </ScreensStack.Group>
         </ScreensStack.Navigator>
       </NavigationContainer>
+      <FlashMessage position="top" />
     </AppProvider>
   );
 };
