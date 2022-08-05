@@ -1,6 +1,19 @@
 import {View, Text, ScrollView, StyleSheet} from 'react-native';
 import React from 'react';
 //import {google_translator} from '../../Api/google-translate-default-api';
+
+let data = [
+  {
+    value: 'Banana',
+  },
+  {
+    value: 'Mango',
+  },
+  {
+    value: 'Pear',
+  },
+];
+
 class EmptyTextConvertor {
   static translate(text) {
     return 'transalted: ' + text;

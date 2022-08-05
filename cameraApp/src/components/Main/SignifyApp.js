@@ -18,6 +18,7 @@ const SignifyApp = () => {
       <NavigationContainer>
         <ScreensStack.Navigator screenOptions={{headerShown: false}}>
           <ScreensStack.Group>
+            <ScreensStack.Screen name={'TestPage'} component={TestsPage} />
             <ScreensStack.Screen
               name={PageName.HomePage}
               component={HomePage}
@@ -38,8 +39,6 @@ const SignifyApp = () => {
               name={PageName.LearningPage}
               component={LearningSignLanguagePage}
             />
-
-            <ScreensStack.Screen name={'TestPage'} component={TestsPage} />
           </ScreensStack.Group>
         </ScreensStack.Navigator>
       </NavigationContainer>
