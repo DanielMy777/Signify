@@ -40,10 +40,9 @@ for name in file_names:
             continue
         else: # good hand positioning
             fixed_img, fixed_keys = flip_image(cut_img, keys, w, letter_detector.detectedSide)
-            padded = pad_image(fixed_img)
-            gaus = cv2.GaussianBlur(padded, (5,5), 10)
-            canny = cv2.Canny(gaus, 60, 120)
-            new_path = "./SignifyService/DetectEngine/model_trainer/canny/" + name.split("\\")[-1]
-            cv2.imwrite(new_path, canny)
+            gaus = cv2.GaussianBlur(fixed_img, (5,5), 10)
+            padded = cv2.resize(gaus, (IM_SIZE, IM_SIZE))
+            new_path = "./SignifyService/DetectEngine/model_trainer/transformed/" + name.split("\\")[-1]
+            cv2.imwrite(new_path, padded)
     print(f"Done {i} from {n}")
     i += 1

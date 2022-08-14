@@ -1,3 +1,4 @@
+from multiprocessing import dummy
 from click import confirm
 import cv2
 import mediapipe as mp
@@ -6,6 +7,7 @@ import numpy as np
 sign_undetected = ['!']
 sign_points = ['D', 'U', 'K', 'Z', 'R']
 sign_fists = ['A', 'E', 'M', 'N', 'S', 'T']
+sign_rock = ['Y']
 
 class Confirmer:
     def __init__(self, hand='right'):
@@ -65,6 +67,12 @@ class Confirmer:
             return self.confirm_y(keys)
         if char == 'Z':
             return self.confirm_z(keys)
+        if char == 'CH':
+            return self.confirm_chet(keys)
+        if char == 'TZ':
+            return self.confirm_tzadik(keys)
+        if char == 'SP':
+            return self.confirm_space(keys)
         else:
             return True
 
@@ -172,7 +180,7 @@ class Confirmer:
         return True # need circle
 
     def confirm_p(self, keys):
-        return True # good detection, nothing similar 
+        return keys[4][2] < keys[12][2] # differ from Q 
 
     def confirm_q(self, keys):
         return True # good detection, nothing similar  
@@ -210,7 +218,7 @@ class Confirmer:
         keys[8][1] > keys[12][1]) # index is right to middle
 
     def confirm_v(self, keys):
-        return ((keys[4][2] > keys[5][2] or keys[4][1] < keys[5][2]) and # thumb lower than index base or past it - differ from K
+        return ((keys[4][2] > keys[5][2] or keys[4][1] < keys[5][1]) and # thumb lower than index base or past it - differ from K
         not self.is_finger_1_open(keys) and 
         self.is_finger_2_open(keys) and 
         self.is_finger_3_open(keys) and 
@@ -249,6 +257,21 @@ class Confirmer:
         return (keys[10][1] > keys[9][1] and
         keys[14][1] > keys[13][1] and
         keys[18][1] > keys[17][1]) # pointing at camera and fist closed
+
+
+    def confirm_chet(self, keys):
+        return (not self.is_finger_1_open(keys) and 
+        self.is_finger_2_open(keys) and 
+        not self.is_finger_3_open(keys) and 
+        not self.is_finger_4_open(keys) and 
+        self.is_finger_5_open(keys)) 
+
+    def confirm_tzadik(self, keys):
+        return (self.is_finger_1_open(keys) and 
+        self.is_finger_2_open(keys) and 
+        self.is_finger_3_open(keys) and 
+        not self.is_finger_4_open(keys) and 
+        not self.is_finger_5_open(keys)) 
 
     def confirm_space(self, keys):
         heights = [k[2] for k in keys]
@@ -295,6 +318,10 @@ class Confirmer:
                 return 'B'
             if(self.confirm_e(keys)):
                 return 'E'
+            if(self.confirm_k(keys)):
+                return 'K'
+            if(self.confirm_tzadik(keys)):
+                return 'TZ'
         elif(char in sign_points):
             if(self.confirm_x(keys)):
                 return 'X'
@@ -304,9 +331,9 @@ class Confirmer:
                 return 'R'
             if(self.confirm_k(keys)):
                 return 'K'
-            if(self.confirm_z(keys)):
-                #return 'Z'
-                return '!'
+        elif(char in sign_rock):
+            if(self.confirm_chet(keys)):
+                return 'CH'
         elif(char in sign_fists):
             return self.detect_fist(keys)
 
@@ -331,20 +358,24 @@ class Confirmer:
 
 
     #0 - Thumb, 4 - Pinkie
-    def decide_fist(self, fist_keys, tip_heights):
+    def decide_fist(self, keys, fist_keys, tip_heights):
+        if(self.confirm_z(keys)):
+            return 'Z'
         if (max(tip_heights) == tip_heights[0]):
             return 'E'
-
         elif (fist_keys[0][1] > fist_keys[1][1] and fist_keys[0][1] > fist_keys[2][1] and
             fist_keys[0][0] > fist_keys[3][0] and fist_keys[0][0] > fist_keys[4][0] and
             fist_keys[0][0] < fist_keys[1][0] and
             abs(fist_keys[0][0] - fist_keys[2][0]) < abs(fist_keys[0][0] - fist_keys[3][0]) and
             tip_heights[0] < tip_heights[1]):
             return 'S'
+        elif(tip_heights[1] < fist_keys[1][1] or tip_heights[2] < fist_keys[2][1]):
+            return '!'
 
-        elif fist_keys[0][0] > fist_keys[1][0]:
+        elif (fist_keys[0][0] > fist_keys[1][0] and tip_heights[1] > tip_heights[0]):
             return 'A'
-        elif fist_keys[0][0] > fist_keys[2][0] and fist_keys[0][1] < fist_keys[2][1]:
+        elif (fist_keys[0][0] > fist_keys[2][0] and fist_keys[0][1] < fist_keys[2][1] and
+            tip_heights[0] < tip_heights[2]):
             return 'T'
         elif fist_keys[0][1] < fist_keys[3][1]:
             return 'N'
@@ -355,25 +386,27 @@ class Confirmer:
 
 
     def detect_fist(self, keys, imsize = 300):
+        dummy = Confirmer()
         angle = Confirmer.detect_angle(None, keys)
         
         fist_keys = []
         tip_heights = []
         base = tuple(np.array((imsize, imsize)) / 2)
         for i in [4, 6, 10, 14, 18]:
-            fist_keys.append(Confirmer.rotate_key(None, (keys[i][1], keys[i][2]), base, angle))
+            fist_keys.append(dummy.rotate_key((keys[i][1], keys[i][2]), base, angle))
         for j in [4, 8, 12, 16, 20]:
             tip_heights.append(keys[j][2])
 
-        return Confirmer.decide_fist(None, fist_keys, tip_heights)
+        return dummy.decide_fist(keys, fist_keys, tip_heights)
 
     def straight_keys(self, keys, imsize = 300):
-        angle = Confirmer.detect_angle(None, keys)
+        dummy = Confirmer()
+        angle = dummy.detect_angle(keys)
         base = tuple(np.array((imsize, imsize)) / 2)
 
         rotated_keys = []
         for i in range(21):
-            rotated_keys.append((0, Confirmer.rotate_key(None, (keys[i][1], keys[i][2]), base, angle)))
+            rotated_keys.append((0, dummy.rotate_key((keys[i][1], keys[i][2]), base, angle)))
         
         return rotated_keys
 
