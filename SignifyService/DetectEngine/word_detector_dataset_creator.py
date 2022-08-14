@@ -31,7 +31,7 @@ mp_hands = mp_mpHands.Hands(mp_mode, mp_maxHands,
 mpDraw = mp.solutions.drawing_utils
 
 # Extract all pictures
-file_names = glob.glob(abs_dir + "/../Resources/Words-sml/*.jpg")
+file_names = glob.glob(abs_dir + "/../Resources/Words-sml/*.jpeg")
 num_files = len(file_names)
 curr_file = 1
 

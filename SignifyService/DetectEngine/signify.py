@@ -50,7 +50,7 @@ def setupTorchModel(useCuda: bool) -> None:       # if imported the importing mo
     global device
     str_device = "cuda" if torch.cuda.is_available() and useCuda else "cpu"
     device = torch.device(str_device)
-    model = torch.hub.load('ultralytics/yolov5', 'custom', path=(abs_dir + '/../Weights/best.pt'))
+    model = torch.hub.load('ultralytics/yolov5', 'custom', path=(abs_dir + '/../Weights/best.pt'), force_reload=True)
 
 # ====== Results
 prev_results = []
