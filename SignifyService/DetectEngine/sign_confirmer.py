@@ -115,6 +115,7 @@ class Confirmer:
 
     def confirm_f(self, keys):
         return (not keys[8][2] < keys[12][2] and
+        not self.is_finger_1_open(keys) and
         not self.is_finger_2_open(keys) and 
         self.is_finger_3_open(keys) and 
         self.is_finger_4_open(keys) and 
@@ -338,6 +339,12 @@ class Confirmer:
             return self.detect_fist(keys)
 
         return '!'
+
+    def special_treatment(self, char, keys):
+        if char == 'D':
+            return 'D' if keys[3][2] < keys[12][2] else 'DAL'
+        else:
+            return char
 
     
     def detect_angle(self, keys):
