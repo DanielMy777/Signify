@@ -1,6 +1,7 @@
 # %% [markdown]
 # # Epsilon Team
 
+from filecmp import clear_cache
 import math
 import sys
 import os
@@ -50,7 +51,7 @@ def setupTorchModel(useCuda: bool) -> None:       # if imported the importing mo
     global device
     str_device = "cuda" if torch.cuda.is_available() and useCuda else "cpu"
     device = torch.device(str_device)
-    model = torch.hub.load('ultralytics/yolov5', 'custom', path=(abs_dir + '/../Weights/best.pt'), force_reload=True)
+    model = torch.hub.load('ultralytics/yolov5', 'custom', path=(abs_dir + '/../Weights/best-new.pt'), force_reload=True)
 
 # ====== Results
 prev_results = []
@@ -158,8 +159,6 @@ def cut_hand(img, keys_dict):
 # ====== Recieve image and hand keys, return the best match detection for this image
 def get_match(img, keys):
     sec_char = '!'
-
-    img = pad_image(img)
     
     curr_char = compare_to_db(img)[0]
 
@@ -324,7 +323,10 @@ def process_image_letter(img):
             write_message(dst, "Please centrelize your hand", ERROR)
         else: # good hand positioning
             fixed_img, fixed_keys = flip_image(cut_img, keys, w, letter_detector.detectedSide)
-            char = get_match(fixed_img, fixed_keys)
+            gaus = cv2.GaussianBlur(fixed_img, (5,5), 10)
+            resized = cv2.resize(gaus, (IM_SIZE-100, IM_SIZE-100))
+            padded = pad_image(resized)
+            char = get_match(padded, fixed_keys)
             check_identify(char)
             dst = draw_square(dst, keys_dict, char)
     return (char, dst)
