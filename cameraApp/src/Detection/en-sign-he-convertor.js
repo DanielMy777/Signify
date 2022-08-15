@@ -2,7 +2,7 @@ en_sign_to_he_map = {
   A: 'א',
   B: 'ב',
   G: 'ג',
-  D: 'ד',
+  DAL: 'ד',
   H: 'ה',
   D: 'ו',
   Z: 'ז',
@@ -22,6 +22,7 @@ en_sign_to_he_map = {
   W: 'ש',
   T: 'ת',
   ' ': ' ',
+  SP: ' ',
 };
 
 en_word_he_map = {
