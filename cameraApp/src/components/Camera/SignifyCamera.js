@@ -21,6 +21,7 @@ import {useForceRender} from '../../Utils/custom-hooks';
 import Languages from '../../Utils/Languages';
 import {en_he_sign_convertor} from '../../Detection/en-sign-he-convertor';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {NetworkException} from '../../Network/httpClient';
 let detectLetterLock = false;
 let framesHandDidntMove = 0;
 const SignifyCamera = ({
@@ -72,7 +73,18 @@ const SignifyCamera = ({
       detect_res.sign.language = Languages.HEABREW;
       detect_res.sign.char = en_he_sign_convertor.convert(detect_res.sign);
     }
+
+    if (detect_res.sign.char == 'DAL' && !isHeabrew.value) {
+      detect_res.sign.char = 'D';
+    }
     if (detect_res.sign.char == 'SP') detect_res.sign.char = ' ';
+    console.log(detect_res.sign);
+    if (
+      (detect_res.sign.char == 'TZ' || detect_res.sign.char == 'CH') &&
+      !isHeabrew.value
+    ) {
+      detect_res.sign.char = '!';
+    }
   };
 
   const detectedTextStyle = useMemo(() => {
