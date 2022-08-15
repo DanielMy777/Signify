@@ -31,9 +31,7 @@ let predictedTextHistory = '';
 let is_heabrew = false;
 const CameraPage = ({style, CharMaxSequence = 2, history = true}) => {
   const {heabrewDetectionEnabled} = useContext(AppContext);
-  const [predictedText, setPredictedText] = useState(
-    history ? predictedTextHistory : '',
-  );
+  const [predictedText, setPredictedText] = useState('my name is o');
   const [googleTranslateEnabled, setGoogleTranslateEnabled] = useState(false);
   const detectSoundEnabled = useSharedValue(detectSoundHistory);
   const autoCorrectEnabled = useSharedValue(autoCorrectHistory);
@@ -184,6 +182,7 @@ const CameraPage = ({style, CharMaxSequence = 2, history = true}) => {
         hebrewLanguage={heabrewDetectionEnabled}
         onError={onError}
         errorStyle={{fontSize: 28, top: '88%'}}
+        stableDetection={true}
       />
       <View style={styles.predictedTextView}>
         <View style={styles.predictedTextTitleView}>
@@ -233,8 +232,7 @@ const styles = StyleSheet.create({
   },
   predictedText: {
     marginTop: 5,
-    fontSize: 24,
-    fontFamily: FontName.Blocks,
+    fontSize: 30,
     color: '#71797a',
   },
   prdeictedScrollView: {

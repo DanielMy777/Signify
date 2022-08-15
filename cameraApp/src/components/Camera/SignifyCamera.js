@@ -21,7 +21,8 @@ import {useForceRender} from '../../Utils/custom-hooks';
 import Languages from '../../Utils/Languages';
 import {en_he_sign_convertor} from '../../Detection/en-sign-he-convertor';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
+let detectLetterLock = false;
+let framesHandDidntMove = 0;
 const SignifyCamera = ({
   style,
   HandRectStyle = styles.hand_rect_default,
@@ -37,6 +38,7 @@ const SignifyCamera = ({
   errorStyle,
   onError,
   hebrewLanguage = false,
+  stableDetection = false,
 }) => {
   const [cameraPermission, setCameraPermission] = useState(undefined);
   const [handRect, setHandsRect] = useState(UN_DETECTED_HANDS);
@@ -49,6 +51,10 @@ const SignifyCamera = ({
   const reRender = useForceRender();
   const isHeabrew = useSharedValue(false);
   //console.log(device_orientation);
+
+  useEffect(() => {
+    detectLetterLock = false;
+  }, []);
 
   useEffect(() => {
     isHeabrew.value = hebrewLanguage;
@@ -66,6 +72,7 @@ const SignifyCamera = ({
       detect_res.sign.language = Languages.HEABREW;
       detect_res.sign.char = en_he_sign_convertor.convert(detect_res.sign);
     }
+    if (detect_res.sign.char == 'SP') detect_res.sign.char = ' ';
   };
 
   const detectedTextStyle = useMemo(() => {
@@ -158,7 +165,16 @@ const SignifyCamera = ({
       const fnumber = updateGetFrameNumber();
       const detectSignMethod =
         (fnumber == 1 || (fnumber == frameProcessorFps && false)) &&
-        detectSignFrames !== 0;
+        detectSignFrames !== 0 &&
+        (!stableDetection ||
+          // detectLetterLock == false ?is it good no one know no one
+          framesHandDidntMove >= Math.ceil(frameProcessorFps / 2));
+      //console.log(framesHandDidntMove);
+      if (detectSignMethod) {
+        //console.log('here');
+        detectLetterLock = true;
+        //console.log('getting lock');
+      }
 
       //console.log(detectType.value);
 
@@ -169,12 +185,26 @@ const SignifyCamera = ({
       const hands = detect_res.hands;
       //console.log(hands);
       //hands.hand1.stable = hands.hand2.stable = true;
+      const hand_moves =
+        hands.hand1.stable || hands.hand2.stable || detect_res.error;
       if (hands.hand1.stable) {
         setHandsRect(hands.hand1);
       }
 
       if (hands.hand2.stable) {
         setHand2Rect(hands.hand2);
+      }
+
+      if (!detectSignMethod) {
+        framesHandDidntMove += 1;
+        if (hand_moves) {
+          framesHandDidntMove = 0;
+        }
+      }
+
+      if (detectSignMethod) {
+        console.log(detect_res);
+        detectLetterLock = false;
       }
 
       if (detect_res.error) {
