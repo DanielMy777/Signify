@@ -51,7 +51,7 @@ def setupTorchModel(useCuda: bool) -> None:       # if imported the importing mo
     global device
     str_device = "cuda" if torch.cuda.is_available() and useCuda else "cpu"
     device = torch.device(str_device)
-    model = torch.hub.load('ultralytics/yolov5', 'custom', path=(abs_dir + '/../Weights/best-new.pt'), force_reload=True)
+    model = torch.hub.load('ultralytics/yolov5', 'custom', path=(abs_dir + '/../Weights/best-new.pt'))
 
 # ====== Results
 prev_results = []
@@ -173,6 +173,8 @@ def get_match(img, keys):
         if(curr_char == '!'):
             curr_char = letter_confirmer.semantic_corrent(curr_char, keys)
 
+    curr_char = letter_confirmer.special_treatment(curr_char, keys)
+    
     return curr_char
 
 # ====== Recieve image, hand keys, and letter. Draws these results on the image
