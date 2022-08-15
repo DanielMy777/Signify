@@ -159,9 +159,6 @@ def cut_hand(img, keys_dict):
 # ====== Recieve image and hand keys, return the best match detection for this image
 def get_match(img, keys):
     sec_char = '!'
-
-    #img = pad_image(img)
-    cv2.imshow('outi', img)
     
     curr_char = compare_to_db(img)[0]
 
