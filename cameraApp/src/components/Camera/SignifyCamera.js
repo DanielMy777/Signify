@@ -203,7 +203,7 @@ const SignifyCamera = ({
       }
 
       if (detectSignMethod) {
-        console.log(detect_res);
+        // console.log(detect_res);
         detectLetterLock = false;
       }
 
