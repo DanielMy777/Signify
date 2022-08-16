@@ -24,6 +24,8 @@ import SignifyCamera from '../Camera/SignifyCamera';
 import {useKeyBoardOpen} from '../../Utils/custom-hooks';
 import {play_random_sound} from '../../Utils/sound';
 import {AppContext} from '../../Context/AppContext';
+import {is_english_text} from '../../Utils/utils';
+import {showWarning} from '../../Utils/pop-messages';
 import {useSharedValue} from 'react-native-reanimated';
 
 let signTextHistory = '';
@@ -58,6 +60,10 @@ const LearningSignLanguagePage = ({history = true}) => {
   };
 
   const onTranslateButtonPressed = () => {
+    if (!is_english_text(text)) {
+      showWarning('text must be english letters', 1000);
+      return;
+    }
     setSignText(text);
     signTextHistory = text;
     detectedCharsHistory = 0;

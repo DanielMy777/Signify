@@ -41,6 +41,12 @@ const is_heabrew_text = text => {
   );
 };
 
+const is_english_text = text => {
+  const english_letters = 'abcdefghijklmnopqrstu vwxyz';
+  text = text.toLowerCase();
+  return [...text].filter(x => !english_letters.includes(x)).length == 0;
+};
+
 module.exports = {
   getNumInStr,
   copyProps,
@@ -50,4 +56,5 @@ module.exports = {
   get_random_item_list,
   get_last_word,
   is_heabrew_text,
+  is_english_text,
 };

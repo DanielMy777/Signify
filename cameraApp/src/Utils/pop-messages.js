@@ -15,8 +15,8 @@ const show_message = (message, type = MessageType.WARNING, duration = 1850) => {
   });
 };
 
-const showWarning = msg => {
-  show_message(msg, MessageType.WARNING);
+const showWarning = (msg, duration) => {
+  show_message(msg, MessageType.WARNING, duration);
 };
 
 const showError = msg => {
