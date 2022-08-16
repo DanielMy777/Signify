@@ -180,7 +180,7 @@ const CameraPage = ({style, CharMaxSequence = 2, history = true}) => {
         frameQuality={80}
         detectSignFrames={1}
         hebrewLanguage={heabrewDetectionEnabled}
-        onError={onError}
+        // onError={onError}
         errorStyle={{fontSize: 28, top: '88%'}}
         stableDetection={true}
       />
