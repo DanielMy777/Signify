@@ -68,6 +68,7 @@ const SignifyCamera = ({
   };
 
   const updateResultsByLanguage = detect_res => {
+    //console.log(detect_res.sign);
     detect_res.sign.language = Languages.ENGLISH;
     if (isHeabrew.value) {
       detect_res.sign.language = Languages.HEABREW;
@@ -78,7 +79,6 @@ const SignifyCamera = ({
       detect_res.sign.char = 'D';
     }
     if (detect_res.sign.char == 'SP') detect_res.sign.char = ' ';
-    console.log(detect_res.sign);
     if (
       (detect_res.sign.char == 'TZ' || detect_res.sign.char == 'CH') &&
       !isHeabrew.value
@@ -180,10 +180,10 @@ const SignifyCamera = ({
         detectSignFrames !== 0 &&
         (!stableDetection ||
           // detectLetterLock == false ?is it good no one know no one
-          framesHandDidntMove >= Math.ceil(frameProcessorFps / 2));
+          framesHandDidntMove >= Math.floor(frameProcessorFps / 2));
       //console.log(framesHandDidntMove);
       if (detectSignMethod) {
-        //console.log('here');
+        //console.log('here')
         detectLetterLock = true;
         //console.log('getting lock');
       }

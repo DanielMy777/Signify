@@ -44,6 +44,7 @@ Tts.say = text => {
     Tts.speak(text);
   }
 };
+
 Tts.voices().then(voices => {
   //console.log(voices.map(x => x.language).filter(x => x.startsWith('HE')));
 });
