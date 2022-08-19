@@ -40,6 +40,7 @@ const SignifyCamera = ({
   onError,
   hebrewLanguage = false,
   stableDetection = false,
+  stableDetectionWords = false,
 }) => {
   const [cameraPermission, setCameraPermission] = useState(undefined);
   const [handRect, setHandsRect] = useState(UN_DETECTED_HANDS);
@@ -173,12 +174,15 @@ const SignifyCamera = ({
   const upload_img = useCallback(
     async img => {
       let detect_res = EMPTY_RESULTS;
-
+      const stableDetect =
+        stableDetection ||
+        (detectType.value == DetectionType.WORD && stableDetectionWords);
       const fnumber = updateGetFrameNumber();
+      const middleFrame = Math.ceil(frameProcessorFps / 2);
       const detectSignMethod =
         (fnumber == 1 || (fnumber == frameProcessorFps && false)) &&
         detectSignFrames !== 0 &&
-        (!stableDetection ||
+        (!stableDetect ||
           // detectLetterLock == false ?is it good no one know no one
           framesHandDidntMove >= Math.floor(frameProcessorFps / 2));
       //console.log(framesHandDidntMove);

@@ -177,12 +177,13 @@ const CameraPage = ({style, CharMaxSequence = 2, history = true}) => {
         style={styles.camera}
         frameProcessorFps={5}
         frameMaxSize={700}
-        frameQuality={80}
+        frameQuality={50}
         detectSignFrames={1}
         hebrewLanguage={heabrewDetectionEnabled}
         // onError={onError}
         errorStyle={{fontSize: 28, top: '88%'}}
-        stableDetection={true}
+        stableDetection={false}
+        stableDetectionWords={true}
       />
       <View style={styles.predictedTextView}>
         <View style={styles.predictedTextTitleView}>
