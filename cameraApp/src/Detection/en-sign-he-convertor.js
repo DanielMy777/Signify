@@ -30,12 +30,14 @@ for (const [key, value] of Object.entries(en_sign_to_he_map)) {
 }
 he_sign_to_en_map[' '] = ' ';
 he_sign_to_en_map['ד'] = 'E';
-he_sign_to_en_map['ח'] = 'j';
-he_sign_to_en_map['צ'] = 'o';
-he_sign_to_en_map['ן'] = 'N';
-he_sign_to_en_map['ך'] = 'j';
-he_sign_to_en_map['ץ'] = 'o';
-he_sign_to_en_map['ף'] = 'P';
+he_sign_to_en_map['ח'] = 'J';
+he_sign_to_en_map['צ'] = 'O';
+he_sign_to_en_map['ן'] = 'c';
+he_sign_to_en_map['ך'] = 'b';
+he_sign_to_en_map['ץ'] = 'd';
+he_sign_to_en_map['ף'] = 'e';
+he_sign_to_en_map['ם'] = 'f';
+he_sign_to_en_map['א'] = 'a';
 
 const convert_he_en = he_text => {
   const words = he_text.split(' ');
