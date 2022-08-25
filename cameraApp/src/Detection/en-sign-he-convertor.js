@@ -24,6 +24,31 @@ en_sign_to_he_map = {
   ' ': ' ',
   SP: ' ',
 };
+he_sign_to_en_map = {};
+for (const [key, value] of Object.entries(en_sign_to_he_map)) {
+  he_sign_to_en_map[value] = key;
+}
+he_sign_to_en_map[' '] = ' ';
+he_sign_to_en_map['ד'] = 'E';
+he_sign_to_en_map['ח'] = 'j';
+he_sign_to_en_map['צ'] = 'o';
+he_sign_to_en_map['ן'] = 'N';
+he_sign_to_en_map['ך'] = 'j';
+he_sign_to_en_map['ץ'] = 'o';
+he_sign_to_en_map['ף'] = 'P';
+
+const convert_he_en = he_text => {
+  const words = he_text.split(' ');
+  let en_text = '';
+  for (word of words) {
+    if (en_text != '') en_text += '\n';
+    en_text += [...word]
+      .map(he_letter => he_sign_to_en_map[he_letter])
+      .reverse()
+      .join('');
+  }
+  return en_text;
+};
 
 en_word_he_map = {
   I: 'אני',
@@ -59,4 +84,5 @@ class en_he_sign_convertor {
 
 module.exports = {
   en_he_sign_convertor,
+  convert_he_en,
 };
