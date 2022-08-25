@@ -7,6 +7,8 @@ class FontName {
   static BerlinSans = 'Berlin Sans FB Regular';
   static BabyBlock = 'Baby Blocks';
   static Blocks = 'blocks';
+  static EnglishSignLanguage = 'ASL';
+  static HeabrewSignLanguage = 'HSL';
 }
 
 export default FontName;

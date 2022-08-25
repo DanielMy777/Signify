@@ -24,7 +24,7 @@ import SignifyCamera from '../Camera/SignifyCamera';
 import {useKeyBoardOpen} from '../../Utils/custom-hooks';
 import {play_random_sound} from '../../Utils/sound';
 import {AppContext} from '../../Context/AppContext';
-import {is_english_text} from '../../Utils/utils';
+import {is_english_text, is_heabrew_text} from '../../Utils/utils';
 import {showWarning} from '../../Utils/pop-messages';
 import {useSharedValue} from 'react-native-reanimated';
 
@@ -60,8 +60,8 @@ const LearningSignLanguagePage = ({history = true}) => {
   };
 
   const onTranslateButtonPressed = () => {
-    if (!is_english_text(text)) {
-      showWarning('text must be english letters', 1000);
+    if (!is_english_text(text) && !is_heabrew_text(text)) {
+      showWarning('text must be english or heabrew no mixing', 1000);
       return;
     }
     setSignText(text);
@@ -85,8 +85,8 @@ const LearningSignLanguagePage = ({history = true}) => {
     }),
     [keyboardOpen],
   );
-  styles.camera_style.top = sign_translate_view_height_current + '%';
-  styles.camera_style.height = 100 - signTranslateViewHeight + '%';
+  styles.camera_style.top = sign_translate_view_height_current + 3 + '%';
+  styles.camera_style.height = 97 - signTranslateViewHeight + '%';
   const setTextFixed = text => {
     setText(text);
     sentenceToTranslateHistory = text;
@@ -129,6 +129,7 @@ const LearningSignLanguagePage = ({history = true}) => {
 
         <ScrollView
           contentContainerStyle={styles.signTextScrollView}
+          //style={{width: '100%'}}
           persistentScrollbar={true}>
           <SignText
             text={signText}
@@ -146,6 +147,7 @@ const LearningSignLanguagePage = ({history = true}) => {
           frameQuality={80}
           frameMaxSize={700}
           errorStyle={{top: '82%'}}
+          hebrewLanguage={is_heabrew_text(signText)}
         />
       }
     </View>
@@ -185,6 +187,10 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '40%',
   },
-  signTextScrollView: {textAlign: 'center'},
+  signTextScrollView: {
+    textAlign: 'center',
+    //alignItems:'center'
+    paddingRight: 5,
+  },
 });
 export default LearningSignLanguagePage;

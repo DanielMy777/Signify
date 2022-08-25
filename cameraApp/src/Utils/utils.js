@@ -34,7 +34,7 @@ const get_last_word = str => {
   words = str.split(' ');
   return words.length == 0 ? null : words[words.length - 1];
 };
-const heabrew_letters = 'ךןםאבגדהוזחטיכלמנסעפצקרשתץ';
+const heabrew_letters = 'ךףןםאבגדהוזחטיכלמנסעפצקרשתץ';
 const is_heabrew_text = text => {
   return (
     [...text].filter(x => x != ' ' && !heabrew_letters.includes(x)).length == 0
@@ -47,6 +47,18 @@ const is_english_text = text => {
   return [...text].filter(x => !english_letters.includes(x)).length == 0;
 };
 
+const to_heabrew_lower_case = he_text => {
+  return [...he_text]
+    .map(current_letter => {
+      if (current_letter == 'ן') current_letter = 'נ';
+      if (current_letter == 'ך') current_letter = 'ח';
+      if (current_letter == 'ץ') current_letter = 'צ';
+      if (current_letter == 'ף') current_letter = 'פ';
+      return current_letter;
+    })
+    .join('');
+};
+
 module.exports = {
   getNumInStr,
   copyProps,
@@ -57,4 +69,5 @@ module.exports = {
   get_last_word,
   is_heabrew_text,
   is_english_text,
+  to_heabrew_lower_case,
 };

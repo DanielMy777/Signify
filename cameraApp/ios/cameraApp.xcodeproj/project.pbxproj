@@ -38,6 +38,10 @@
 		1D97B26DAC304BEEB0D23F1A /* Baby Blocks.TTF in Resources */ = {isa = PBXBuildFile; fileRef = 19E38BBE923B4CDBB59A0D1A /* Baby Blocks.TTF */; };
 		42D9D17BCA23483FA681FB76 /* Baby Blocks.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B03606841C48466BB6D48959 /* Baby Blocks.ttf */; };
 		3588C81D4F8F4A36AD08F924 /* blocks.otf in Resources */ = {isa = PBXBuildFile; fileRef = 9C275098B7F54F6288478912 /* blocks.otf */; };
+		2686C45C82F146E8980BCCD9 /* ASL-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8713179248E046A397DD8E6A /* ASL-Regular.ttf */; };
+		7B83FC08C94A4BF3BE50EA88 /* HSL-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B3EC8F96B75B47DB9F4F2290 /* HSL-Regular.ttf */; };
+		E02E836874D64B2899512E76 /* ASL.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A743CE93E02647BFA7DDBD67 /* ASL.ttf */; };
+		FEA9DD92EA0944A5B25C74BB /* HSL.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 748806047E7044BC971848FE /* HSL.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +92,10 @@
 		19E38BBE923B4CDBB59A0D1A /* Baby Blocks.TTF */ = {isa = PBXFileReference; name = "Baby Blocks.TTF"; path = "../resources/fonts/Baby Blocks.TTF"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		B03606841C48466BB6D48959 /* Baby Blocks.ttf */ = {isa = PBXFileReference; name = "Baby Blocks.ttf"; path = "../resources/fonts/Baby Blocks.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		9C275098B7F54F6288478912 /* blocks.otf */ = {isa = PBXFileReference; name = "blocks.otf"; path = "../resources/fonts/blocks.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		8713179248E046A397DD8E6A /* ASL-Regular.ttf */ = {isa = PBXFileReference; name = "ASL-Regular.ttf"; path = "../resources/fonts/ASL-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		B3EC8F96B75B47DB9F4F2290 /* HSL-Regular.ttf */ = {isa = PBXFileReference; name = "HSL-Regular.ttf"; path = "../resources/fonts/HSL-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		A743CE93E02647BFA7DDBD67 /* ASL.ttf */ = {isa = PBXFileReference; name = "ASL.ttf"; path = "../resources/fonts/ASL.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		748806047E7044BC971848FE /* HSL.ttf */ = {isa = PBXFileReference; name = "HSL.ttf"; path = "../resources/fonts/HSL.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -206,6 +214,10 @@
 				19E38BBE923B4CDBB59A0D1A /* Baby Blocks.TTF */,
 				B03606841C48466BB6D48959 /* Baby Blocks.ttf */,
 				9C275098B7F54F6288478912 /* blocks.otf */,
+				8713179248E046A397DD8E6A /* ASL-Regular.ttf */,
+				B3EC8F96B75B47DB9F4F2290 /* HSL-Regular.ttf */,
+				A743CE93E02647BFA7DDBD67 /* ASL.ttf */,
+				748806047E7044BC971848FE /* HSL.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -327,6 +339,10 @@
 				1D97B26DAC304BEEB0D23F1A /* Baby Blocks.TTF in Resources */,
 				42D9D17BCA23483FA681FB76 /* Baby Blocks.ttf in Resources */,
 				3588C81D4F8F4A36AD08F924 /* blocks.otf in Resources */,
+				2686C45C82F146E8980BCCD9 /* ASL-Regular.ttf in Resources */,
+				7B83FC08C94A4BF3BE50EA88 /* HSL-Regular.ttf in Resources */,
+				E02E836874D64B2899512E76 /* ASL.ttf in Resources */,
+				FEA9DD92EA0944A5B25C74BB /* HSL.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
