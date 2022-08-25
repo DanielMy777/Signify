@@ -26,7 +26,7 @@ class wordConfirmer:
         if word == 'you':
             return self.confirm_you(keys_pose, keys_hand)
         if word == '!':
-            return True
+            return '!'
 
     #TODO: add conds
     def confirm_do(self, keys_pose, keys_hand):
@@ -39,10 +39,10 @@ class wordConfirmer:
         return 'hamburger'
 
     def confirm_iloveyou(self, keys_pose, keys_hand):
-        return 'i love you'
+        return 'i love you' if (keys_hand[8][1] < keys_hand[6][1]) else 'i'
 
     def confirm_i(self, keys_pose, keys_hand):
-        return 'i'
+        return 'i love you' if (keys_hand[8][1] < keys_hand[6][1]) else 'i'
 
     def confirm_no(self, keys_pose, keys_hand):
         return 'no'
