@@ -110,9 +110,7 @@ const SignText = (
         letter_index += letter != ' ' && letter != '\n';
         return (
           <Text style={{color: letter_color}} key={index}>
-            {letter.toLowerCase() == 'a'
-              ? letter.toLowerCase()
-              : letter.toUpperCase()}
+            {letter}
           </Text>
         );
       })}
