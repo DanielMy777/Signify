@@ -8,7 +8,12 @@ import {getPercent} from '../../Utils/utils';
 
 const PremessionsPage = ({paddingTopPercent = 5}) => {
   const dimension = useWindowDimensions();
-  console.log(getPercent(dimension.height, paddingTopPercent));
+  console.log(
+    `premission page  precent =  ${getPercent(
+      dimension.height,
+      paddingTopPercent,
+    )}`,
+  );
   return (
     <FullScreenBackground>
       <SignifyHeader fontSize={50} />

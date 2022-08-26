@@ -1,12 +1,14 @@
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import React from 'react';
 
 class VectorIconType {
   static MatterialCommunity = 'MaterialCommunityIcons';
   static IonIcons = 'IonIcons';
   static MaterialIcons = 'MaterialIcons';
+  static FontAwesome = 'FontAwesome';
 }
 
 const GeneralIcon = ({
@@ -33,6 +35,11 @@ const GeneralIcon = ({
     if (type == VectorIconType.MaterialIcons) {
       return (
         <MaterialIcons size={size} name={name} style={style} color={color} />
+      );
+    }
+    if (type == VectorIconType.FontAwesome) {
+      return (
+        <FontAwesome size={size} name={name} style={style} color={color} />
       );
     }
 

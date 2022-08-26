@@ -41,6 +41,7 @@ const SignifyCamera = ({
   hebrewLanguage = false,
   stableDetection = false,
   stableDetectionWords = false,
+  onDetectionTypeSwitch,
 }) => {
   const [cameraPermission, setCameraPermission] = useState(undefined);
   const [handRect, setHandsRect] = useState(UN_DETECTED_HANDS);
@@ -154,10 +155,14 @@ const SignifyCamera = ({
       icon_type: VectorIconType.MatterialCommunity,
       color: 'black',
       onPress: () => {
-        detectType.value =
+        prev_value = detectType.value;
+        new_value =
           detectType.value == DetectionType.LETTER
             ? DetectionType.WORD
             : DetectionType.LETTER;
+        detectType.value = new_value;
+
+        if (onDetectionTypeSwitch) onDetectionTypeSwitch(new_value);
         reRender();
       },
     };

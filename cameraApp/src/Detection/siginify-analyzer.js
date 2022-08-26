@@ -58,21 +58,28 @@ class SignifyDetectionAnalyzer {
     hand1 = res.hands.handsRect;
     hand2 = UN_DETECTED_HANDS;
     const num_hands = !is_letter && hands.th == 1 ? 2 : 1;
-    const increase = !is_letter ? 2 : 0;
+    const increase = 2;
+    const bottom = is_letter ? hand1.y + hand1.h : 0;
+    const increase_h = bottom < 90 ? 4 : 0;
     if (!is_letter) {
       hand1 = {
-        x: hands.x1,
-        y: hands.y1,
-        w: hands.w1 + increase,
-        h: hands.h1 + increase,
+        x: hands.x1 - increase,
+        y: hands.y1 - increase,
+        w: hands.w1 + increase * 2,
+        h: hands.h1 + increase * 2,
       };
       if (num_hands == 2)
         hand2 = {
-          x: hands.x2,
-          y: hands.y2,
-          w: hands.w2 + increase,
-          h: hands.h2 + increase,
+          x: hands.x2 - increase,
+          y: hands.y2 - increase,
+          w: hands.w2 + increase * 2,
+          h: hands.h2 + increase * 2 + increase_h,
         };
+    } else {
+      hand1.x -= increase;
+      hand1.y -= increase;
+      hand1.w += increase * 2;
+      hand1.h += increase * 2 + increase_h;
     }
 
     return {

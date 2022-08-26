@@ -102,7 +102,19 @@ const SignText = (
     }
     return signTextStyle;
   }, [isHeabrew, fontSize]);
-
+  const fix_letter = letter => {
+    if (isHeabrew) return letter;
+    else {
+      return letter.toLowerCase() == 'a' ? 'a' : letter.toUpperCase();
+    }
+  };
+  if (
+    text_fixed.length > 0 &&
+    is_heabrew_text(text_fixed[0]) &&
+    text_fixed[0] != ' '
+  ) {
+    return <View></View>;
+  }
   return (
     <Text style={textStyle} adjustsFontSizeToFit={true}>
       {text_fixed.split('').map((letter, index) => {
@@ -110,7 +122,7 @@ const SignText = (
         letter_index += letter != ' ' && letter != '\n';
         return (
           <Text style={{color: letter_color}} key={index}>
-            {letter}
+            {fix_letter(letter)}
           </Text>
         );
       })}
