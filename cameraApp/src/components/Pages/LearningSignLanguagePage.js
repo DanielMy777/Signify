@@ -5,6 +5,7 @@ import {
   ScrollView,
   StyleSheet,
   KeyboardAvoidingView,
+  Image,
   Keyboard,
 } from 'react-native';
 import React, {
@@ -24,32 +25,84 @@ import SignifyCamera from '../Camera/SignifyCamera';
 import {useKeyBoardOpen} from '../../Utils/custom-hooks';
 import {play_random_sound} from '../../Utils/sound';
 import {AppContext} from '../../Context/AppContext';
-import {is_english_text, is_heabrew_text} from '../../Utils/utils';
+import {
+  is_english_text,
+  is_heabrew_text,
+  get_random_item_list,
+} from '../../Utils/utils';
 import {showWarning} from '../../Utils/pop-messages';
+import {signWordsImages} from '../../Utils/signWordImages';
+import {Dropdown} from 'react-native-element-dropdown';
+import {DetectionType} from '../../Detection/detection-constants';
 import {useSharedValue} from 'react-native-reanimated';
+import {GeneralIcon, VectorIconType} from '../General/Icons';
 
 let signTextHistory = '';
 let detectedCharsHistory = 0;
 let sentenceToTranslateHistory = '';
+const wordsImagesData = signWordsImages.map((signWordImg, index) => ({
+  word: signWordImg.word,
+  index: index,
+}));
 const LearningSignLanguagePage = ({history = true}) => {
+  const [wordsLearning, setWordsLearning] = useState(false);
+  const wordsLearningSharedValue = useSharedValue(false);
+  const [selectedWordIndex, setSelectedWordIndex] = useState(0);
+  const [randomWords, setRandomWords] = useState(0);
+  const selectedWordIndexSharedValue = useSharedValue(0);
+  const [detectedWord, setDetectedWord] = useState(false);
   const [text, setText] = useState(history ? sentenceToTranslateHistory : '');
   const [signText, setSignText] = useState(history ? signTextHistory : '');
   const {learningSoundEffectsEnabled} = useContext(AppContext);
   const keyboardOpen = useKeyBoardOpen();
-  const signTextRef = useRef();
+  const signTextRef = useRef(undefined);
   const signTranslateViewHeight = 44,
     signTranslateViewHeightWhenKeyboardOpen = signTranslateViewHeight + 25;
   useEffect(() => {
-    if (history)
+    if (history && signTextRef.current != undefined)
       signTextRef.current.setDetectedLettersCount(detectedCharsHistory);
   }, [signTextRef]);
 
+  useEffect(() => {
+    wordsLearningSharedValue.value = wordsLearning;
+  }, [wordsLearning]);
+
+  useEffect(() => {
+    selectedWordIndexSharedValue.value = selectedWordIndex;
+  }, [selectedWordIndex]);
+
+  const selectRandomWord = () => {
+    let word = get_random_item_list(wordsImagesData);
+    while (word.index == selectedWordIndex && wordsImagesData.length > 1)
+      word = get_random_item_list(wordsImagesData);
+
+    setSelectedWordIndex(word.index);
+    setDetectedWord(false);
+  };
+
   const onSignDetection = useCallback(
     detect_obj => {
-      if (!signTextRef.current) {
-        return;
+      if (wordsLearningSharedValue.value == false) {
+        if (!signTextRef.current) {
+          return;
+        }
+        signTextRef.current.detect_letter(detect_obj.sign.char);
+      } else if (wordsLearningSharedValue.value == true) {
+        setDetectedWord(detectedWordPrev => {
+          if (
+            !detectedWordPrev &&
+            selectedWordIndexSharedValue.value >= 0 &&
+            selectedWordIndexSharedValue.value < wordsImagesData.length &&
+            detect_obj.sign.char ==
+              wordsImagesData[selectedWordIndexSharedValue.value].word
+          ) {
+            //Tts.say(detect_obj.sign.char);
+            play_random_sound();
+            return true;
+          }
+          return detectedWordPrev;
+        });
       }
-      signTextRef.current.detect_letter(detect_obj.sign.char);
     },
     [signTextRef],
   );
@@ -91,53 +144,129 @@ const LearningSignLanguagePage = ({history = true}) => {
     setText(text);
     sentenceToTranslateHistory = text;
   };
+  //console.log(wordsImagesData);
 
+  const get_current_word = () => {
+    if (selectedWordIndex >= 0 && selectedWordIndex <= wordsImagesData.length) {
+      return signWordsImages[selectedWordIndex].word;
+    }
+    return undefined;
+  };
   return (
     <View style={styles.container}>
       <View style={styles.backgroundColor} />
-      <View style={signTranslateViewStyleFixed}>
-        <View style={styles.input}>
-          <TextInput
-            style={styles.textBox}
-            value={text}
-            onChangeText={setTextFixed}
-            placeholder="sentence to translate"
-            onSubmitEditing={onTranslateButtonPressed}
-          />
-          <PressableOpacity
-            style={styles.button}
-            disabledOpacity={0.4}
-            onPress={onTranslateButtonPressed}>
-            <FontAwesome
-              name="american-sign-language-interpreting"
-              color="black"
-              size={40}
+      {wordsLearning && (
+        <View style={signTranslateViewStyleFixed}>
+          <View style={styles.input}>
+            <Dropdown
+              style={styles.dropdown}
+              // containerStyle={styles.selectContainerStyle}
+              placeholderStyle={styles.placeholderStyle}
+              search
+              inputSearchStyle={styles.inputSearchStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              value={selectedWordIndex}
+              data={wordsImagesData}
+              valueField="index"
+              labelField="word"
+              autoScroll={false}
+              placeholder="Word"
+              searchPlaceholder="Search..."
+              onChange={data_obj => {
+                if (!data_obj.index) {
+                  console.log('problem with index in DropDown learning page');
+                }
+                setSelectedWordIndex(data_obj.index);
+                setDetectedWord(false);
+              }}
             />
-          </PressableOpacity>
 
-          <PressableOpacity
-            style={{marginLeft: 5}}
-            disabledOpacity={0.4}
-            onPress={onTextToSpeechPressed}>
-            <MaterialCommunityIcons
-              name="volume-high"
-              color="black"
-              size={50}
-            />
-          </PressableOpacity>
+            <PressableOpacity onPress={selectRandomWord}>
+              <GeneralIcon
+                size={30}
+                Type={VectorIconType.FontAwesome}
+                name="random"
+                color="black"
+              />
+            </PressableOpacity>
+          </View>
+
+          {selectedWordIndex >= 0 &&
+            selectedWordIndex <= signWordsImages.length && (
+              <Image
+                source={signWordsImages[selectedWordIndex].img}
+                style={{
+                  zIndex: 10000,
+                  // position: 'absolute',
+                  // top: '8%',
+                  //left: '25%',
+                  width: '70%',
+                  height: '70%',
+                  bottom: 20,
+                }}
+              />
+            )}
+          {selectedWordIndex >= 0 &&
+            selectedWordIndex <= signWordsImages.length && (
+              <Text
+                style={{
+                  fontSize: 35,
+                  bottom: 15,
+                  color: detectedWord ? 'white' : 'black',
+                  paddingRight: 4,
+                  paddingLeft: 4,
+                  backgroundColor: detectedWord ? 'green' : 'transparent',
+                }}>
+                {signWordsImages[selectedWordIndex].word}
+              </Text>
+            )}
         </View>
+      )}
+      {!wordsLearning && (
+        <View style={signTranslateViewStyleFixed}>
+          <View style={styles.input}>
+            <TextInput
+              style={styles.textBox}
+              value={text}
+              onChangeText={setTextFixed}
+              placeholder="sentence to translate"
+              onSubmitEditing={onTranslateButtonPressed}
+            />
+            <PressableOpacity
+              style={styles.button}
+              disabledOpacity={0.4}
+              onPress={onTranslateButtonPressed}>
+              <FontAwesome
+                name="american-sign-language-interpreting"
+                color="black"
+                size={40}
+              />
+            </PressableOpacity>
 
-        <ScrollView
-          contentContainerStyle={styles.signTextScrollView}
-          //style={{width: '100%'}}
-          persistentScrollbar={true}>
-          <SignText
-            text={signText}
-            ref={signTextRef}
-            onLetterDetected={onLetterDetected}
-          />
-        </ScrollView>
-      </View>
+            <PressableOpacity
+              style={{marginLeft: 5}}
+              disabledOpacity={0.4}
+              onPress={onTextToSpeechPressed}>
+              <MaterialCommunityIcons
+                name="volume-high"
+                color="black"
+                size={50}
+              />
+            </PressableOpacity>
+          </View>
+
+          <ScrollView
+            contentContainerStyle={styles.signTextScrollView}
+            //style={{width: '100%'}}
+            persistentScrollbar={true}>
+            <SignText
+              text={signText}
+              ref={signTextRef}
+              onLetterDetected={onLetterDetected}
+            />
+          </ScrollView>
+        </View>
+      )}
       {
         <SignifyCamera
           style={styles.camera_style}
@@ -147,7 +276,13 @@ const LearningSignLanguagePage = ({history = true}) => {
           frameQuality={80}
           frameMaxSize={700}
           errorStyle={{top: '82%'}}
-          hebrewLanguage={is_heabrew_text(signText)}
+          onDetectionTypeSwitch={new_type => {
+            setWordsLearning(new_type == DetectionType.WORD);
+          }}
+          hebrewLanguage={
+            (!wordsLearning && !is_english_text(signText)) ||
+            (wordsLearning && !is_english_text(get_current_word()))
+          }
         />
       }
     </View>
@@ -191,6 +326,37 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     //alignItems:'center'
     paddingRight: 5,
+  },
+  dropdown: {
+    margin: 16,
+    height: 35,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    width: '50%',
+
+    elevation: 2,
+  },
+  selectContainerStyle: {
+    position: 'absolute',
+    top: '100%',
+    width: '100%',
+  },
+  placeholderStyle: {
+    fontSize: 25,
+  },
+  selectedTextStyle: {
+    fontSize: 25,
+  },
+  inputSearchStyle: {
+    fontSize: 20,
   },
 });
 export default LearningSignLanguagePage;

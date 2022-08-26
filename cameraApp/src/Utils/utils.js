@@ -42,6 +42,7 @@ const is_heabrew_text = text => {
 };
 
 const is_english_text = text => {
+  if (text == undefined) return true;
   const english_letters = 'abcdefghijklmnopqrstu vwxyz';
   text = text.toLowerCase();
   return [...text].filter(x => !english_letters.includes(x)).length == 0;

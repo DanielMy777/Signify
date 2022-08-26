@@ -13,7 +13,7 @@ const correct_sentence = (sentence, number_of_matches, print_matches_flag) => {
   ) {
     const matches = auto_correct.get_best_matches(last_word, number_of_matches);
     if (print_matches_flag) {
-      console.log(matches);
+      console.log(f`matches are : ${matches}`);
     }
     correct_text =
       words.slice(0, words.length - 1).join(' ') + ' ' + matches[0];
