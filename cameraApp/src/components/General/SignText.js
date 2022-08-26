@@ -87,6 +87,16 @@ const SignText = (
 
   let letter_index = 0; // only the indexes of chars that are not ' '
 
+  const fix_english = english_text => {
+    const words = english_text.split(' ');
+    let fixed = '';
+    for (word of words) {
+      if (fixed != '') fixed += '\n';
+      fixed += word;
+    }
+    return fixed;
+  };
+
   const text_fixed = useMemo(() => {
     return isHeabrew ? convert_he_en(text) : text;
   }, [text, isHeabrew]);
@@ -96,10 +106,13 @@ const SignText = (
     return index < detectedLettersCount ? detectedColor : color;
   };
   const textStyle = useMemo(() => {
-    const signTextStyle = isHeabrew ? styles.signTextHeabrew : styles.signText;
+    let signTextStyle = isHeabrew
+      ? {...styles.signTextHeabrew}
+      : {...styles.signText};
     if (fontSize) {
-      return {...signTextStyle, fontSize};
+      signTextStyle.fontSize = fontSize;
     }
+    signTextStyle.lineHeight = signTextStyle.fontSize;
     return signTextStyle;
   }, [isHeabrew, fontSize]);
   const fix_letter = letter => {
