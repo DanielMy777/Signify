@@ -30,8 +30,8 @@ class SignifyWebDetectionModel {
         2000,
       );
     } catch (err) {
-      console.log('signify web-api catch:');
-      console.log(err);
+      //console.log('signify web-api catch:');
+      //console.log(err);
       throw new NetworkException('cant reach Server');
     }
   }

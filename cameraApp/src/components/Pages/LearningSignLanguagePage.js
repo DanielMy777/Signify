@@ -45,10 +45,10 @@ const wordsImagesData = signWordsImages.map((signWordImg, index) => ({
   index: index,
 }));
 const LearningSignLanguagePage = ({history = true}) => {
+  const {signWordsLearned, setSignWordsLearned} = useContext(AppContext);
   const [wordsLearning, setWordsLearning] = useState(false);
   const wordsLearningSharedValue = useSharedValue(false);
   const [selectedWordIndex, setSelectedWordIndex] = useState(0);
-  const [randomWords, setRandomWords] = useState(0);
   const selectedWordIndexSharedValue = useSharedValue(0);
   const [detectedWord, setDetectedWord] = useState(false);
   const [text, setText] = useState(history ? sentenceToTranslateHistory : '');
@@ -80,6 +80,33 @@ const LearningSignLanguagePage = ({history = true}) => {
     setDetectedWord(false);
   };
 
+  const updateDetectedWordOnDetection = detect_obj => {
+    setDetectedWord(detectedWordPrev => {
+      if (
+        !detectedWordPrev &&
+        selectedWordIndexSharedValue.value >= 0 &&
+        selectedWordIndexSharedValue.value < wordsImagesData.length &&
+        detect_obj.sign.char ==
+          wordsImagesData[selectedWordIndexSharedValue.value].word
+      ) {
+        //Tts.say(detect_obj.sign.char);
+        play_random_sound();
+        return true;
+      }
+      return detectedWordPrev;
+    });
+  };
+
+  const updateLearnedWordsOnDetection = detect_obj => {
+    setSignWordsLearned(words_learend => {
+      const word = detect_obj.sign.char;
+      if (words_learend[word] == true) return words_learend;
+      let words_learned_updated = {...words_learend};
+      words_learned_updated[word] = true;
+      return words_learned_updated;
+    });
+  };
+
   const onSignDetection = useCallback(
     detect_obj => {
       if (wordsLearningSharedValue.value == false) {
@@ -88,20 +115,8 @@ const LearningSignLanguagePage = ({history = true}) => {
         }
         signTextRef.current.detect_letter(detect_obj.sign.char);
       } else if (wordsLearningSharedValue.value == true) {
-        setDetectedWord(detectedWordPrev => {
-          if (
-            !detectedWordPrev &&
-            selectedWordIndexSharedValue.value >= 0 &&
-            selectedWordIndexSharedValue.value < wordsImagesData.length &&
-            detect_obj.sign.char ==
-              wordsImagesData[selectedWordIndexSharedValue.value].word
-          ) {
-            //Tts.say(detect_obj.sign.char);
-            play_random_sound();
-            return true;
-          }
-          return detectedWordPrev;
-        });
+        updateDetectedWordOnDetection(detect_obj);
+        updateLearnedWordsOnDetection(detect_obj);
       }
     },
     [signTextRef],
@@ -152,6 +167,22 @@ const LearningSignLanguagePage = ({history = true}) => {
     }
     return undefined;
   };
+
+  const renderItem = item => {
+    return (
+      <View style={styles.item}>
+        <Text style={styles.textItem}>{item.word}</Text>
+        {signWordsLearned[item.word] == true && (
+          <GeneralIcon
+            style={styles.dropDownItemIcon}
+            name="check-bold"
+            size={18}
+            color="green"
+          />
+        )}
+      </View>
+    );
+  };
   return (
     <View style={styles.container}>
       <View style={styles.backgroundColor} />
@@ -159,7 +190,19 @@ const LearningSignLanguagePage = ({history = true}) => {
         <View style={signTranslateViewStyleFixed}>
           <View style={styles.input}>
             <Dropdown
+              renderItem={renderItem}
+              renderRightIcon={() => (
+                <GeneralIcon
+                  style={styles.dropDownItemIcon}
+                  name="check-bold"
+                  size={signWordsLearned[get_current_word()] == true ? 18 : 0}
+                  color="green"
+                />
+              )}
               style={styles.dropdown}
+              //searchQuery={(searchWord, wordLabel) => {
+              // return wordLabel.startsWith(searchWord);
+              //}}
               // containerStyle={styles.selectContainerStyle}
               placeholderStyle={styles.placeholderStyle}
               search
@@ -173,8 +216,9 @@ const LearningSignLanguagePage = ({history = true}) => {
               placeholder="Word"
               searchPlaceholder="Search..."
               onChange={data_obj => {
-                if (!data_obj.index) {
+                if (data_obj.index == undefined) {
                   console.log('problem with index in DropDown learning page');
+                  return;
                 }
                 setSelectedWordIndex(data_obj.index);
                 setDetectedWord(false);
@@ -351,12 +395,29 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     fontSize: 25,
+    color: 'black',
   },
   selectedTextStyle: {
     fontSize: 25,
+    color: 'black',
   },
   inputSearchStyle: {
     fontSize: 20,
+    color: 'black',
+  },
+  item: {
+    padding: 17,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  textItem: {
+    flex: 1,
+    fontSize: 16,
+    color: 'black',
+  },
+  dropDownItemIcon: {
+    marginRight: 5,
   },
 });
 export default LearningSignLanguagePage;

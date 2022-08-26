@@ -3,8 +3,10 @@ const AppContext = React.createContext();
 import {AsyncStorageGetItem, AsyncStorageSetItem} from '../Utils/async-storage';
 const heabrewEanbledItem = 'heabrewEnabled';
 const learningSoundEffectsItem = 'learningsoundeffects';
+const learnedSignWordsItem = 'learnedsignwords';
 
 const AppProvider = ({children}) => {
+  const [signWordsLearned, setSignWordsLearned] = useState({});
   const [heabrewDetectionEnabled, setHeabrewDetectionEnabled] = useState(false);
   const [learningSoundEffectsEnabled, setLearningSoundEffectsEnabled] =
     useState(true);
@@ -18,6 +20,7 @@ const AppProvider = ({children}) => {
       setHeabrewDetectionEnabled(
         await AsyncStorageGetItem(heabrewEanbledItem, false),
       );
+      setSignWordsLearned(await AsyncStorageGetItem(learnedSignWordsItem, {}));
       setLoaded(true);
     };
 
@@ -31,8 +34,14 @@ const AppProvider = ({children}) => {
         learningSoundEffectsItem,
         learningSoundEffectsEnabled,
       );
+      AsyncStorageSetItem(learnedSignWordsItem, signWordsLearned);
     }
-  }, [heabrewDetectionEnabled, learningSoundEffectsEnabled, loaded]);
+  }, [
+    heabrewDetectionEnabled,
+    learningSoundEffectsEnabled,
+    signWordsLearned,
+    loaded,
+  ]);
 
   return (
     <AppContext.Provider
@@ -41,6 +50,8 @@ const AppProvider = ({children}) => {
         setHeabrewDetectionEnabled,
         learningSoundEffectsEnabled,
         setLearningSoundEffectsEnabled,
+        signWordsLearned,
+        setSignWordsLearned,
       }}>
       {children}
     </AppContext.Provider>
