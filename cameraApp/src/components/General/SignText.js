@@ -71,8 +71,10 @@ const SignText = (
           detectedLettersCount + 1,
           text.length - (detectedLettersCount + 1),
         );
-
-        if (onTextDetected) {
+        if (
+          onTextDetected &&
+          detectedLettersCount + 1 == text_no_spaces.length
+        ) {
           onTextDetected();
         }
       }

@@ -35,6 +35,7 @@ const get_last_word = str => {
   return words.length == 0 ? null : words[words.length - 1];
 };
 const heabrew_letters = 'ךףןםאבגדהוזחטיכלמנסעפצקרשתץ';
+const english_letters = 'abcdefghijklmnopqrstuvwxyz';
 const is_heabrew_text = text => {
   return (
     [...text].filter(x => x != ' ' && !heabrew_letters.includes(x)).length == 0
@@ -60,6 +61,26 @@ const to_heabrew_lower_case = he_text => {
     .join('');
 };
 
+const generate_word_from_letters = (letters, length) => {
+  let word = '';
+  for (let i = 0; i < length; i++) {
+    let random_letter = get_random_item_list(letters);
+    word += random_letter;
+  }
+  return word;
+};
+
+const get_random_word_noteq_prev_word = (prev_word, maxLength = 6) => {
+  const length = parseInt(Math.random() * 6) + 1;
+  const letters = is_english_text(prev_word)
+    ? [...english_letters]
+    : [...heabrew_letters].filter(x => x != ' ');
+  let rand_word = generate_word_from_letters(letters, length);
+  while (rand_word == prev_word)
+    rand_word = generate_word_from_letters(letters, length);
+  return rand_word;
+};
+
 module.exports = {
   getNumInStr,
   copyProps,
@@ -71,4 +92,5 @@ module.exports = {
   is_heabrew_text,
   is_english_text,
   to_heabrew_lower_case,
+  get_random_word_noteq_prev_word,
 };
