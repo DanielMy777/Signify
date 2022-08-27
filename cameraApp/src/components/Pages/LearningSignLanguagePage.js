@@ -40,17 +40,24 @@ import {GeneralIcon, VectorIconType} from '../General/Icons';
 let signTextHistory = '';
 let detectedCharsHistory = 0;
 let sentenceToTranslateHistory = '';
+let detectedWordHistory = false;
+let selectedWordIndexHistory = 0;
+let detectTypeHistory = DetectionType.LETTER;
 const wordsImagesData = signWordsImages.map((signWordImg, index) => ({
   word: signWordImg.word,
   index: index,
 }));
 const LearningSignLanguagePage = ({history = true}) => {
   const {signWordsLearned, setSignWordsLearned} = useContext(AppContext);
-  const [wordsLearning, setWordsLearning] = useState(false);
+  const [wordsLearning, setWordsLearning] = useState(
+    detectTypeHistory == DetectionType.WORD,
+  );
   const wordsLearningSharedValue = useSharedValue(false);
-  const [selectedWordIndex, setSelectedWordIndex] = useState(0);
+  const [selectedWordIndex, setSelectedWordIndex] = useState(
+    selectedWordIndexHistory,
+  );
   const selectedWordIndexSharedValue = useSharedValue(0);
-  const [detectedWord, setDetectedWord] = useState(false);
+  const [detectedWord, setDetectedWord] = useState(detectedWordHistory);
   const [text, setText] = useState(history ? sentenceToTranslateHistory : '');
   const [signText, setSignText] = useState(history ? signTextHistory : '');
   const {learningSoundEffectsEnabled} = useContext(AppContext);
@@ -59,9 +66,10 @@ const LearningSignLanguagePage = ({history = true}) => {
   const signTranslateViewHeight = 44,
     signTranslateViewHeightWhenKeyboardOpen = signTranslateViewHeight + 25;
   useEffect(() => {
-    if (history && signTextRef.current != undefined)
+    console.log('here bitch');
+    if (history && signTextRef.current != undefined && !wordsLearning)
       signTextRef.current.setDetectedLettersCount(detectedCharsHistory);
-  }, [signTextRef]);
+  }, [signTextRef, wordsLearning]);
 
   useEffect(() => {
     wordsLearningSharedValue.value = wordsLearning;
@@ -77,7 +85,9 @@ const LearningSignLanguagePage = ({history = true}) => {
       word = get_random_item_list(wordsImagesData);
 
     setSelectedWordIndex(word.index);
+    selectedWordIndexHistory = word.index;
     setDetectedWord(false);
+    detectedWordHistory = false;
   };
 
   const updateDetectedWordOnDetection = detect_obj => {
@@ -91,8 +101,10 @@ const LearningSignLanguagePage = ({history = true}) => {
       ) {
         //Tts.say(detect_obj.sign.char);
         play_random_sound();
+        detectedWordHistory = true;
         return true;
       }
+      detectedWordHistory = detectedWordPrev;
       return detectedWordPrev;
     });
   };
@@ -221,6 +233,7 @@ const LearningSignLanguagePage = ({history = true}) => {
                   return;
                 }
                 setSelectedWordIndex(data_obj.index);
+                selectedWordIndexHistory = data_obj.index;
                 setDetectedWord(false);
               }}
             />
@@ -256,10 +269,16 @@ const LearningSignLanguagePage = ({history = true}) => {
                 style={{
                   fontSize: 35,
                   bottom: 15,
-                  color: detectedWord ? 'white' : 'black',
+                  color:
+                    detectedWord && signWordsLearned[get_current_word()] == true
+                      ? 'white'
+                      : 'black',
                   paddingRight: 4,
                   paddingLeft: 4,
-                  backgroundColor: detectedWord ? 'green' : 'transparent',
+                  backgroundColor:
+                    detectedWord && signWordsLearned[get_current_word()] == true
+                      ? 'green'
+                      : 'transparent',
                 }}>
                 {signWordsImages[selectedWordIndex].word}
               </Text>
@@ -320,8 +339,10 @@ const LearningSignLanguagePage = ({history = true}) => {
           frameQuality={80}
           frameMaxSize={700}
           errorStyle={{top: '82%'}}
+          detectTypeDefault={detectTypeHistory}
           onDetectionTypeSwitch={new_type => {
             setWordsLearning(new_type == DetectionType.WORD);
+            detectTypeHistory = new_type;
           }}
           hebrewLanguage={
             (!wordsLearning && !is_english_text(signText)) ||

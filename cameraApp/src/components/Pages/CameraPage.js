@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import {StyleSheet, Text, View, ScrollView} from 'react-native';
 import {useSharedValue} from 'react-native-reanimated';
-import {EMPTY_SIGN} from '../../Detection/detection-constants';
+import {DetectionType, EMPTY_SIGN} from '../../Detection/detection-constants';
 import SignifyCamera from '../Camera/SignifyCamera';
 import {
   count_char_sequence_from_str_end,
@@ -29,7 +29,15 @@ let autoCorrectHistory = false;
 let detectSoundHistory = true;
 let predictedTextHistory = '';
 let is_heabrew = false;
-const CameraPage = ({style, CharMaxSequence = 2, history = true}) => {
+let selfiCameraHistory = true;
+let detectTypeHistory = DetectionType.LETTER;
+let cantSayWord = {};
+const CameraPage = ({
+  style,
+  CharMaxSequence = 2,
+  history = true,
+  timeoutBetweenSayingSameWord = 1500,
+}) => {
   const {heabrewDetectionEnabled} = useContext(AppContext);
   const [predictedText, setPredictedText] = useState('my name is o');
   const [googleTranslateEnabled, setGoogleTranslateEnabled] = useState(false);
@@ -67,13 +75,20 @@ const CameraPage = ({style, CharMaxSequence = 2, history = true}) => {
     autoCorrectHistory = val;
   };
 
-  const sayTextIfEnabled = text => {
+  const sayTextIfEnabled = (text, is_word) => {
     if (
       detectSoundEnabled.value &&
-      text != signToNotAllowInsertTwiceInARow.value
+      text != signToNotAllowInsertTwiceInARow.value &&
+      cantSayWord[text] != true
     ) {
       if (text != ' ') {
         Tts.say(text);
+        if (is_word) {
+          cantSayWord[text] = true;
+          setTimeout(() => {
+            cantSayWord[text] = false;
+          }, timeoutBetweenSayingSameWord);
+        }
       } else {
         play_random_sound();
       }
@@ -100,7 +115,7 @@ const CameraPage = ({style, CharMaxSequence = 2, history = true}) => {
       setPredictedText(prev => {
         const add_new_text = is_to_add_text(prev, res);
 
-        sayTextIfEnabled(res.sign.char);
+        sayTextIfEnabled(res.sign.char, is_word);
         add_if_word =
           is_word && prev != '' && get_str_last_char(prev) != ' ' ? ' ' : '';
 
@@ -180,10 +195,18 @@ const CameraPage = ({style, CharMaxSequence = 2, history = true}) => {
         frameQuality={50}
         detectSignFrames={1}
         hebrewLanguage={heabrewDetectionEnabled}
+        detectTypeDefault={detectTypeHistory}
+        onDetectionTypeSwitch={new_type => {
+          detectTypeHistory = new_type;
+        }}
         // onError={onError}
         errorStyle={{fontSize: 28, top: '88%'}}
         stableDetection={false}
         stableDetectionWords={true}
+        selfieCamera={selfiCameraHistory}
+        onCameraViewChanged={isSelfie => {
+          selfiCameraHistory = isSelfie;
+        }}
       />
       <View style={styles.predictedTextView}>
         <View style={styles.predictedTextTitleView}>
