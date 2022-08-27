@@ -29,6 +29,7 @@ import {
   is_english_text,
   is_heabrew_text,
   get_random_item_list,
+  get_random_word_noteq_prev_word,
 } from '../../Utils/utils';
 import {showWarning} from '../../Utils/pop-messages';
 import {signWordsImages} from '../../Utils/signWordImages';
@@ -43,11 +44,13 @@ let sentenceToTranslateHistory = '';
 let detectedWordHistory = false;
 let selectedWordIndexHistory = 0;
 let detectTypeHistory = DetectionType.LETTER;
+let randomTrainWords = false;
+let randomTrainLetters = false;
 const wordsImagesData = signWordsImages.map((signWordImg, index) => ({
   word: signWordImg.word,
   index: index,
 }));
-const LearningSignLanguagePage = ({history = true}) => {
+const LearningSignLanguagePage = ({history = true, randomDelay = 400}) => {
   const {signWordsLearned, setSignWordsLearned} = useContext(AppContext);
   const [wordsLearning, setWordsLearning] = useState(
     detectTypeHistory == DetectionType.WORD,
@@ -60,34 +63,59 @@ const LearningSignLanguagePage = ({history = true}) => {
   const [detectedWord, setDetectedWord] = useState(detectedWordHistory);
   const [text, setText] = useState(history ? sentenceToTranslateHistory : '');
   const [signText, setSignText] = useState(history ? signTextHistory : '');
+  const [randomTrain, setRandomTrain] = useState(false);
+  const randomTrainSharedValue = useSharedValue(false);
   const {learningSoundEffectsEnabled} = useContext(AppContext);
   const keyboardOpen = useKeyBoardOpen();
   const signTextRef = useRef(undefined);
   const signTranslateViewHeight = 44,
     signTranslateViewHeightWhenKeyboardOpen = signTranslateViewHeight + 25;
+
   useEffect(() => {
-    console.log('here bitch');
     if (history && signTextRef.current != undefined && !wordsLearning)
       signTextRef.current.setDetectedLettersCount(detectedCharsHistory);
   }, [signTextRef, wordsLearning]);
 
   useEffect(() => {
+    randomTrainSharedValue.value = randomTrain;
+  }, [randomTrain]);
+
+  useEffect(() => {
     wordsLearningSharedValue.value = wordsLearning;
+    setRandomTrain(wordsLearning ? randomTrainWords : randomTrainLetters);
   }, [wordsLearning]);
 
   useEffect(() => {
     selectedWordIndexSharedValue.value = selectedWordIndex;
   }, [selectedWordIndex]);
 
-  const selectRandomWord = () => {
-    let word = get_random_item_list(wordsImagesData);
-    while (word.index == selectedWordIndex && wordsImagesData.length > 1)
-      word = get_random_item_list(wordsImagesData);
+  const updateRandomTrain = value => {
+    setRandomTrain(value);
+    if (wordsLearning) randomTrainWords = value;
+    else randomTrainLetters = value;
+  };
 
-    setSelectedWordIndex(word.index);
-    selectedWordIndexHistory = word.index;
+  const updateWordIndex = word_index => {
+    setSelectedWordIndex(word_index);
+    selectedWordIndexHistory = word_index;
     setDetectedWord(false);
     detectedWordHistory = false;
+  };
+
+  const selectRandomWord = () => {
+    let word = get_random_item_list(wordsImagesData);
+    while (
+      word.index == selectedWordIndexSharedValue.value &&
+      wordsImagesData.length > 1
+    )
+      word = get_random_item_list(wordsImagesData);
+    updateWordIndex(word.index);
+  };
+
+  const selectRandomLetters = () => {
+    const rand_letters = get_random_word_noteq_prev_word(text);
+    setText(rand_letters);
+    updateSignText(rand_letters);
   };
 
   const updateDetectedWordOnDetection = detect_obj => {
@@ -102,6 +130,9 @@ const LearningSignLanguagePage = ({history = true}) => {
         //Tts.say(detect_obj.sign.char);
         play_random_sound();
         detectedWordHistory = true;
+        if (randomTrainSharedValue.value) {
+          setTimeout(selectRandomWord, randomDelay);
+        }
         return true;
       }
       detectedWordHistory = detectedWordPrev;
@@ -112,7 +143,11 @@ const LearningSignLanguagePage = ({history = true}) => {
   const updateLearnedWordsOnDetection = detect_obj => {
     setSignWordsLearned(words_learend => {
       const word = detect_obj.sign.char;
-      if (words_learend[word] == true) return words_learend;
+      if (
+        words_learend[word] == true ||
+        word != wordsImagesData[selectedWordIndexSharedValue.value].word
+      )
+        return words_learend;
       let words_learned_updated = {...words_learend};
       words_learned_updated[word] = true;
       return words_learned_updated;
@@ -127,8 +162,8 @@ const LearningSignLanguagePage = ({history = true}) => {
         }
         signTextRef.current.detect_letter(detect_obj.sign.char);
       } else if (wordsLearningSharedValue.value == true) {
-        updateDetectedWordOnDetection(detect_obj);
         updateLearnedWordsOnDetection(detect_obj);
+        updateDetectedWordOnDetection(detect_obj);
       }
     },
     [signTextRef],
@@ -139,14 +174,18 @@ const LearningSignLanguagePage = ({history = true}) => {
     detectedCharsHistory += 1;
   };
 
+  const updateSignText = text => {
+    setSignText(text);
+    signTextHistory = text;
+    detectedCharsHistory = 0;
+  };
+
   const onTranslateButtonPressed = () => {
     if (!is_english_text(text) && !is_heabrew_text(text)) {
       showWarning('text must be english or heabrew no mixing', 1000);
       return;
     }
-    setSignText(text);
-    signTextHistory = text;
-    detectedCharsHistory = 0;
+    updateSignText(text);
     Keyboard.dismiss();
     signTextRef.current.clear_detected_letters();
   };
@@ -232,18 +271,16 @@ const LearningSignLanguagePage = ({history = true}) => {
                   console.log('problem with index in DropDown learning page');
                   return;
                 }
-                setSelectedWordIndex(data_obj.index);
-                selectedWordIndexHistory = data_obj.index;
-                setDetectedWord(false);
+                updateWordIndex(data_obj.index);
               }}
             />
 
-            <PressableOpacity onPress={selectRandomWord}>
+            <PressableOpacity onPress={() => updateRandomTrain(!randomTrain)}>
               <GeneralIcon
                 size={30}
                 Type={VectorIconType.FontAwesome}
                 name="random"
-                color="black"
+                color={randomTrain ? 'black' : 'gray'}
               />
             </PressableOpacity>
           </View>
@@ -295,14 +332,25 @@ const LearningSignLanguagePage = ({history = true}) => {
               placeholder="sentence to translate"
               onSubmitEditing={onTranslateButtonPressed}
             />
+
             <PressableOpacity
-              style={styles.button}
               disabledOpacity={0.4}
               onPress={onTranslateButtonPressed}>
               <FontAwesome
                 name="american-sign-language-interpreting"
                 color="black"
                 size={40}
+              />
+            </PressableOpacity>
+
+            <PressableOpacity
+              style={{marginLeft: 5}}
+              onPress={() => updateRandomTrain(!randomTrain)}>
+              <GeneralIcon
+                size={30}
+                Type={VectorIconType.FontAwesome}
+                name="random"
+                color={randomTrain ? 'black' : 'gray'}
               />
             </PressableOpacity>
 
@@ -326,6 +374,11 @@ const LearningSignLanguagePage = ({history = true}) => {
               text={signText}
               ref={signTextRef}
               onLetterDetected={onLetterDetected}
+              onTextDetected={() => {
+                if (randomTrain) {
+                  setTimeout(selectRandomLetters, randomDelay);
+                }
+              }}
             />
           </ScrollView>
         </View>
