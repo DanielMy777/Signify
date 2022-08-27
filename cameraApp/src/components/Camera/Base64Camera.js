@@ -32,7 +32,7 @@ function scanQRCodes(
     rotation_degree,
   );
 }
-
+let frontCameraHistory = false;
 const Base64Camera = React.forwardRef(
   (
     {
@@ -45,12 +45,14 @@ const Base64Camera = React.forwardRef(
       rotationObject = normal_rotation_obj,
       rightMaterialIconsButtons,
       rightButtonsSize = 40,
+      selfieCamera = true,
+      onCameraViewChanged,
     },
     ref,
   ) => {
-    const [frontCamera, setFrontCamera] = useState(true);
+    const [frontCamera, setFrontCamera] = useState(selfieCamera);
     const orientation_obj = useSharedValue('null');
-    const isFrontCamera = useSharedValue(true);
+    const isFrontCamera = useSharedValue(selfieCamera);
     useEffect(() => {
       const update_orientation = value => {
         orientation_obj.value = value;
@@ -64,6 +66,7 @@ const Base64Camera = React.forwardRef(
     const flipCamera = () => {
       setFrontCamera(!frontCamera);
       isFrontCamera.value = !isFrontCamera.value;
+      if (onCameraViewChanged) onCameraViewChanged(!frontCamera);
     };
 
     const convert_button_icon_obj_to_element = (icon_button, index) => {

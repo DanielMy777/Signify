@@ -42,6 +42,9 @@ const SignifyCamera = ({
   stableDetection = false,
   stableDetectionWords = false,
   onDetectionTypeSwitch,
+  detectTypeDefault = DetectionType.LETTER,
+  selfieCamera = true,
+  onCameraViewChanged,
 }) => {
   const [cameraPermission, setCameraPermission] = useState(undefined);
   const [handRect, setHandsRect] = useState(UN_DETECTED_HANDS);
@@ -49,7 +52,7 @@ const SignifyCamera = ({
   const frameNumber = useSharedValue(0);
   const [detectedChar, setDetectedChar] = useState('');
   const [errorText, setErrorText] = useState('');
-  const detectType = useSharedValue(DetectionType.LETTER);
+  const detectType = useSharedValue(detectTypeDefault);
   const device_orientation = useDeviceOrientation();
   const reRender = useForceRender();
   const isHeabrew = useSharedValue(false);
@@ -185,7 +188,8 @@ const SignifyCamera = ({
       const fnumber = updateGetFrameNumber();
       const middleFrame = Math.ceil(frameProcessorFps / 2);
       const detectSignMethod =
-        (fnumber == 1 || (fnumber == frameProcessorFps && false)) &&
+        (fnumber == 1 ||
+          (fnumber == middleFrame && detectType.value == DetectionType.WORD)) &&
         detectSignFrames !== 0 &&
         (!stableDetect ||
           // detectLetterLock == false ?is it good no one know no one
@@ -259,6 +263,8 @@ const SignifyCamera = ({
       {cameraPermission && (
         <View style={styles.container}>
           <Base64Camera
+            selfieCamera={selfieCamera}
+            onCameraViewChanged={onCameraViewChanged}
             handle_frame={upload_img}
             handsOk={handRect.detected}
             frameProcessorFps={frameProcessorFps}

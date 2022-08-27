@@ -1,7 +1,8 @@
-import {View, StyleSheet, Text} from 'react-native';
+import {View, StyleSheet, Alert} from 'react-native';
 import React, {useState, useContext} from 'react';
 import {AnimatedBackground} from '../General/AnimatedBackground';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import AwesomeButtonRick from 'react-native-really-awesome-button/src/themes/rick';
 import {AppContext} from '../../Context/AppContext';
 
 const SettingsPage = () => {
@@ -10,7 +11,22 @@ const SettingsPage = () => {
     setHeabrewDetectionEnabled,
     learningSoundEffectsEnabled,
     setLearningSoundEffectsEnabled,
+    setSignWordsLearned,
   } = useContext(AppContext);
+
+  const onDeleteProgressPress = () => {
+    Alert.alert('Delete words progress', 'are you sure?', [
+      {
+        text: 'Yes',
+        onPress: () => {
+          setSignWordsLearned({});
+        },
+      },
+      {
+        text: 'No',
+      },
+    ]);
+  };
   return (
     <AnimatedBackground animation={false}>
       <View style={styles.container}>
@@ -38,6 +54,20 @@ const SettingsPage = () => {
           isChecked={learningSoundEffectsEnabled}
           style={{marginTop: 20}}
         />
+        <AwesomeButtonRick
+          type="primary"
+          style={styles.deleteProgressButton}
+          onPress={onDeleteProgressPress}
+          backgroundColor="#fcf003"
+          textColor={'black'}
+          textSize={30}
+          stretch={true}
+          backgroundDarker="#fcca03"
+          backgroundShadow={null}
+          //style={style}
+        >
+          Erase Progress
+        </AwesomeButtonRick>
       </View>
     </AnimatedBackground>
   );
@@ -54,6 +84,10 @@ const styles = StyleSheet.create({
     fontSize: 25,
     color: 'black',
     textDecorationLine: 'none',
+  },
+  deleteProgressButton: {
+    width: '80%',
+    top: 20,
   },
 });
 export default SettingsPage;
