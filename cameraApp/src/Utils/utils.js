@@ -56,6 +56,7 @@ const to_heabrew_lower_case = he_text => {
       if (current_letter == 'ך') current_letter = 'ח';
       if (current_letter == 'ץ') current_letter = 'צ';
       if (current_letter == 'ף') current_letter = 'פ';
+      if (current_letter == 'ם') current_letter = 'מ';
       return current_letter;
     })
     .join('');
