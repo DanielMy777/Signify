@@ -245,7 +245,7 @@ const SignifyCamera = ({
       if (onHandsDetection) onHandsDetection(detect_res);
       if (detectSignMethod) {
         updateResultsByLanguage(detect_res);
-        if (onSignDetection) onSignDetection(detect_res);
+        if (onSignDetection) await onSignDetection(detect_res);
         setDetectedChar(detect_res.sign.char);
       }
     },
