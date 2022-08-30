@@ -25,6 +25,7 @@ import {VectorIconType} from '../General/Icons';
 import {correct_sentence} from '../../Utils/correct-sentence';
 import {AppContext} from '../../Context/AppContext';
 import Languages from '../../Utils/Languages';
+import {showWarning} from '../../Utils/pop-messages';
 let autoCorrectHistory = false;
 let detectSoundHistory = true;
 let predictedTextHistory = '';
@@ -39,7 +40,9 @@ const CameraPage = ({
   timeoutBetweenSayingSameWord = 1500,
 }) => {
   const {heabrewDetectionEnabled} = useContext(AppContext);
-  const [predictedText, setPredictedText] = useState('my name is o');
+  const [predictedText, setPredictedText] = useState(predictedTextHistory);
+  const predictedTextSharedValue = useSharedValue(predictedTextHistory);
+
   const [googleTranslateEnabled, setGoogleTranslateEnabled] = useState(false);
   const detectSoundEnabled = useSharedValue(detectSoundHistory);
   const autoCorrectEnabled = useSharedValue(autoCorrectHistory);
@@ -50,6 +53,7 @@ const CameraPage = ({
 
   useEffect(() => {
     predictedTextHistory = predictedText;
+    predictedTextSharedValue.value = predictedText;
   }, [predictedText]);
 
   useEffect(() => {
@@ -106,32 +110,38 @@ const CameraPage = ({
     return add_new_text;
   };
 
-  const onSignDetection = useCallback(res => {
+  const onSignDetection = useCallback(async res => {
     is_word = res.sign.is_word;
     if (
       res.sign.char != EMPTY_SIGN &&
       signToNotAllowInsertTwiceInARow.value != res.sign.char
     ) {
-      setPredictedText(prev => {
-        const add_new_text = is_to_add_text(prev, res);
+      const prev = predictedTextSharedValue.value;
+      const add_new_text = is_to_add_text(prev, res);
 
-        sayTextIfEnabled(res.sign.char, is_word);
-        add_if_word =
-          is_word && prev != '' && get_str_last_char(prev) != ' ' ? ' ' : '';
-
-        if (
-          add_new_text &&
-          !is_word &&
-          autoCorrectEnabled.value &&
-          prev.length > 0 &&
-          get_str_last_char(prev) !== ' ' &&
-          res.sign.char === ' '
-        ) {
-          const PRINT_MATCHES = true;
-          return correct_sentence(prev, 3, !PRINT_MATCHES) + ' ';
+      add_if_word =
+        is_word && prev != '' && get_str_last_char(prev) != ' ' ? ' ' : '';
+      if (
+        add_new_text &&
+        !is_word &&
+        autoCorrectEnabled.value &&
+        prev.length > 0 &&
+        get_str_last_char(prev) !== ' ' &&
+        res.sign.char === ' '
+      ) {
+        const PRINT_MATCHES = true;
+        try {
+          const fixed_sentece = await correct_sentence(prev, 0, PRINT_MATCHES);
+          setPredictedText(fixed_sentece + ' ');
+        } catch (e) {
+          console.log(e);
+          if (e.msg) showWarning(e.msg);
+          setPredictedText(prev + ' ');
         }
-        return add_new_text ? prev + add_if_word + res.sign.char : prev;
-      });
+      } else if (add_new_text) {
+        setPredictedText(prev + add_if_word + res.sign.char);
+      }
+      sayTextIfEnabled(res.sign.char, is_word);
     }
 
     signToNotAllowInsertTwiceInARow.value =
@@ -200,7 +210,7 @@ const CameraPage = ({
           detectTypeHistory = new_type;
         }}
         // onError={onError}
-        errorStyle={{fontSize: 28, top: '88%'}}
+        errorStyle={{fontSize: 28, top: '85%'}}
         stableDetection={false}
         stableDetectionWords={true}
         selfieCamera={selfiCameraHistory}
@@ -249,10 +259,12 @@ const styles = StyleSheet.create({
   },
   camera: {
     position: 'absolute',
-    top: '0%',
-    left: '0%',
-    width: '100%',
+    top: '1%',
+    left: '2%',
+    width: '97%',
     height: '60%',
+    borderRadius: 20,
+    overflow: 'hidden',
   },
   predictedText: {
     marginTop: 5,
@@ -278,6 +290,7 @@ const styles = StyleSheet.create({
   predictedTextTitle: {
     fontSize: 23,
     fontFamily: FontName.BerlinSans,
+    color: 'black',
   },
   bottomButtons: {
     position: 'absolute',

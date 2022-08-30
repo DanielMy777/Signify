@@ -205,7 +205,7 @@ const LearningSignLanguagePage = ({history = true, randomDelay = 400}) => {
     [keyboardOpen],
   );
   styles.camera_style.top = sign_translate_view_height_current + 3 + '%';
-  styles.camera_style.height = 97 - signTranslateViewHeight + '%';
+  styles.camera_style.height = 96 - signTranslateViewHeight + '%';
   const setTextFixed = text => {
     setText(text);
     sentenceToTranslateHistory = text;
@@ -391,7 +391,7 @@ const LearningSignLanguagePage = ({history = true, randomDelay = 400}) => {
           detectSignFrames={1}
           frameQuality={80}
           frameMaxSize={700}
-          errorStyle={{top: '82%'}}
+          errorStyle={{top: '82%', fontSize: 30}}
           detectTypeDefault={detectTypeHistory}
           onDetectionTypeSwitch={new_type => {
             setWordsLearning(new_type == DetectionType.WORD);
@@ -430,6 +430,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '40%',
     height: '60%',
+    left: '1%',
+    width: '98%',
+    borderRadius: 20,
+    overflow: 'hidden',
     //transform: [{rotate: '360deg'}],
   },
   signTranslateView: {

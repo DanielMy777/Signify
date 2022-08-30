@@ -20,13 +20,19 @@ class NetworkException extends Exception {
   }
 }
 
-async function http_method(url, method = HttpMethod.GET, data, timeout = 1000) {
+async function http_method(
+  url,
+  method = HttpMethod.GET,
+  data,
+  timeout = 1000,
+  extra_headers = {undefined},
+) {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
   const response = await fetch(url, {
     method: method,
     body: data ? JSON.stringify(data) : undefined,
-    headers: {'Content-Type': 'application/json'},
+    headers: {'Content-Type': 'application/json', ...extra_headers},
     signal: controller.signal,
   });
   clearTimeout(id);
