@@ -135,7 +135,7 @@ const CameraPage = ({
           setPredictedText(fixed_sentece + ' ');
         } catch (e) {
           console.log(e);
-          if (e.msg) showWarning(e.msg);
+          if (e.msg) showWarning(e.msg, 2000);
           setPredictedText(prev + ' ');
         }
       } else if (add_new_text) {

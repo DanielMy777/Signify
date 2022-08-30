@@ -18,7 +18,7 @@ class AutoCorrect {
   async get_words_to_fix(sentence) {
     try {
       const matches = await http_method(
-        `${bingAutoCorrectApiUrl}?mode=spell&text=${sentence.toLowerCase()}`,
+        `${bingAutoCorrectApiUrl}?mode=spell&mkt=en-us&text=${sentence.toLowerCase()}`,
         HttpMethod.POST,
         undefined,
         1000,
