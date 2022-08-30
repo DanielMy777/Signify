@@ -7,6 +7,7 @@ import Orientation from 'react-native-orientation-locker';
 import KeepAwake from 'react-native-keep-awake';
 import HomePageButtons from '../General/HomePageButtons';
 import {VectorIconType} from '../General/Icons';
+import Testify from '../../Utils/test';
 
 const HomePage = () => {
   const navigation = useNavigation();

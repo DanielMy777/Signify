@@ -131,7 +131,7 @@ const CameraPage = ({
       ) {
         const PRINT_MATCHES = true;
         try {
-          const fixed_sentece = await correct_sentence(prev, 0, PRINT_MATCHES);
+          const fixed_sentece = await correct_sentence(prev, PRINT_MATCHES);
           setPredictedText(fixed_sentece + ' ');
         } catch (e) {
           console.log(e);

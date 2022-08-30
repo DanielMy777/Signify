@@ -15,10 +15,10 @@ class AutoCorrect {
     return dict.has(word);
   }
 
-  async get_best_match_by_api(word) {
+  async get_words_to_fix(sentence) {
     try {
       const matches = await http_method(
-        `${bingAutoCorrectApiUrl}?mkt=en-US&mode=proof&text=${word.toLowerCase()}`,
+        `${bingAutoCorrectApiUrl}?mode=spell&text=${sentence.toLowerCase()}`,
         HttpMethod.POST,
         undefined,
         1000,
@@ -30,9 +30,12 @@ class AutoCorrect {
 
       if (matches_array.length == 0) {
         //  console.log('suggestion array is empty');
-        return word; //no need to fix
+        return []; //no need to fix
       }
-      return matches_array[0].suggestions[0].suggestion;
+      return matches_array.map(fix_obj => ({
+        word: fix_obj.token,
+        fixed_word: fix_obj.suggestions[0].suggestion,
+      }));
     } catch (e) {
       if (e.msg && e.msg.error) {
         if (e.msg.error.message.includes('invalid subscription key'))
@@ -66,16 +69,5 @@ class AutoCorrect {
     return ret;
   }
 }
-
-const autoc = new AutoCorrect();
-const meow = async () => {
-  try {
-    // const response = await autoc.get_best_match_by_api('nname');
-    // console.log(response);
-  } catch (e) {
-    console.log(e);
-  }
-};
-meow();
 
 export {AutoCorrect};

@@ -2,27 +2,19 @@ import {AutoCorrect} from './auto-correct';
 
 const auto_correct = new AutoCorrect();
 
-const correct_sentence = async (
-  sentence,
-  number_of_matches,
-  print_matches_flag,
-) => {
-  let correct_text = sentence;
-  const words = sentence.split(' ');
-  const last_word = words.length == 0 ? null : words[words.length - 1];
-  if (
-    last_word !== null &&
-    last_word !== '' &&
-    !auto_correct.is_word_correct(last_word)
-  ) {
-    const bestMatch = await auto_correct.get_best_match_by_api(last_word);
-    //console.log(bestMatch);
-    if (print_matches_flag) {
-      console.log(`matches are : ${bestMatch}`);
-    }
-    correct_text = words.slice(0, words.length - 1).join(' ') + ' ' + bestMatch;
-  }
-
+const correct_sentence = async (sentence, print_matches_flag) => {
+  let correct_text = sentence.toUpperCase();
+  let fixes = await auto_correct.get_words_to_fix(sentence);
+  if (print_matches_flag && fixes.length == 0)
+    console.log('no fix matches found');
+  console.log('matches are:');
+  fixes.forEach(correct_obj => {
+    if (print_matches_flag) console.log(correct_obj);
+    correct_text = correct_text.replace(
+      correct_obj.word.toUpperCase(),
+      correct_obj.fixed_word.toUpperCase(),
+    );
+  });
   return correct_text;
 };
 
