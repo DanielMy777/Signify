@@ -245,8 +245,12 @@ const SignifyCamera = ({
       if (onHandsDetection) onHandsDetection(detect_res);
       if (detectSignMethod) {
         updateResultsByLanguage(detect_res);
-        if (onSignDetection) await onSignDetection(detect_res);
-        setDetectedChar(detect_res.sign.char);
+        let showDetectedChar = true;
+        if (onSignDetection)
+          await onSignDetection(detect_res, () => {
+            showDetectedChar = false;
+          });
+        setDetectedChar(showDetectedChar !== false ? detect_res.sign.char : '');
       }
     },
     [detectSignFrames, updateGetFrameNumber],
