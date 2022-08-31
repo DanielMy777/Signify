@@ -50,7 +50,7 @@ const wordsImagesData = signWordsImages.map((signWordImg, index) => ({
   word: signWordImg.word,
   index: index,
 }));
-const LearningSignLanguagePage = ({history = true, randomDelay = 400}) => {
+const LearningSignLanguagePage = ({history = true, randomDelay = 600}) => {
   const {signWordsLearned, setSignWordsLearned} = useContext(AppContext);
   const [wordsLearning, setWordsLearning] = useState(
     detectTypeHistory == DetectionType.WORD,
@@ -78,6 +78,10 @@ const LearningSignLanguagePage = ({history = true, randomDelay = 400}) => {
 
   useEffect(() => {
     randomTrainSharedValue.value = randomTrain;
+    if (wordsLearning) {
+      setDetectedWord(false);
+      detectedWordHistory = false;
+    }
   }, [randomTrain]);
 
   useEffect(() => {
@@ -118,14 +122,21 @@ const LearningSignLanguagePage = ({history = true, randomDelay = 400}) => {
     updateSignText(rand_letters);
   };
 
+  const get_current_shared_word = () => {
+    if (
+      selectedWordIndexSharedValue.value >= 0 &&
+      selectedWordIndexSharedValue.value < wordsImagesData.length
+    ) {
+      return wordsImagesData[selectedWordIndexSharedValue.value].word;
+    }
+    return undefined;
+  };
+
   const updateDetectedWordOnDetection = detect_obj => {
     setDetectedWord(detectedWordPrev => {
       if (
         !detectedWordPrev &&
-        selectedWordIndexSharedValue.value >= 0 &&
-        selectedWordIndexSharedValue.value < wordsImagesData.length &&
-        detect_obj.sign.char ==
-          wordsImagesData[selectedWordIndexSharedValue.value].word
+        detect_obj.sign.char == get_current_shared_word()
       ) {
         //Tts.say(detect_obj.sign.char);
         play_random_sound();
@@ -143,11 +154,9 @@ const LearningSignLanguagePage = ({history = true, randomDelay = 400}) => {
   const updateLearnedWordsOnDetection = detect_obj => {
     setSignWordsLearned(words_learend => {
       const word = detect_obj.sign.char;
-      if (
-        words_learend[word] == true ||
-        word != wordsImagesData[selectedWordIndexSharedValue.value].word
-      )
+      if (words_learend[word] == true || word != get_current_shared_word()) {
         return words_learend;
+      }
       let words_learned_updated = {...words_learend};
       words_learned_updated[word] = true;
       return words_learned_updated;
@@ -155,7 +164,7 @@ const LearningSignLanguagePage = ({history = true, randomDelay = 400}) => {
   };
 
   const onSignDetection = useCallback(
-    detect_obj => {
+    (detect_obj, dontShowDetectedWord) => {
       if (wordsLearningSharedValue.value == false) {
         if (!signTextRef.current) {
           return;
@@ -164,6 +173,9 @@ const LearningSignLanguagePage = ({history = true, randomDelay = 400}) => {
       } else if (wordsLearningSharedValue.value == true) {
         updateLearnedWordsOnDetection(detect_obj);
         updateDetectedWordOnDetection(detect_obj);
+        if (get_current_shared_word() != detect_obj.sign.char) {
+          dontShowDetectedWord();
+        }
       }
     },
     [signTextRef],
