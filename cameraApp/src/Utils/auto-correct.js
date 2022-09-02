@@ -42,6 +42,7 @@ class AutoCorrect {
           e.msg.error.message = 'invalid api key';
         throw new Exception(e.msg.error.message);
       }
+      console.log(e);
       throw new NetworkException('couldnt reach api server');
     }
   }

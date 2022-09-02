@@ -45,6 +45,12 @@ const SignText = (
       clear_detected_letters: () => {
         setDetectedLettersCount(0);
       },
+      is_all_detected: () => {
+        return (
+          detectedLettersCount ==
+          [...text].filter(x => x != ' ' && x != '\n').length
+        );
+      },
     };
   });
 
