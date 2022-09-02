@@ -78,9 +78,15 @@ const LearningSignLanguagePage = ({history = true, randomDelay = 600}) => {
 
   useEffect(() => {
     randomTrainSharedValue.value = randomTrain;
-    if (wordsLearning) {
-      setDetectedWord(false);
-      detectedWordHistory = false;
+    if (wordsLearning && detectedWord && randomTrain) {
+      selectRandomWord();
+    } else if (
+      randomTrain &&
+      !wordsLearning &&
+      signTextRef.current != undefined &&
+      signTextRef.current.is_all_detected()
+    ) {
+      selectRandomLetters();
     }
   }, [randomTrain]);
 

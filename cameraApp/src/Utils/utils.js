@@ -1,3 +1,4 @@
+import {english_dict, heabrew_dict} from './words-dictionaries';
 const getNumInStr = numPercent => {
   numPercent = numPercent + '';
   return parseInt([...numPercent].filter(c => c >= '0' && c <= '9').join(''));
@@ -72,13 +73,14 @@ const generate_word_from_letters = (letters, length) => {
 };
 
 const get_random_word_noteq_prev_word = (prev_word, maxLength = 6) => {
-  const length = parseInt(Math.random() * 6) + 1;
-  const letters = is_english_text(prev_word)
-    ? [...english_letters]
-    : [...heabrew_letters].filter(x => x != ' ');
-  let rand_word = generate_word_from_letters(letters, length);
+  const english_text = is_english_text(prev_word);
+  let rand_word = get_random_item_list(
+    english_text ? english_dict : heabrew_dict,
+  );
   while (rand_word == prev_word)
-    rand_word = generate_word_from_letters(letters, length);
+    rand_word = get_random_item_list(
+      english_text ? english_dict : heabrew_dict,
+    );
   return rand_word;
 };
 
