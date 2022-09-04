@@ -319,7 +319,7 @@ const LearningSignLanguagePage = ({
           {selectedWordIndex >= 0 &&
             selectedWordIndex <= signWordsImages.length && (
               <Image
-                source={signWordsImages[selectedWordIndex].img}
+                source={{uri: signWordsImages[selectedWordIndex].url}}
                 style={{
                   zIndex: 10000,
                   // position: 'absolute',
