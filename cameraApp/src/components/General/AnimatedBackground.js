@@ -131,7 +131,7 @@ export const AnimatedBackground = ({
           style={[styles.image, {transform: [{translateY: translateX}]}]}>
           <Image
             style={styles.image}
-            source={require('../../../resources/images/SignifyScreen.jpg')}
+            source={{uri: 'asset:/SignifyScreen.jpg'}}
             resizeMode="stretch"
           />
         </Animated.View>
