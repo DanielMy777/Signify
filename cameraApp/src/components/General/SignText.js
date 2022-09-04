@@ -39,11 +39,18 @@ const SignText = (
 
   useImperativeHandle(ref, () => {
     return {
+      get_text: () => {
+        return text;
+      },
       detect_letter: detect_letter,
       get_detected_letters_count: get_detected_letters_count,
       setDetectedLettersCount: setDetectedLettersCount,
       clear_detected_letters: () => {
         setDetectedLettersCount(0);
+      },
+      get_last_char: () => {
+        if (!text || text.length == 0) return undefined;
+        return text[text.length - 1];
       },
       is_all_detected: () => {
         return (

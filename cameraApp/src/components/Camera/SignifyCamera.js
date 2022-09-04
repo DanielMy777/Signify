@@ -90,6 +90,9 @@ const SignifyCamera = ({
     ) {
       detect_res.sign.char = '!';
     }
+    if (detect_res.sign.char == null || !detect_res.sign.char) {
+      detect_res.sign.char = '';
+    }
   };
 
   const detectedTextStyle = useMemo(() => {
