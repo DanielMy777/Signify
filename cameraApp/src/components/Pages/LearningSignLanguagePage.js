@@ -50,7 +50,11 @@ const wordsImagesData = signWordsImages.map((signWordImg, index) => ({
   word: signWordImg.word,
   index: index,
 }));
-const LearningSignLanguagePage = ({history = true, randomDelay = 600}) => {
+const LearningSignLanguagePage = ({
+  history = true,
+  randomDelay = 600,
+  stableDetectedLetters = false,
+}) => {
   const {signWordsLearned, setSignWordsLearned} = useContext(AppContext);
   const [wordsLearning, setWordsLearning] = useState(
     detectTypeHistory == DetectionType.WORD,
@@ -176,6 +180,15 @@ const LearningSignLanguagePage = ({history = true, randomDelay = 600}) => {
           return;
         }
         signTextRef.current.detect_letter(detect_obj.sign.char);
+        const show_letter =
+          signTextRef.current.get_text() &&
+          signTextRef.current
+            .get_text()
+            .toUpperCase()
+            .includes(detect_obj.sign.char);
+        if (!show_letter && stableDetectedLetters) {
+          dontShowDetectedWord();
+        }
       } else if (wordsLearningSharedValue.value == true) {
         updateLearnedWordsOnDetection(detect_obj);
         updateDetectedWordOnDetection(detect_obj);
