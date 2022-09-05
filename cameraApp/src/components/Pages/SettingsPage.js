@@ -35,7 +35,7 @@ const SettingsPage = () => {
           fillColor="black"
           unfillColor="#FFFFFF"
           isChecked={heabrewDetectionEnabled}
-          text="Heabrew Live Detection"
+          text="Hebrew Live Detection"
           iconStyle={{borderColor: 'black'}}
           iconInnerStyle={{borderWidth: 2}}
           textStyle={styles.text}
