@@ -22,7 +22,7 @@ const local_data = [
   },
   {
     value: 'HE',
-    lable: 'Heabrew',
+    lable: 'Hebrew',
   },
 ];
 
